@@ -35,12 +35,14 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import de.jonasrottmann.realmbrowser.RealmBrowser;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener {
     private Context activityContext;
@@ -143,6 +145,16 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                 .build();
 
         drawerResult.addStickyFooterItem(item0);
+        //更换个性化背景图
+        try (Realm realm = Realm.getDefaultInstance()) {
+            CurrentUser currentUser = realm.where(CurrentUser.class).findFirst();
+            if (currentUser.getPics().size() > 0) {
+                Picasso.with(activityContext)
+                        .load(PPHelper.get80ImageUrl(currentUser.getPics().get(0).getNetFileName()))
+                        .into(headerResult.getHeaderBackgroundView());
+            }
+        }
+
         updateProfile();
 
         //创建moment按钮监控
@@ -167,6 +179,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         switch ((int) drawerItem.getIdentifier()) {
             case 0:
                 //logout
+                PPHelper.setPrefBooleanValue("autoLogin", false);
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
                 break;

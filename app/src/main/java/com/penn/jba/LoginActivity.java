@@ -1,22 +1,20 @@
 package com.penn.jba;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.penn.jba.databinding.ActivityLoginBinding;
-import com.penn.jba.util.InfoType;
 import com.penn.jba.util.PPHelper;
 
 import java.util.ArrayList;
@@ -28,7 +26,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Function3;
 import io.reactivex.schedulers.Schedulers;
 
 public class LoginActivity extends AppCompatActivity {
@@ -38,6 +35,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private ArrayList<Disposable> disposableList = new ArrayList<Disposable>();
 
+    private SharedPreferences pref;
+    private SharedPreferences.Editor meditor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
         activityContext = this;
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         binding.setPresenter(this);
+        pref = PreferenceManager.getDefaultSharedPreferences(activityContext);
         //end common
 
         //设置键盘返回键的快捷方式
@@ -144,27 +145,44 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 })
         );
+
+        if (PPHelper.getPrefBooleanValue("autoLogin")) {
+            autoLogin();
+        }
     }
 
     //-----help-----
-    public void signIn() {
+    private void autoLogin() {
+        binding.phoneEt.setText(PPHelper.getPrefStringValue("phone"));
+        binding.passwordEt.setText(PPHelper.getPrefStringValue("pwd"));
+        signIn();
+    }
+
+
+    private void signIn() {
         PPHelper.showLoading(activityContext);
         try {
-            PPHelper.signIn(binding.phoneEt.getText().toString(), binding.passwordEt.getText().toString())
+            final String phone = binding.phoneEt.getText().toString();
+            final String pwd = binding.passwordEt.getText().toString();
+            PPHelper.signIn(phone, pwd)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<String>() {
                         @Override
                         public void accept(String s) throws Exception {
-                            //pptodo go next activity
+                            PPHelper.setPrefBooleanValue("autoLogin", true);
+                            PPHelper.setPrefStringValue("phone", phone);
+                            PPHelper.setPrefStringValue("pwd", pwd);
+
                             Intent intent = new Intent(activityContext, TabsActivity.class);
                             startActivity(intent);
-                            
+
                             PPHelper.endLoading();
                         }
                     }, new Consumer<Throwable>() {
                         @Override
                         public void accept(Throwable throwable) throws Exception {
+                            PPHelper.setPrefBooleanValue("autoLogin", false);
                             PPHelper.ppShowError(throwable.toString());
                             PPHelper.endLoading();
                         }

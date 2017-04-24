@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.penn.jba.PPApplication;
@@ -48,6 +49,8 @@ import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class PPHelper {
     //秒
+    public static final String AppName = "JBA";
+
     public static final int REQUEST_VERIFY_CODE_INTERVAL = 5;
 
     public static final String qiniuBase = "http://7xu8w0.com1.z0.glb.clouddn.com/";
@@ -70,7 +73,9 @@ public class PPHelper {
     //pptodo end testing block
 
     public static String get80ImageUrl(String imageName) {
-        return qiniuBase + imageName + "?imageView2/1/w/80/h/80/interlace/1/";
+        String result = qiniuBase + imageName + "?imageView2/1/w/80/h/80/interlace/1/";
+        Log.v("pplog1", result);
+        return result;
     }
 
     public static void ppShowError(String msg) {
@@ -116,9 +121,7 @@ public class PPHelper {
                             throw new Exception(ppWarn.msg);
                         }
 
-                        Log.v("pplog", "1.1:" + s);
                         initRealm(PPApplication.getContext(), phone);
-                        Log.v("pplog", "1.2:" + s);
                         try (Realm realm = Realm.getDefaultInstance()) {
                             realm.beginTransaction();
 
@@ -148,7 +151,7 @@ public class PPHelper {
                             PPRetrofit.authBody = authBody;
                             currentUserId = currentUser.getUserId();
                         }
-                        Log.v("pplog", "1.5:" + s);
+
                         return PPRetrofit.getInstance().api("user.startup", null);
                     }
                 })
@@ -196,7 +199,8 @@ public class PPHelper {
                             for (int i = 0; i < tmpArr.size(); i++) {
                                 Pic pic = new Pic();
                                 pic.setKey("profile_pic" + i);
-                                pic.setNetFileName(tmpArr.get(i).toString());
+                                Log.v("pplog2", "test:" + tmpArr.get(i).getAsString());
+                                pic.setNetFileName(tmpArr.get(i).getAsString());
                                 pic.setStatus(PicStatus.NET);
                                 pics.add(pic);
                             }
@@ -294,12 +298,36 @@ public class PPHelper {
         return error;
     }
 
-    public static void setLastVerifyCodeRequestTime(Context context) {
-        context.getSharedPreferences("JBA", Context.MODE_PRIVATE).edit().putLong("LastVerifyCodeRequestTime", System.currentTimeMillis() / 1000).apply();
+    public static void setLastVerifyCodeRequestTime() {
+        setPrefLongValue("LastVerifyCodeRequestTime", System.currentTimeMillis() / 1000);
     }
 
-    public static long getLastVerifyCodeRequestTime(Context context) {
-        return context.getSharedPreferences("JBA", Context.MODE_PRIVATE).getLong("LastVerifyCodeRequestTime", 0);
+    public static long getLastVerifyCodeRequestTime() {
+        return getPrefLongValue("LastVerifyCodeRequestTime");
+    }
+
+    public static void setPrefStringValue(String key, String value) {
+        PPApplication.getContext().getSharedPreferences(AppName, Context.MODE_PRIVATE).edit().putString(key, value).apply();
+    }
+
+    public static String getPrefStringValue(String key) {
+        return PPApplication.getContext().getSharedPreferences(AppName, Context.MODE_PRIVATE).getString(key, "");
+    }
+
+    public static void setPrefLongValue(String key, long value) {
+        PPApplication.getContext().getSharedPreferences(AppName, Context.MODE_PRIVATE).edit().putLong(key, value).apply();
+    }
+
+    public static long getPrefLongValue(String key) {
+        return PPApplication.getContext().getSharedPreferences(AppName, Context.MODE_PRIVATE).getLong(key, 0);
+    }
+
+    public static void setPrefBooleanValue(String key, boolean value) {
+        PPApplication.getContext().getSharedPreferences(AppName, Context.MODE_PRIVATE).edit().putBoolean(key, value).apply();
+    }
+
+    public static boolean getPrefBooleanValue(String key) {
+        return PPApplication.getContext().getSharedPreferences(AppName, Context.MODE_PRIVATE).getBoolean(key, false);
     }
 
     public static PPWarn ppWarning(String jServerResponse) {
