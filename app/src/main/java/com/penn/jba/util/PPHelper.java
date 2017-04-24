@@ -1,9 +1,12 @@
 package com.penn.jba.util;
 
+import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.Toast;
 
 import com.google.gson.JsonArray;
@@ -37,6 +40,8 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
+
 /**
  * Created by penn on 02/04/2017.
  */
@@ -53,11 +58,13 @@ public class PPHelper {
 
     public static final int MomentGridViewWidth = 192;
 
+    public static ProgressDialog dialog;
+
     //pptodo remove testing block
-    public static void startRealmModelsActivity(Context context) {
+    public static void startRealmModelsActivity() {
         try (Realm realm = Realm.getDefaultInstance()) {
             RealmConfiguration configuration = realm.getConfiguration();
-            RealmBrowser.startRealmModelsActivity(context, configuration);
+            RealmBrowser.startRealmModelsActivity(PPApplication.getContext(), configuration);
         }
     }
     //pptodo end testing block
@@ -67,12 +74,28 @@ public class PPHelper {
     }
 
     public static void ppShowError(String msg) {
-        final SnackbarWrapper snackbarWrapper = SnackbarWrapper.make(msg, InfoType.ERROR);
+        if (ppToast != null) {
+            ppToast.cancel();
+        }
 
-        snackbarWrapper.show();
+        ppToast = Toast.makeText(PPApplication.getContext(), msg, Toast.LENGTH_LONG);
+        ppToast.show();
     }
 
-    public static void signIn(final String phone, String pwd) throws Exception {
+    public static void showLoading(Context context) {
+        showMsg(context, context.getResources().getString(R.string.loading));
+    }
+
+    public static void showMsg(Context context, String msg) {
+        dialog = ProgressDialog.show(context, "", msg, true);
+        dialog.show();
+    }
+
+    public static void endLoading() {
+        dialog.cancel();
+    }
+
+    public static Observable<String> signIn(final String phone, String pwd) throws Exception {
         PPJSONObject jBody = new PPJSONObject();
         jBody
                 .put("phone", phone)
@@ -81,19 +104,21 @@ public class PPHelper {
         final Observable<String> apiResult = PPRetrofit.getInstance()
                 .api("user.login", jBody.getJSONObject());
 
-        apiResult
+        return apiResult
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .flatMap(new Function<String, ObservableSource<String>>() {
                     @Override
                     public ObservableSource<String> apply(String s) throws Exception {
+                        Log.v("pplog", "1:" + s);
                         PPWarn ppWarn = ppWarning(s);
                         if (ppWarn != null) {
                             throw new Exception(ppWarn.msg);
                         }
 
+                        Log.v("pplog", "1.1:" + s);
                         initRealm(PPApplication.getContext(), phone);
-
+                        Log.v("pplog", "1.2:" + s);
                         try (Realm realm = Realm.getDefaultInstance()) {
                             realm.beginTransaction();
 
@@ -108,7 +133,7 @@ public class PPHelper {
 
                             if (currentUserSetting == null) {
                                 //新注册用户或者首次在本手机使用, 默认在足迹页面不是显示我的moment
-                                currentUserSetting = realm.createObject(CurrentUserSetting.class);
+                                currentUserSetting = realm.createObject(CurrentUserSetting.class, currentUser.getUserId());
                                 currentUserSetting.setFootprintMine(false);
                             }
 
@@ -123,69 +148,63 @@ public class PPHelper {
                             PPRetrofit.authBody = authBody;
                             currentUserId = currentUser.getUserId();
                         }
-
+                        Log.v("pplog", "1.5:" + s);
                         return PPRetrofit.getInstance().api("user.startup", null);
                     }
                 })
-                .subscribe(
-                        new Consumer<String>() {
-                            public void accept(String s) {
-                                PPWarn ppWarn = ppWarning(s);
-                                if (ppWarn != null) {
-                                    ppShowError(ppWarn.msg);
-
-                                    return;
-                                }
-
-                                String imToken = ppFromString(s, "data.userInfo.params.im.token").getAsString();
-
-                                //pptodo connect to rongyun
-                                try (Realm realm = Realm.getDefaultInstance()) {
-                                    realm.beginTransaction();
-
-                                    CurrentUser currentUser = realm.where(CurrentUser.class)
-                                            .findFirst();
-
-                                    currentUser.setPhone(ppFromString(s, "data.userInfo.phone").getAsString());
-                                    currentUser.setNickname(ppFromString(s, "data.userInfo.nickname").getAsString());
-                                    currentUser.setGender(ppFromString(s, "data.userInfo.gender").getAsInt());
-                                    currentUser.setBirthday(ppFromString(s, "data.userInfo.birthday").getAsLong());
-                                    currentUser.setHead(ppFromString(s, "data.userInfo.head").getAsString());
-                                    currentUser.setBaiduApiUrl(ppFromString(s, "data.settings.geo.api").getAsString());
-                                    currentUser.setBaiduAkBrowser(ppFromString(s, "data.settings.geo.ak_browser").getAsString());
-                                    currentUser.setSocketHost(ppFromString(s, "data.settings.socket.host").getAsString());
-                                    currentUser.setSocketPort(ppFromString(s, "data.settings.socket.port").getAsInt());
-                                    currentUser.setUnreadMessageMoment(ppFromString(s, "data.stats.message.moment", PPValueType.INT).getAsInt());
-                                    currentUser.setUnreadMessageIndex(ppFromString(s, "data.stats.message.index", PPValueType.INT).getAsInt());
-                                    currentUser.setUnreadMessageFriend(ppFromString(s, "data.stats.message.friend", PPValueType.INT).getAsInt());
-                                    currentUser.setUnreadMessageSystem(ppFromString(s, "data.stats.message.system", PPValueType.INT).getAsInt());
-                                    currentUser.setFollows(ppFromString(s, "data.stats.follows", PPValueType.INT).getAsInt());
-                                    currentUser.setNewFriend(ppFromString(s, "data.stats.newFriend", PPValueType.INT).getAsInt());
-                                    currentUser.setFans(ppFromString(s, "data.stats.fans", PPValueType.INT).getAsInt());
-                                    currentUser.setNewFans(ppFromString(s, "data.stats.newFans", PPValueType.INT).getAsInt());
-                                    currentUser.setImToken(imToken);
-                                    currentUser.setImAppKey(ppFromString(s, "data.userInfo.params.im.appKey").getAsString());
-
-                                    //pptodo get im_unread_count_int
-                                    RealmList<Pic> pics = currentUser.getPics();
-                                    JsonArray tmpArr = ppFromString(s, "data.userInfo.params.more.pics", PPValueType.ARRAY).getAsJsonArray();
-                                    for (int i = 0; i < tmpArr.size(); i++) {
-                                        Pic pic = new Pic();
-                                        pic.setKey("profile_pic" + i);
-                                        pic.setNetFileName(tmpArr.get(i).toString());
-                                        pic.setStatus(PicStatus.NET);
-                                        pics.add(pic);
-                                    }
-                                    realm.commitTransaction();
-                                }
-                            }
-                        },
-                        new Consumer<Throwable>() {
-                            public void accept(Throwable t) {
-                                ppShowError(t.toString());
-                            }
+                .map(new Function<String, String>() {
+                    @Override
+                    public String apply(String s) throws Exception {
+                        Log.v("pplog", "2:" + s);
+                        PPWarn ppWarn = ppWarning(s);
+                        if (ppWarn != null) {
+                            throw new Exception(ppWarn.msg);
                         }
-                );
+
+                        String imToken = ppFromString(s, "data.userInfo.params.im.token").getAsString();
+
+                        //pptodo connect to rongyun
+                        try (Realm realm = Realm.getDefaultInstance()) {
+                            realm.beginTransaction();
+
+                            CurrentUser currentUser = realm.where(CurrentUser.class)
+                                    .findFirst();
+
+                            currentUser.setPhone(ppFromString(s, "data.userInfo.phone").getAsString());
+                            currentUser.setNickname(ppFromString(s, "data.userInfo.nickname").getAsString());
+                            currentUser.setGender(ppFromString(s, "data.userInfo.gender").getAsInt());
+                            currentUser.setBirthday(ppFromString(s, "data.userInfo.birthday").getAsLong());
+                            currentUser.setHead(ppFromString(s, "data.userInfo.head").getAsString());
+                            currentUser.setBaiduApiUrl(ppFromString(s, "data.settings.geo.api").getAsString());
+                            currentUser.setBaiduAkBrowser(ppFromString(s, "data.settings.geo.ak_browser").getAsString());
+                            currentUser.setSocketHost(ppFromString(s, "data.settings.socket.host").getAsString());
+                            currentUser.setSocketPort(ppFromString(s, "data.settings.socket.port").getAsInt());
+                            currentUser.setUnreadMessageMoment(ppFromString(s, "data.stats.message.moment", PPValueType.INT).getAsInt());
+                            currentUser.setUnreadMessageIndex(ppFromString(s, "data.stats.message.index", PPValueType.INT).getAsInt());
+                            currentUser.setUnreadMessageFriend(ppFromString(s, "data.stats.message.friend", PPValueType.INT).getAsInt());
+                            currentUser.setUnreadMessageSystem(ppFromString(s, "data.stats.message.system", PPValueType.INT).getAsInt());
+                            currentUser.setFollows(ppFromString(s, "data.stats.follows", PPValueType.INT).getAsInt());
+                            currentUser.setNewFriend(ppFromString(s, "data.stats.newFriend", PPValueType.INT).getAsInt());
+                            currentUser.setFans(ppFromString(s, "data.stats.fans", PPValueType.INT).getAsInt());
+                            currentUser.setNewFans(ppFromString(s, "data.stats.newFans", PPValueType.INT).getAsInt());
+                            currentUser.setImToken(imToken);
+                            currentUser.setImAppKey(ppFromString(s, "data.userInfo.params.im.appKey").getAsString());
+
+                            //pptodo get im_unread_count_int
+                            RealmList<Pic> pics = currentUser.getPics();
+                            JsonArray tmpArr = ppFromString(s, "data.userInfo.params.more.pics", PPValueType.ARRAY).getAsJsonArray();
+                            for (int i = 0; i < tmpArr.size(); i++) {
+                                Pic pic = new Pic();
+                                pic.setKey("profile_pic" + i);
+                                pic.setNetFileName(tmpArr.get(i).toString());
+                                pic.setStatus(PicStatus.NET);
+                                pics.add(pic);
+                            }
+                            realm.commitTransaction();
+                        }
+                        return "OK";
+                    }
+                });
     }
 
     public static void initRealm(Context context, String phone) {
@@ -310,7 +329,7 @@ public class PPHelper {
         return jsonElement;
     }
 
-    private static JsonElement ppFromString(String json, String path) {
+    public static JsonElement ppFromString(String json, String path) {
         try {
             JsonParser parser = new JsonParser();
             JsonElement item = parser.parse(json);

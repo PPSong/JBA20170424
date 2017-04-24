@@ -1,13 +1,172 @@
 package com.penn.jba;
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
+
+import com.jakewharton.rxbinding2.view.RxView;
+import com.jakewharton.rxbinding2.widget.RxTextView;
+import com.penn.jba.databinding.ActivityLoginBinding;
+import com.penn.jba.util.PPHelper;
+
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Function3;
+import io.reactivex.schedulers.Schedulers;
 
 public class LoginActivity extends AppCompatActivity {
+    private Context activityContext;
+
+    private ActivityLoginBinding binding;
+
+    private ArrayList<Disposable> disposableList = new ArrayList<Disposable>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+
+        //common
+        activityContext = this;
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
+        binding.setPresenter(this);
+        //end common
+
+        //设置键盘返回键的快捷方式
+        binding.passwordEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                if (id == R.id.sign_in_ime || id == EditorInfo.IME_NULL) {
+                    signIn();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        setup();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        for (Disposable d : disposableList) {
+            if (!d.isDisposed()) {
+                d.dispose();
+            }
+        }
+    }
+
+    public void setup() {
+        //登录按钮监控
+        Observable<Object> signInButtonObservable = RxView.clicks(binding.signInBt)
+                .debounce(200, TimeUnit.MILLISECONDS);
+
+        disposableList.add(signInButtonObservable
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Consumer<Object>() {
+                            public void accept(Object o) {
+                                signIn();
+                            }
+                        }
+                )
+        );
+
+        //手机号码输入监控
+        Observable<String> phoneInputObservable = RxTextView.textChanges(binding.phoneEt)
+                .skip(1)
+                .map(new Function<CharSequence, String>() {
+                    @Override
+                    public String apply(CharSequence charSequence) throws Exception {
+                        return PPHelper.isPhoneValid(activityContext, charSequence.toString());
+                    }
+                }).doOnNext(
+                        new Consumer<String>() {
+                            @Override
+                            public void accept(String error) throws Exception {
+                                binding.phoneTil.setError(TextUtils.isEmpty(error) ? null : error);
+                            }
+                        }
+                );
+
+        //密码输入监控
+        Observable<String> passwordInputObservable = RxTextView.textChanges(binding.passwordEt)
+                .skip(1)
+                .map(new Function<CharSequence, String>() {
+                    @Override
+                    public String apply(CharSequence charSequence) throws Exception {
+                        return PPHelper.isPasswordValid(activityContext, charSequence.toString());
+                    }
+                }).doOnNext(
+                        new Consumer<String>() {
+                            @Override
+                            public void accept(String error) throws Exception {
+                                binding.passwordTil.setError(TextUtils.isEmpty(error) ? null : error);
+                            }
+                        }
+                );
+
+        //登录按钮是否可用
+        disposableList.add(Observable.combineLatest(
+                phoneInputObservable,
+                passwordInputObservable,
+                new BiFunction<String, String, Boolean>() {
+                    @Override
+                    public Boolean apply(String s1, String s2) throws Exception {
+                        return TextUtils.isEmpty(s1) && TextUtils.isEmpty(s2);
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .distinctUntilChanged()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        binding.signInBt.setEnabled(aBoolean);
+                    }
+                })
+        );
+    }
+
+    //-----help-----
+    public void signIn() {
+        PPHelper.showLoading(activityContext);
+        try {
+            PPHelper.signIn(binding.phoneEt.getText().toString(), binding.passwordEt.getText().toString())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<String>() {
+                        @Override
+                        public void accept(String s) throws Exception {
+                            //pptodo go next activity
+                            PPHelper.endLoading();
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            PPHelper.ppShowError(throwable.toString());
+                            PPHelper.endLoading();
+                        }
+                    });
+        } catch (Exception e) {
+            PPHelper.ppShowError(e.toString());
+            e.printStackTrace();
+        }
     }
 }

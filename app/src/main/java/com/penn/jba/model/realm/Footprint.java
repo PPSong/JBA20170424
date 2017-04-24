@@ -21,7 +21,7 @@ public class Footprint extends RealmObject {
     private String hash;
     private long createTime;
     private String id;
-    private FootprintStatus status;
+    private String status;
     private int type;
     private String body;
     private RealmList<Pic> pics;
@@ -58,12 +58,12 @@ public class Footprint extends RealmObject {
         this.id = id;
     }
 
-    public FootprintStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
     public void setStatus(FootprintStatus status) {
-        this.status = status;
+        this.status = status.toString();
     }
 
     public int getType() {

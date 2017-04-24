@@ -67,5 +67,6 @@
     <string name="error_invalid_moment_content">内容不能超过120字</string>
     <string name="error_invalid_place">地名不得超过70字</string>
     <string name="moment_content_place_required">内容和地址都不能为空</string>
+    <string name="loading">处理中...</string>
 
 </resources>

@@ -48,7 +48,6 @@ public class PPMsgPackConverterFactory extends Converter.Factory {
             return new Converter<ResponseBody, String>() {
                 @Override public String convert(ResponseBody value) throws IOException {
                     final InputStream in = value.byteStream();
-                    Log.v("ppLog", "available:" + in.available());
                     MessageUnpacker unPacker= MessagePack.newDefaultUnpacker(in);
 
                     return unPacker.unpackValue().toString();

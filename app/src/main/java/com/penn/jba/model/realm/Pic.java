@@ -17,7 +17,7 @@ public class Pic extends RealmObject {
     @PrimaryKey
     private String key;
     private String netFileName;
-    private PicStatus status;
+    private String status;
     private byte[] localData;
 
     public String getKey() {
@@ -36,12 +36,12 @@ public class Pic extends RealmObject {
         this.netFileName = netFileName;
     }
 
-    public PicStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
     public void setStatus(PicStatus status) {
-        this.status = status;
+        this.status = status.toString();
     }
 
     public byte[] getLocalData() {
