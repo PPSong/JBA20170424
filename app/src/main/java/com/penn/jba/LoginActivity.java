@@ -46,7 +46,6 @@ public class LoginActivity extends AppCompatActivity {
         activityContext = this;
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         binding.setPresenter(this);
-        pref = PreferenceManager.getDefaultSharedPreferences(activityContext);
         //end common
 
         //设置键盘返回键的快捷方式
@@ -153,8 +152,8 @@ public class LoginActivity extends AppCompatActivity {
 
     //-----help-----
     private void autoLogin() {
-        binding.phoneEt.setText(PPHelper.getPrefStringValue("phone"));
-        binding.passwordEt.setText(PPHelper.getPrefStringValue("pwd"));
+        binding.phoneEt.setText(PPHelper.getPrefStringValue("phone", ""));
+        binding.passwordEt.setText(PPHelper.getPrefStringValue("pwd", ""));
         signIn();
     }
 

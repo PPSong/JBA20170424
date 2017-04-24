@@ -136,9 +136,9 @@ public class FootprintFragment extends Fragment {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0: // Fragment # 0 - This will show FirstFragment
-                    return FootprintAllFragment.newInstance();
-                case 1: // Fragment # 0 - This will show FirstFragment different title
                     return FootprintMineFragment.newInstance();
+                case 1: // Fragment # 0 - This will show FirstFragment different title
+                    return FootprintAllFragment.newInstance();
                 default:
                     return null;
             }
@@ -149,9 +149,9 @@ public class FootprintFragment extends Fragment {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0: // Fragment # 0 - This will show FirstFragment
-                    return getResources().getString(R.string.all);
-                case 1: // Fragment # 0 - This will show FirstFragment different title
                     return getResources().getString(R.string.mine);
+                case 1: // Fragment # 0 - This will show FirstFragment different title
+                    return getResources().getString(R.string.all);
                 default:
                     return "";
             }

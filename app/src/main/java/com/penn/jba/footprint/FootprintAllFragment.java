@@ -14,9 +14,11 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.penn.jba.R;
 import com.penn.jba.databinding.FragmentFootprintAllBinding;
 import com.penn.jba.model.realm.Footprint;
+import com.penn.jba.model.realm.Pic;
 import com.penn.jba.util.FootprintStatus;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPJSONObject;
@@ -24,6 +26,9 @@ import com.penn.jba.util.PPLoadAdapter;
 import com.penn.jba.util.PPRefreshLoadController;
 import com.penn.jba.util.PPRetrofit;
 import com.penn.jba.util.PPWarn;
+import com.penn.jba.util.PicStatus;
+
+import java.util.ArrayList;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -91,13 +96,12 @@ public class FootprintAllFragment extends Fragment {
         footprints.addChangeListener(changeListener);
 
         binding.mainRv.setLayoutManager(new LinearLayoutManager(getActivity()));
-        footprintAdapter = new FootprintAdapter(activityContext, footprints);
+        footprintAdapter = new FootprintAdapter(activityContext, footprints, false);
         binding.mainRv.setAdapter(footprintAdapter);
 
         binding.mainRv.setHasFixedSize(true);
 
         ppRefreshLoadController = new InnerPPRefreshLoadController(binding.mainSwipeRefreshLayout, binding.mainRv);
-
     }
 
     //-----helper-----
@@ -134,7 +138,7 @@ public class FootprintAllFragment extends Fragment {
             realm.beginTransaction();
 
             if (refresh) {
-                realm.delete(Footprint.class);
+                realm.where(Footprint.class).equalTo("isMine", false).findAll().deleteAllFromRealm();
             }
 
             JsonArray ja = PPHelper.ppFromString(s, "data").getAsJsonArray();
@@ -168,7 +172,19 @@ public class FootprintAllFragment extends Fragment {
                 ft.setStatus(FootprintStatus.NET);
                 ft.setType(type);
                 ft.setHash(hash);
+                ft.setMine(false);
                 ft.setBody(PPHelper.ppFromString(s, "data." + i + "").getAsJsonObject().toString());
+
+                //处理图片s
+                if (type == 3) {
+                    JsonArray pics = PPHelper.ppFromString(s, "data." + i + ".detail.pics").getAsJsonArray();
+                    for (JsonElement item : pics) {
+                        Pic pic = new Pic();
+                        pic.setNetFileName(item.getAsString());
+                        pic.setStatus(PicStatus.NET);
+                        ft.getPics().add(pic);
+                    }
+                }
             }
 
             realm.commitTransaction();
@@ -284,7 +300,6 @@ public class FootprintAllFragment extends Fragment {
 
                                     PPLoadAdapter tmp = ((PPLoadAdapter) (recyclerView.getAdapter()));
                                     tmp.cancelLoadMoreCell();
-                                    tmp.notifyItemRemoved(tmp.data.size());
                                     end();
                                 }
                             }

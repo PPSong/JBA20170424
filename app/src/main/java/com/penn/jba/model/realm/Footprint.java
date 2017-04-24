@@ -1,8 +1,10 @@
 package com.penn.jba.model.realm;
 
+import com.penn.jba.PPApplication;
 import com.penn.jba.R;
 import com.penn.jba.util.FootprintStatus;
 import com.penn.jba.util.PPHelper;
+import com.penn.jba.util.PPValueType;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -101,17 +103,98 @@ public class Footprint extends RealmObject {
     }
 
     public String getContent() {
-        //pptodo
-        return "";
+        if (type == 8) {
+            String idA = ppFromString(body, "detail.createdBy").getAsString();
+            String idB = ppFromString(body, "detail.receivedBy").getAsString();
+            String nicknameA = ppFromString(body, "relatedUsers.0.nickname").getAsString();
+            String nicknameB = ppFromString(body, "relatedUsers.1.nickname").getAsString();
+            if (idA == PPHelper.currentUserId) {
+                return PPApplication.getContext().getString(R.string.i_send_a_mail_to) + nicknameB;
+            } else {
+                return nicknameA + PPApplication.getContext().getString(R.string.send_a_mail_to_me);
+            }
+        } else if (type == 9) {
+            String idA = ppFromString(body, "detail.createdBy").getAsString();
+            String idB = ppFromString(body, "detail.receivedBy").getAsString();
+            String nicknameA = ppFromString(body, "relatedUsers.0.nickname").getAsString();
+            String nicknameB = ppFromString(body, "relatedUsers.1.nickname").getAsString();
+            if (idA == PPHelper.currentUserId) {
+                String i_reply_to_sb = PPApplication.getContext().getString((R.string.i_reply_to_sb));
+
+                return String.format(i_reply_to_sb, nicknameB);
+            } else {
+                String sb_reply_to_me = PPApplication.getContext().getString((R.string.sb_reply_to_me));
+
+                return String.format(sb_reply_to_me, nicknameA);
+            }
+        } else if (type == 1) {
+            String idA = ppFromString(body, "relatedUsers.0.id").getAsString();
+            String idB = ppFromString(body, "relatedUsers.1.id").getAsString();
+            String nicknameA = ppFromString(body, "relatedUsers.0.nickname").getAsString();
+            String nicknameB = ppFromString(body, "relatedUsers.1.nickname").getAsString();
+            String beFriend = ppFromString(body, "detail.beFriend", PPValueType.INT).getAsInt() == 1 ? PPApplication.getContext().getString(R.string.be_friend) : "";
+            if (idA == PPHelper.currentUserId) {
+                String i_follow_to_sb = PPApplication.getContext().getString(R.string.i_follow_to_sb);
+
+                return String.format(i_follow_to_sb, nicknameB, beFriend);
+            } else {
+                String sb_follow_to_me = PPApplication.getContext().getString(R.string.sb_follow_to_me);
+
+                return String.format(sb_follow_to_me, nicknameA, beFriend);
+            }
+        } else if (type == 3) {
+            return ppFromString(body, "detail.content").getAsString();
+        } else if (type == 10) {
+            int fansNum = ppFromString(body, "detail.fansNum").getAsInt();
+            int collectNum = ppFromString(body, "detail.collectNum").getAsInt();
+            int beCollectedNum = ppFromString(body, "detail.beCollectedNum").getAsInt();
+            String result = PPApplication.getContext().getString(R.string.daily_report);
+
+            return String.format(result, beCollectedNum, collectNum, fansNum);
+        } else if (type == 0) {
+            return PPApplication.getContext().getString((R.string.welcome));
+        }
+
+        return getBody();
     }
 
     public String getAvatarNetFileName() {
-        //pptodo
-        return "";
+        if (type == 8) {
+            String idA = ppFromString(body, "detail.createdBy").getAsString();
+            String idB = ppFromString(body, "detail.receivedBy").getAsString();
+
+            if (idA == PPHelper.currentUserId) {
+                return ppFromString(body, "relatedUsers.1.head").getAsString();
+            } else {
+                return ppFromString(body, "relatedUsers.0.head").getAsString();
+            }
+        } else if (type == 9) {
+            String idA = ppFromString(body, "detail.createdBy").getAsString();
+            String idB = ppFromString(body, "detail.receivedBy").getAsString();
+
+            if (idA == PPHelper.currentUserId) {
+                return ppFromString(body, "relatedUsers.1.head").getAsString();
+            } else {
+                return ppFromString(body, "relatedUsers.0.head").getAsString();
+            }
+        } else if (type == 1) {
+            String idA = ppFromString(body, "relatedUsers.0.id").getAsString();
+            String idB = ppFromString(body, "relatedUsers.1.id").getAsString();
+
+            if (idA == PPHelper.currentUserId) {
+                return ppFromString(body, "relatedUsers.1.head").getAsString();
+            } else {
+                return ppFromString(body, "relatedUsers.0.head").getAsString();
+            }
+        }
+        return "no avatar";
     }
 
     public String getPlace() {
-        //pptodo
-        return "";
+        if (type == 3) {
+            return ppFromString(body, "detail.location.city", PPValueType.STRING).getAsString() + ppFromString(body, "detail.location.detail").getAsString();
+        } else {
+            return "";
+        }
     }
 }

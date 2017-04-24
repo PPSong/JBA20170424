@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.penn.jba.CreateMomentActivity">
+
+    <data>
+
+        <variable
+            name="presenter"
+            type="com.penn.jba.CreateMomentActivity" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/content_et"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:gravity="start"
+            android:hint="@string/say_something"
+            android:inputType="textMultiLine"
+            android:maxLines="10" />
+
+        <GridView
+            android:id="@+id/image_preview_gv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:horizontalSpacing="0dp"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="4dp">
+
+        </GridView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/ic_place_black_24dp" />
+
+            <EditText
+                android:id="@+id/place_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:hint="@string/input_address_pls"
+                android:inputType="textMultiLine"
+                android:maxLines="3" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/publish_bt"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="@string/publish" />
+
+    </LinearLayout>
+</layout>

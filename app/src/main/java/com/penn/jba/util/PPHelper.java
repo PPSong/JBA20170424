@@ -41,6 +41,7 @@ import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 
+import static android.R.attr.value;
 import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
@@ -311,8 +312,8 @@ public class PPHelper {
         PPApplication.getContext().getSharedPreferences(AppName, Context.MODE_PRIVATE).edit().putString(key, value).apply();
     }
 
-    public static String getPrefStringValue(String key) {
-        return PPApplication.getContext().getSharedPreferences(AppName, Context.MODE_PRIVATE).getString(key, "");
+    public static String getPrefStringValue(String key, String defaultValue) {
+        return PPApplication.getContext().getSharedPreferences(AppName, Context.MODE_PRIVATE).getString(key, defaultValue);
     }
 
     public static void setPrefLongValue(String key, long value) {

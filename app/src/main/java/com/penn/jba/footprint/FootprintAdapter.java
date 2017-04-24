@@ -2,6 +2,7 @@ package com.penn.jba.footprint;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -35,8 +36,8 @@ import io.realm.RealmList;
 public class FootprintAdapter extends PPLoadAdapter<Footprint> {
     private Context context;
 
-    public FootprintAdapter(Context context, List<Footprint> data) {
-        super(data);
+    public FootprintAdapter(Context context, List<Footprint> data, boolean isMine) {
+        super(data, isMine);
         this.context = context;
     }
 

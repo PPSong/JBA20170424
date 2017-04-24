@@ -167,7 +167,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                 .subscribe(
                         new Consumer<Object>() {
                             public void accept(Object o) {
-                                //pptodo
+                                Intent intent = new Intent(activityContext, CreateMomentActivity.class);
+                                startActivity(intent);
                             }
                         }
                 )
