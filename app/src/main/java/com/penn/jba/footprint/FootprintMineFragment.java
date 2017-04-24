@@ -89,7 +89,10 @@ public class FootprintMineFragment extends Fragment {
 
     public void setup() {
         realm = Realm.getDefaultInstance();
-        footprints = realm.where(Footprint.class).equalTo("isMine", true).findAllSorted("createTime", Sort.DESCENDING);
+        footprints = realm.where(Footprint.class)
+                .equalTo("isMine", true)
+                .notEqualTo("status", FootprintStatus.PREPARE.toString())
+                .findAllSorted("createTime", Sort.DESCENDING);
         footprints.addChangeListener(changeListener);
 
         binding.mainRv.setLayoutManager(new LinearLayoutManager(getActivity()));

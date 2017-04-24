@@ -3,6 +3,7 @@ package com.penn.jba;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,9 +12,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -29,9 +33,25 @@ import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.penn.jba.databinding.ActivityTabsBinding;
 import com.penn.jba.footprint.FootprintFragment;
 import com.penn.jba.model.realm.CurrentUser;
+import com.penn.jba.model.realm.Footprint;
+import com.penn.jba.model.realm.Pic;
+import com.penn.jba.util.FootprintStatus;
 import com.penn.jba.util.PPHelper;
+import com.penn.jba.util.PicStatus;
 import com.squareup.picasso.Picasso;
 
+import org.lasque.tusdk.core.TuSdkResult;
+import org.lasque.tusdk.core.struct.TuSdkSize;
+import org.lasque.tusdk.core.utils.TLog;
+import org.lasque.tusdk.core.utils.image.BitmapHelper;
+import org.lasque.tusdk.core.utils.sqllite.ImageSqlInfo;
+import org.lasque.tusdk.geev2.TuSdkGeeV2;
+import org.lasque.tusdk.geev2.impl.components.TuRichEditComponent;
+import org.lasque.tusdk.impl.activity.TuFragment;
+import org.lasque.tusdk.modules.components.TuSdkComponent;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -43,8 +63,9 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmList;
 
-public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener {
+public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener, TuSdkComponent.TuSdkComponentDelegate {
     private Context activityContext;
 
     private ActivityTabsBinding binding;
@@ -167,8 +188,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                 .subscribe(
                         new Consumer<Object>() {
                             public void accept(Object o) {
-                                Intent intent = new Intent(activityContext, CreateMomentActivity.class);
-                                startActivity(intent);
+                                takePhoto();
                             }
                         }
                 )
@@ -226,6 +246,86 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                     .withEmail("Follows:" + follows + ", " + "Fans:" + fans);
             headerResult.updateProfile(profileDrawerItem);
         }
+    }
+
+    @Override
+    public void onComponentFinished(TuSdkResult result, Error error, TuFragment tuFragment) {
+        TLog.d("PackageComponentSample onComponentFinished: %s | %s", result.images, error);
+        //新建moment
+        try (Realm realm = Realm.getDefaultInstance()) {
+            //pptodo improve to clear former record with "PREPARE" status
+
+            long now = System.currentTimeMillis();
+            Footprint ft = new Footprint();
+            String key = "" + now + "_3_" + PPHelper.currentUserId + "_" + true;
+            ft.setKey(key);
+            ft.setCreateTime(now);
+            ft.setStatus(FootprintStatus.PREPARE);
+            ft.setType(3);
+            ft.setMine(true);
+
+            int i = 0;
+            for (ImageSqlInfo info : result.images) {
+                i++;
+                // 方式1：直接通过 ImageSqlInfo 生成 Bitmap
+                //pptodo 优化下原始图片
+                Bitmap mImage = BitmapHelper.getBitmap(info, true);
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                mImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] data = stream.toByteArray();
+
+                Pic pic = new Pic();
+                pic.setKey(key + "_" + i);
+                pic.setNetFileName(key + "_" + i);
+                pic.setStatus(PicStatus.LOCAL);
+                pic.setLocalData(data);
+                ft.setPics(new RealmList<Pic>());
+                ft.getPics().add(pic);
+            }
+
+            realm.beginTransaction();
+            realm.copyToRealm(ft);
+            realm.commitTransaction();
+        }
+        Intent intent = new Intent(activityContext, CreateMomentActivity.class);
+        startActivity(intent);
+    }
+
+    public void takePhoto() {
+        TuRichEditComponent comp = TuSdkGeeV2.richEditCommponent(this, this);
+
+        // 组件选项配置
+        // 设置是否启用图片编辑 默认 true
+        // comp.componentOption().setEnableEditMultiple(true);
+
+        // 相机组件配置
+        // 设置拍照后是否预览图片 默认 true
+        // comp.componentOption().cameraOption().setEnablePreview(true);
+
+        // 多选相册组件配置
+        // 设置相册最大选择数量
+        comp.componentOption().albumMultipleComponentOption().albumListOption().setMaxSelection(9);
+
+        // 多功能编辑组件配置项
+        // 设置最大编辑数量
+        comp.componentOption().editMultipleComponentOption().setMaxEditImageCount(9);
+
+        // 设置没有改变的图片是否保存(默认 false)
+        // comp.componentOption().editMultipleComponentOption().setEnableAlwaysSaveEditResult(false);
+
+        // 设置编辑时是否支持追加图片 默认 true
+        // comp.componentOption().editMultipleComponentOption().setEnableAppendImage(true);
+
+        // 设置照片排序方式
+        // comp.componentOption().albumMultipleComponentOption().albumListOption().setPhotosSortDescriptor(PhotoSortDescriptor.Date_Added);
+
+        // 设置最大支持的图片尺寸 默认：8000 * 8000
+		 comp.componentOption().albumMultipleComponentOption().albumListOption().setMaxSelectionImageSize(new TuSdkSize(1000, 1000));
+
+        // 操作完成后是否自动关闭页面
+        comp.setAutoDismissWhenCompleted(true)
+                // 显示组件
+                .showComponent();
     }
 
     private class MyPagerAdapter extends FragmentPagerAdapter {

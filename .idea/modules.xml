@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/JBA.iml" filepath="$PROJECT_DIR$/JBA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TuSDKUIGeeV2/TuSDKUIGeeV2.iml" filepath="$PROJECT_DIR$/TuSDKUIGeeV2/TuSDKUIGeeV2.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

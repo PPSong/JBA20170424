@@ -5,6 +5,8 @@ import android.content.Context;
 
 import com.squareup.leakcanary.LeakCanary;
 
+import org.lasque.tusdk.core.TuSdk;
+
 /**
  * Created by penn on 09/04/2017.
  */
@@ -21,6 +23,7 @@ public class PPApplication extends Application {
             // You should not init your app in this process.
             return;
         }
+        TuSdk.init(this.getApplicationContext(), "14da989436547ce3-00-bxlqq1");
         LeakCanary.install(this);
         // Normal app init code...
     }

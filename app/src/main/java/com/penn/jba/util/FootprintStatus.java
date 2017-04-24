@@ -5,6 +5,7 @@ package com.penn.jba.util;
  */
 
 public enum FootprintStatus {
+    PREPARE,
     LOCAL,
     NET,
     FAILED

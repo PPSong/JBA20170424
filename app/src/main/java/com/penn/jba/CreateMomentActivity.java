@@ -15,11 +15,19 @@ import com.penn.jba.databinding.ActivityCreateMomentBinding;
 import com.penn.jba.model.Geo;
 import com.penn.jba.model.realm.Footprint;
 import com.penn.jba.util.FootprintStatus;
+import com.penn.jba.util.MomentImagePreviewAdapter;
 import com.penn.jba.util.PPHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.lasque.tusdk.core.TuSdk;
+import org.lasque.tusdk.core.TuSdkResult;
+import org.lasque.tusdk.core.utils.TLog;
+import org.lasque.tusdk.geev2.TuSdkGeeV2;
+import org.lasque.tusdk.geev2.impl.components.TuRichEditComponent;
+import org.lasque.tusdk.impl.activity.TuFragment;
+import org.lasque.tusdk.modules.components.TuSdkComponent;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +52,8 @@ public class CreateMomentActivity extends AppCompatActivity {
 
     private Geo geo;
 
+    private Realm realm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,12 +64,15 @@ public class CreateMomentActivity extends AppCompatActivity {
         binding.setPresenter(this);
         //end common
 
+        realm = Realm.getDefaultInstance();
+
         setup();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        realm.close();
         for (Disposable d : disposableList) {
             if (!d.isDisposed()) {
                 d.dispose();
@@ -132,7 +145,7 @@ public class CreateMomentActivity extends AppCompatActivity {
 
         disposableList.add(publishButtonObservable
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         new Consumer<Object>() {
                             public void accept(Object o) {
@@ -141,6 +154,16 @@ public class CreateMomentActivity extends AppCompatActivity {
                         }
                 )
         );
+
+        footprint = realm.where(Footprint.class).equalTo("status", FootprintStatus.PREPARE.toString()).findFirst();
+        int widthDp = 64;
+        final float scale = activityContext.getResources().getDisplayMetrics().density;
+        int width = activityContext.getResources().getDisplayMetrics().widthPixels;
+        int pixels = (int) (widthDp * scale + 0.5f);
+        int cols = width / pixels;
+        binding.imagePreviewGv.setNumColumns(cols);
+        MomentImagePreviewAdapter momentImagePreviewAdapter = new MomentImagePreviewAdapter(activityContext, footprint.getPics(), pixels);
+        binding.imagePreviewGv.setAdapter(momentImagePreviewAdapter);
     }
 
     private void publishMoment() {
@@ -171,20 +194,10 @@ public class CreateMomentActivity extends AppCompatActivity {
                             )
                     );
 
-            long now = System.currentTimeMillis();
-            footprint = new Footprint();
-            footprint.setKey("" + now + "_3_" + PPHelper.currentUserId + "_" + true);
-            footprint.setCreateTime(now);
-            footprint.setStatus(FootprintStatus.LOCAL);
-            footprint.setType(3);
+            realm.beginTransaction();
             footprint.setBody(body.toString());
-            footprint.setMine(true);
-
-            try (Realm realm = Realm.getDefaultInstance()) {
-                realm.beginTransaction();
-                final Footprint ft = realm.copyToRealm(footprint);
-                realm.commitTransaction();
-            }
+            footprint.setStatus(FootprintStatus.LOCAL);
+            realm.commitTransaction();
 
             finish();
 
@@ -195,4 +208,6 @@ public class CreateMomentActivity extends AppCompatActivity {
             return;
         }
     }
+
+
 }
