@@ -2,6 +2,7 @@ package com.penn.jba;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.penn.jba.databinding.ActivityLoginBinding;
+import com.penn.jba.util.InfoType;
 import com.penn.jba.util.PPHelper;
 
 import java.util.ArrayList;
@@ -155,6 +157,9 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void accept(String s) throws Exception {
                             //pptodo go next activity
+                            Intent intent = new Intent(activityContext, TabsActivity.class);
+                            startActivity(intent);
+                            
                             PPHelper.endLoading();
                         }
                     }, new Consumer<Throwable>() {
