@@ -83,6 +83,7 @@ public class PPHelper {
             ppToast.cancel();
         }
 
+        Log.v("pplog", msg);
         ppToast = Toast.makeText(PPApplication.getContext(), msg, Toast.LENGTH_LONG);
         ppToast.show();
     }
@@ -218,7 +219,7 @@ public class PPHelper {
                 .name(phone + ".realm")
                 .build();
         //清除当前用户的数据文件, 测试用
-        boolean clearData = false;
+        boolean clearData = true;
         if (clearData) {
             Realm.deleteRealm(config);
         }

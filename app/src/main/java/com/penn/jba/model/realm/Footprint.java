@@ -17,13 +17,15 @@ import static com.penn.jba.util.PPHelper.ppFromString;
 
 public class Footprint extends RealmObject {
     @PrimaryKey
-    private String key; //createTime+"_"+type+"_"+createdBy
+    private String key; //createTime+"_"+type+"_"+createdBy+"_"+isMine
     private String hash;
     private long createTime;
     private String id;
     private String status;
     private int type;
     private String body;
+    private boolean isMine;
+
     private RealmList<Pic> pics;
 
     public String getKey() {
@@ -80,6 +82,14 @@ public class Footprint extends RealmObject {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public boolean isMine() {
+        return isMine;
+    }
+
+    public void setMine(boolean mine) {
+        isMine = mine;
     }
 
     public RealmList<Pic> getPics() {
