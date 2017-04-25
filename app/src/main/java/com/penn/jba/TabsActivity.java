@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -37,9 +38,16 @@ import com.penn.jba.model.realm.Footprint;
 import com.penn.jba.model.realm.Pic;
 import com.penn.jba.util.FootprintStatus;
 import com.penn.jba.util.PPHelper;
+import com.penn.jba.util.PPJSONObject;
+import com.penn.jba.util.PPRetrofit;
 import com.penn.jba.util.PicStatus;
+import com.qiniu.android.http.ResponseInfo;
+import com.qiniu.android.storage.Configuration;
+import com.qiniu.android.storage.UpCompletionHandler;
+import com.qiniu.android.storage.UploadManager;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONObject;
 import org.lasque.tusdk.core.TuSdkResult;
 import org.lasque.tusdk.core.struct.TuSdkSize;
 import org.lasque.tusdk.core.utils.TLog;
@@ -57,13 +65,20 @@ import java.util.concurrent.TimeUnit;
 
 import de.jonasrottmann.realmbrowser.RealmBrowser;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
+import io.realm.RealmResults;
+
+import static android.R.attr.key;
 
 public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener, TuSdkComponent.TuSdkComponentDelegate {
     private Context activityContext;
@@ -252,17 +267,18 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
     public void onComponentFinished(TuSdkResult result, Error error, TuFragment tuFragment) {
         TLog.d("PackageComponentSample onComponentFinished: %s | %s", result.images, error);
         //新建moment
+        long now = System.currentTimeMillis();
+        String key = "" + now + "_3_" + PPHelper.currentUserId + "_" + true;
         try (Realm realm = Realm.getDefaultInstance()) {
             //pptodo improve to clear former record with "PREPARE" status
-
-            long now = System.currentTimeMillis();
             Footprint ft = new Footprint();
-            String key = "" + now + "_3_" + PPHelper.currentUserId + "_" + true;
             ft.setKey(key);
             ft.setCreateTime(now);
             ft.setStatus(FootprintStatus.PREPARE);
             ft.setType(3);
             ft.setMine(true);
+
+            ft.setPics(new RealmList<Pic>());
 
             int i = 0;
             for (ImageSqlInfo info : result.images) {
@@ -279,7 +295,6 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                 pic.setNetFileName(key + "_" + i);
                 pic.setStatus(PicStatus.LOCAL);
                 pic.setLocalData(data);
-                ft.setPics(new RealmList<Pic>());
                 ft.getPics().add(pic);
             }
 
@@ -288,6 +303,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
             realm.commitTransaction();
         }
         Intent intent = new Intent(activityContext, CreateMomentActivity.class);
+        intent.putExtra("key", key);
         startActivity(intent);
     }
 

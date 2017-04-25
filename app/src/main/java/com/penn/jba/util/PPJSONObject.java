@@ -2,6 +2,9 @@ package com.penn.jba.util;
 
 import android.util.Log;
 
+import com.google.gson.JsonArray;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,6 +32,16 @@ public class PPJSONObject {
     public PPJSONObject put(String name, int i) {
         try {
             jsonObject.put(name, i);
+        } catch (JSONException e) {
+            Log.v("ppLog", "PPJSONObject error:" + e);
+        }
+
+        return this;
+    }
+
+    public PPJSONObject put(String name, JSONArray ja) {
+        try {
+            jsonObject.put(name, ja);
         } catch (JSONException e) {
             Log.v("ppLog", "PPJSONObject error:" + e);
         }
