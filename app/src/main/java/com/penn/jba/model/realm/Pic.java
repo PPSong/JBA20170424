@@ -14,7 +14,7 @@ import io.realm.annotations.PrimaryKey;
  */
 
 public class Pic extends RealmObject {
-    @PrimaryKey
+
     private String key; //netFileName or createTime_userId_index
     private String netFileName;
     private String status;

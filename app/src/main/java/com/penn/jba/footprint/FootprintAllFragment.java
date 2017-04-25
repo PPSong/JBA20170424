@@ -138,7 +138,11 @@ public class FootprintAllFragment extends Fragment {
             realm.beginTransaction();
 
             if (refresh) {
-                realm.where(Footprint.class).equalTo("isMine", false).findAll().deleteAllFromRealm();
+                RealmResults<Footprint> r =  realm.where(Footprint.class).equalTo("isMine", false).findAll();
+                for (Footprint f: r) {
+                    f.getPics().deleteAllFromRealm();
+                }
+                r.deleteAllFromRealm();
             }
 
             JsonArray ja = PPHelper.ppFromString(s, "data").getAsJsonArray();
