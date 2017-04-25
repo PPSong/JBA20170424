@@ -2,14 +2,12 @@ package com.penn.jba;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.google.gson.JsonArray;
+import com.google.gson.Gson;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.penn.jba.databinding.ActivityCreateMomentBinding;
@@ -31,13 +29,6 @@ import com.qiniu.android.storage.UploadManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.lasque.tusdk.core.TuSdk;
-import org.lasque.tusdk.core.TuSdkResult;
-import org.lasque.tusdk.core.utils.TLog;
-import org.lasque.tusdk.geev2.TuSdkGeeV2;
-import org.lasque.tusdk.geev2.impl.components.TuRichEditComponent;
-import org.lasque.tusdk.impl.activity.TuFragment;
-import org.lasque.tusdk.modules.components.TuSdkComponent;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -55,13 +46,11 @@ import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmList;
 
-import static android.R.attr.type;
 import static com.penn.jba.util.PPHelper.ppWarning;
+import static io.reactivex.Observable.mergeDelayError;
 import static io.reactivex.Observable.zip;
 
 public class CreateMomentActivity extends AppCompatActivity {
-    private static final String PP_ERROR = "PP_ERROR";
-
     private Context activityContext;
 
     private ActivityCreateMomentBinding binding;
@@ -70,7 +59,7 @@ public class CreateMomentActivity extends AppCompatActivity {
 
     private Footprint footprint;
 
-    private Geo geo;
+    private JSONArray geoJsonArray;
 
     private Realm realm;
 
@@ -93,6 +82,21 @@ public class CreateMomentActivity extends AppCompatActivity {
         realm = Realm.getDefaultInstance();
 
         key = getIntent().getStringExtra("key");
+
+        Gson gson = new Gson();
+
+        String geoStr = PPHelper.getPrefStringValue("geo", gson.toJson(Geo.getDefaultGeo()));
+
+        Geo geo = gson.fromJson(geoStr, Geo.class);
+
+        geoJsonArray = new JSONArray();
+
+        try {
+            geoJsonArray.put(geo.lon);
+            geoJsonArray.put(geo.lat);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         setup();
     }
@@ -204,19 +208,11 @@ public class CreateMomentActivity extends AppCompatActivity {
         }
 
         try {
-            JSONArray arr = new JSONArray();
-            String geo = PPHelper.getPrefStringValue("geo", "121.52619934082031,31.216968536376953");
-            String[] tmpGeo = geo.split(",");
-            float lon = Float.parseFloat(tmpGeo[0]);
-            float lat = Float.parseFloat(tmpGeo[1]);
-            arr.put(lon);
-            arr.put(lat);
-
             JSONObject body = new JSONObject()
                     .put("detail", new JSONObject()
                             .put("content", content)
                             .put("location", new JSONObject()
-                                    .put("geo", arr)
+                                    .put("geo", geoJsonArray)
                                     .put("detail", place)
                             )
                     );
@@ -257,8 +253,7 @@ public class CreateMomentActivity extends AppCompatActivity {
                                             pic.setStatus(PicStatus.NET);
                                         } else {
                                             Exception apiError = new Exception("七牛上传:" + key + "失败", new Throwable("realm中没有找到指定图片"));
-                                            String errorStr = "ppError:" + key;
-                                            emitter.onNext(errorStr);
+                                            emitter.onError(apiError);
                                         }
                                         realm.commitTransaction();
                                     }
@@ -268,8 +263,7 @@ public class CreateMomentActivity extends AppCompatActivity {
                                     Log.i("qiniu", "Upload Fail");
                                     //如果失败，这里可以把info信息上报自己的服务器，便于后面分析上传错误原因
                                     Exception apiError = new Exception("七牛上传:" + key + "失败", new Throwable(info.error.toString()));
-                                    String errorStr = "ppError:" + key;
-                                    emitter.onNext(errorStr);
+                                    emitter.onError(apiError);
                                 }
                                 Log.i("qiniu", key + ",\r\n " + info + ",\r\n " + res);
                             }
@@ -282,13 +276,14 @@ public class CreateMomentActivity extends AppCompatActivity {
     public void uploadMoment() {
         ArrayList<Observable<String>> obsList = new ArrayList();
 
+        PPJSONObject jBody0 = new PPJSONObject();
+
         try (Realm realm = Realm.getDefaultInstance()) {
             final Footprint ft = realm.where(Footprint.class).equalTo("key", key).findFirst();
             //上传图片
             RealmList<Pic> pics = ft.getPics();
 
             for (int i = 0; i < pics.size(); i++) {
-                final int tmpI = i;
                 final Pic item = pics.get(i);
                 if (item.getStatus().equals(PicStatus.NET.toString())) {
                     continue;
@@ -307,84 +302,49 @@ public class CreateMomentActivity extends AppCompatActivity {
                     public ObservableSource<String> apply(String tokenMsg) throws Exception {
                         PPWarn ppWarn = ppWarning(tokenMsg);
                         if (ppWarn != null) {
-                            //为了不影响其他图片上传, 这里不用throw exception, 而是用自定义的错误信息, 这样不影响Observable.zip的执行
-                            return Observable.just("ppError:" + ppWarn.msg + ":" + key);
+                            throw new Exception("ppError:" + ppWarn.msg + ":" + key);
                         }
                         String token = PPHelper.ppFromString(tokenMsg, "data.token").getAsString();
                         return uploadSingleImage(tmpData, key, token);
                     }
                 }));
             }
+
+            JSONArray jsonArrayPics = new JSONArray();
+
+            for (Pic pic : pics) {
+                jsonArrayPics.put(pic.getKey());
+            }
+            jBody0
+                    .put("pics", jsonArrayPics)
+                    .put("address", ft.getPlace())
+                    .put("geo", geoJsonArray)
+                    .put("content", ft.getContent())
+                    .put("createTime", ft.getCreateTime());
         }
 
-        Observable.zip(
-                obsList, new Function<Object[], String>() {
-                    @Override
-                    public String apply(Object[] uploadResults) throws Exception {
-                        //检查是否顺利完成
-                        for (Object item : uploadResults) {
-                            String tmpStr = item.toString();
-                            if (tmpStr.startsWith("ppError")) {
-                                return PP_ERROR;
-                            }
-                        }
+        final Observable<String> apiResult = PPRetrofit.getInstance()
+                .api("moment.publish", jBody0.getJSONObject());
 
-                        return "OK";
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String s) throws Exception {
-                        Log.v("ppLog100", s);
-                        //判断一切顺利就上传momnet, 不然就把moment状态改为failed
-                        if (s.equals(PP_ERROR)) {
-                            uploadMomentFailed();
-                        } else {
-                            Log.v("ppLog100", "success");
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable t) throws Exception {
-                        Log.v("ppLog100", "Throwable:" + t);
-                        uploadMomentFailed();
-                    }
-                });
-
-//                .flatMap(new Function<Object, ObservableSource<String>>() {
-//                    @Override
-//                    public ObservableSource<String> apply(Object s) throws Exception {
-//                        //上传momentzx
-//                        PPJSONObject jBody = new PPJSONObject();
-//
-//
-//                        jBody
-//                                .put("pics", array)
-//                                .put("geo", "121.1,36.1")
-//                                .put("content", "ppContent")
-//                                .put("address", "ppPlace");
-//
-//                        return PPRetrofit.getInstance()
-//                                .api("moment.publish", jBody.getJSONObject());
-//                    }
-//                })
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Consumer<Object>() {
-//                    @Override
-//                    public void accept(Object s) throws Exception {
-//                        Log.v("pplog", "uploaded successfully all:" + s);
-//
-//
-//                    }
-//                }, new Consumer<Throwable>() {
-//                    @Override
-//                    public void accept(Throwable t) throws Exception {
-//                        Log.v("pplog", "uploaded failed:" + t);
-//                        PPHelper.ppShowError(t.toString());
-//                    }
-//                });
+        disposableList.add(
+                Observable.mergeDelayError(obsList)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .concatWith(apiResult)
+                        .observeOn(Schedulers.io())
+                        .subscribe(new Consumer<String>() {
+                                       @Override
+                                       public void accept(String s) throws Exception {
+                                           Log.v("pplog102", "ok:" + s);
+                                       }
+                                   },
+                                new Consumer<Throwable>() {
+                                    @Override
+                                    public void accept(Throwable t) throws Exception {
+                                        Log.v("pplog102", "error:" + t);
+                                        uploadMomentFailed();
+                                    }
+                                }));
     }
 
     private void uploadMomentFailed() {

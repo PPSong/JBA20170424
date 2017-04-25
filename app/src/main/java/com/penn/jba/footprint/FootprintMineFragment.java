@@ -181,8 +181,14 @@ public class FootprintMineFragment extends Fragment {
                 //处理图片s
                 if (type == 3) {
                     JsonArray pics = PPHelper.ppFromString(s, "data." + i + ".detail.pics").getAsJsonArray();
+                    //如果是重复记录, 先删除当前的pics, 要不然会出现重复图片
+                    if (ft.getPics().size() > 0) {
+                        Log.v("pplog103", ft.getHash());
+                    }
+                    ft.getPics().deleteAllFromRealm();
                     for (JsonElement item : pics) {
                         Pic pic = new Pic();
+                        pic.setKey(item.getAsString());
                         pic.setNetFileName(item.getAsString());
                         pic.setStatus(PicStatus.NET);
                         ft.getPics().add(pic);
@@ -257,8 +263,8 @@ public class FootprintMineFragment extends Fragment {
             PPJSONObject jBody = new PPJSONObject();
             jBody
                     //因为最后一条记录为"loadmore"的fake记录
-                    .put("beforeThan", "" + footprints.get(footprints.size() - 2).getHash())
-                    .put("afterThan", "");
+                    .put("before", "" + footprints.get(footprints.size() - 2).getCreateTime())
+                    .put("after", "");
 
             final Observable<String> apiResult = PPRetrofit.getInstance().api("footprint.myMoment", jBody.getJSONObject());
             apiResult

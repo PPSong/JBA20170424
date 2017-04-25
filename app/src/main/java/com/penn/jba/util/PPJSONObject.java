@@ -39,6 +39,16 @@ public class PPJSONObject {
         return this;
     }
 
+    public PPJSONObject put(String name, long i) {
+        try {
+            jsonObject.put(name, i);
+        } catch (JSONException e) {
+            Log.v("ppLog", "PPJSONObject error:" + e);
+        }
+
+        return this;
+    }
+
     public PPJSONObject put(String name, JSONArray ja) {
         try {
             jsonObject.put(name, ja);

@@ -143,7 +143,11 @@ public class Footprint extends RealmObject {
                 return String.format(sb_follow_to_me, nicknameA, beFriend);
             }
         } else if (type == 3) {
-            return ppFromString(body, "detail.content").getAsString();
+//            String tmp = "";
+//            for (Pic pic: pics) {
+//                tmp += pic.getKey() + ",";
+//            }
+            return ppFromString(body, "detail.content").getAsString() + hash;
         } else if (type == 10) {
             int fansNum = ppFromString(body, "detail.fansNum").getAsInt();
             int collectNum = ppFromString(body, "detail.collectNum").getAsInt();

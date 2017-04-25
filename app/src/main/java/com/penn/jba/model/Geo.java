@@ -12,4 +12,8 @@ public class Geo {
         this.lon = lon;
         this.lat = lat;
     }
+
+    public static Geo getDefaultGeo() {
+        return new Geo(121.52619934082031f, 31.216968536376953f);
+    }
 }
