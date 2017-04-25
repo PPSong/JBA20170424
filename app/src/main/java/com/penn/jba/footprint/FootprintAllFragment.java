@@ -32,6 +32,7 @@ import java.util.ArrayList;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -48,6 +49,8 @@ public class FootprintAllFragment extends Fragment {
     private final static int pageSize = 15;
 
     private Context activityContext;
+
+    private ArrayList<Disposable> disposableList = new ArrayList<Disposable>();
 
     private Realm realm;
 
@@ -90,6 +93,18 @@ public class FootprintAllFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realm.close();
+        for (Disposable d : disposableList) {
+            if (!d.isDisposed()) {
+                d.dispose();
+            }
+        }
+    }
+
+    //-----helper-----
     public void setup() {
         realm = Realm.getDefaultInstance();
         footprints = realm.where(Footprint.class).equalTo("isMine", false).findAllSorted("createTime", Sort.DESCENDING);
@@ -104,7 +119,6 @@ public class FootprintAllFragment extends Fragment {
         ppRefreshLoadController = new InnerPPRefreshLoadController(binding.mainSwipeRefreshLayout, binding.mainRv);
     }
 
-    //-----helper-----
     private final OrderedRealmCollectionChangeListener<RealmResults<Footprint>> changeListener = new OrderedRealmCollectionChangeListener<RealmResults<Footprint>>() {
         @Override
         public void onChange(RealmResults<Footprint> collection, OrderedCollectionChangeSet changeSet) {
@@ -138,8 +152,8 @@ public class FootprintAllFragment extends Fragment {
             realm.beginTransaction();
 
             if (refresh) {
-                RealmResults<Footprint> r =  realm.where(Footprint.class).equalTo("isMine", false).findAll();
-                for (Footprint f: r) {
+                RealmResults<Footprint> r = realm.where(Footprint.class).equalTo("isMine", false).findAll();
+                for (Footprint f : r) {
                     f.getPics().deleteAllFromRealm();
                 }
                 r.deleteAllFromRealm();
@@ -217,46 +231,48 @@ public class FootprintAllFragment extends Fragment {
                     .put("afterThan", "");
 
             final Observable<String> apiResult = PPRetrofit.getInstance().api("footprint.mine", jBody.getJSONObject());
-            apiResult
-                    .subscribeOn(Schedulers.io())
-                    .map(new Function<String, String>() {
-                        @Override
-                        public String apply(String s) throws Exception {
-                            PPWarn ppWarn = PPHelper.ppWarning(s);
+            disposableList.add(
+                    apiResult
+                            .subscribeOn(Schedulers.io())
+                            .map(new Function<String, String>() {
+                                @Override
+                                public String apply(String s) throws Exception {
+                                    PPWarn ppWarn = PPHelper.ppWarning(s);
 
-                            if (ppWarn != null) {
-                                return ppWarn.msg;
-                            } else {
-                                processFootprintAll(s, true);
-                                return "OK";
-                            }
-                        }
-                    })
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            new Consumer<String>() {
-                                public void accept(String s) {
-                                    if (s != "OK") {
-                                        PPHelper.ppShowError(s);
-
-                                        return;
+                                    if (ppWarn != null) {
+                                        return ppWarn.msg;
+                                    } else {
+                                        processFootprintAll(s, true);
+                                        return "OK";
                                     }
-                                    swipeRefreshLayout.setRefreshing(false);
-                                    end();
-                                    reset();
                                 }
-                            },
-                            new Consumer<Throwable>() {
-                                public void accept(Throwable t1) {
-                                    PPHelper.ppShowError(t1.toString());
+                            })
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                    new Consumer<String>() {
+                                        public void accept(String s) {
+                                            if (s != "OK") {
+                                                PPHelper.ppShowError(s);
 
-                                    swipeRefreshLayout.setRefreshing(false);
-                                    end();
+                                                return;
+                                            }
+                                            swipeRefreshLayout.setRefreshing(false);
+                                            end();
+                                            reset();
+                                        }
+                                    },
+                                    new Consumer<Throwable>() {
+                                        public void accept(Throwable t1) {
+                                            PPHelper.ppShowError(t1.toString());
 
-                                    t1.printStackTrace();
-                                }
-                            }
-                    );
+                                            swipeRefreshLayout.setRefreshing(false);
+                                            end();
+
+                                            t1.printStackTrace();
+                                        }
+                                    }
+                            )
+            );
         }
 
         @Override
@@ -268,52 +284,55 @@ public class FootprintAllFragment extends Fragment {
                     .put("afterThan", "");
 
             final Observable<String> apiResult = PPRetrofit.getInstance().api("footprint.mine", jBody.getJSONObject());
-            apiResult
-                    .subscribeOn(Schedulers.io())
-                    .map(new Function<String, String>() {
-                        @Override
-                        public String apply(String s) throws Exception {
-                            Log.v("pplog5", s);
 
-                            PPWarn ppWarn = PPHelper.ppWarning(s);
+            disposableList.add(
+                    apiResult
+                            .subscribeOn(Schedulers.io())
+                            .map(new Function<String, String>() {
+                                @Override
+                                public String apply(String s) throws Exception {
+                                    Log.v("pplog5", s);
 
-                            if (ppWarn != null) {
-                                return ppWarn.msg;
-                            } else {
-                                if (processFootprintAll(s, false) < pageSize) {
-                                    noMore();
-                                }
+                                    PPWarn ppWarn = PPHelper.ppWarning(s);
 
-                                return "OK";
-                            }
-                        }
-                    })
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            new Consumer<String>() {
-                                public void accept(String s) {
-                                    if (s != "OK") {
-                                        PPHelper.ppShowError(s);
+                                    if (ppWarn != null) {
+                                        return ppWarn.msg;
+                                    } else {
+                                        if (processFootprintAll(s, false) < pageSize) {
+                                            noMore();
+                                        }
 
-                                        return;
+                                        return "OK";
                                     }
-
-                                    final PPLoadAdapter tmp = ((PPLoadAdapter) (recyclerView.getAdapter()));
-                                    tmp.cancelLoadMoreCell();
-                                    end();
                                 }
-                            },
-                            new Consumer<Throwable>() {
-                                public void accept(Throwable t1) {
-                                    PPHelper.ppShowError(t1.getMessage());
-                                    t1.printStackTrace();
+                            })
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                    new Consumer<String>() {
+                                        public void accept(String s) {
+                                            if (s != "OK") {
+                                                PPHelper.ppShowError(s);
 
-                                    PPLoadAdapter tmp = ((PPLoadAdapter) (recyclerView.getAdapter()));
-                                    tmp.cancelLoadMoreCell();
-                                    end();
-                                }
-                            }
-                    );
+                                                return;
+                                            }
+
+                                            final PPLoadAdapter tmp = ((PPLoadAdapter) (recyclerView.getAdapter()));
+                                            tmp.cancelLoadMoreCell();
+                                            end();
+                                        }
+                                    },
+                                    new Consumer<Throwable>() {
+                                        public void accept(Throwable t1) {
+                                            PPHelper.ppShowError(t1.getMessage());
+                                            t1.printStackTrace();
+
+                                            PPLoadAdapter tmp = ((PPLoadAdapter) (recyclerView.getAdapter()));
+                                            tmp.cancelLoadMoreCell();
+                                            end();
+                                        }
+                                    }
+                            )
+            );
         }
     }
 }

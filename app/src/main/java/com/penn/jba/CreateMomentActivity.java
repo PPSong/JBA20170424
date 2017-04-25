@@ -336,6 +336,7 @@ public class CreateMomentActivity extends AppCompatActivity {
                                        @Override
                                        public void accept(String s) throws Exception {
                                            Log.v("pplog102", "ok:" + s);
+                                           uploadMomentOK();
                                        }
                                    },
                                 new Consumer<Throwable>() {
@@ -354,6 +355,17 @@ public class CreateMomentActivity extends AppCompatActivity {
                     .equalTo("key", key)
                     .findFirst()
                     .setStatus(FootprintStatus.FAILED);
+            realm.commitTransaction();
+        }
+    }
+
+    private void uploadMomentOK() {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            realm.beginTransaction();
+            realm.where(Footprint.class)
+                    .equalTo("key", key)
+                    .findFirst()
+                    .setStatus(FootprintStatus.NET);
             realm.commitTransaction();
         }
     }
