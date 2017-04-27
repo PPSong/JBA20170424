@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -40,6 +41,7 @@ import com.penn.jba.util.FootprintStatus;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPJSONObject;
 import com.penn.jba.util.PPRetrofit;
+import com.penn.jba.util.PPWarn;
 import com.penn.jba.util.PicStatus;
 import com.qiniu.android.http.ResponseInfo;
 import com.qiniu.android.storage.Configuration;
@@ -47,6 +49,8 @@ import com.qiniu.android.storage.UpCompletionHandler;
 import com.qiniu.android.storage.UploadManager;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.lasque.tusdk.core.TuSdkResult;
 import org.lasque.tusdk.core.struct.TuSdkSize;
@@ -79,8 +83,11 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 
 import static android.R.attr.key;
+import static com.penn.jba.util.PPHelper.ppWarning;
 
 public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener, TuSdkComponent.TuSdkComponentDelegate {
+    private static final int CREATE_MOMENT = 1001;
+
     private Context activityContext;
 
     private ActivityTabsBinding binding;
@@ -94,6 +101,12 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
     private AccountHeader headerResult;
 
     private ProfileDrawerItem profileDrawerItem;
+
+    private String createMomentKey;
+
+    private Configuration config = new Configuration.Builder().build();
+
+    private UploadManager uploadManager = new UploadManager(config);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +128,14 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
             if (!d.isDisposed()) {
                 d.dispose();
             }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CREATE_MOMENT && resultCode == RESULT_OK) {
+            uploadMoment();
         }
     }
 
@@ -268,11 +289,11 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         TLog.d("PackageComponentSample onComponentFinished: %s | %s", result.images, error);
         //新建moment
         long now = System.currentTimeMillis();
-        String key = "" + now + "_3_" + PPHelper.currentUserId + "_" + true;
+        createMomentKey = "" + now + "_3_" + PPHelper.currentUserId + "_" + true;
         try (Realm realm = Realm.getDefaultInstance()) {
             //pptodo improve to clear former record with "PREPARE" status
             Footprint ft = new Footprint();
-            ft.setKey(key);
+            ft.setKey(createMomentKey);
             ft.setCreateTime(now);
             ft.setStatus(FootprintStatus.PREPARE);
             ft.setType(3);
@@ -291,8 +312,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                 byte[] data = stream.toByteArray();
 
                 Pic pic = new Pic();
-                pic.setKey(key + "_" + i);
-                pic.setNetFileName(key + "_" + i);
+                pic.setKey(createMomentKey + "_" + i);
+                pic.setNetFileName(createMomentKey + "_" + i);
                 pic.setStatus(PicStatus.LOCAL);
                 pic.setLocalData(data);
                 ft.getPics().add(pic);
@@ -303,8 +324,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
             realm.commitTransaction();
         }
         Intent intent = new Intent(activityContext, CreateMomentActivity.class);
-        intent.putExtra("key", key);
-        startActivity(intent);
+        intent.putExtra("key", createMomentKey);
+        startActivityForResult(intent, CREATE_MOMENT);
     }
 
     public void takePhoto() {
@@ -382,5 +403,153 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                     return "";
             }
         }
+    }
+
+    public void uploadMoment() {
+        ArrayList<Observable<String>> obsList = new ArrayList();
+
+        PPJSONObject jBody0 = new PPJSONObject();
+
+        try (Realm realm = Realm.getDefaultInstance()) {
+            final Footprint ft = realm.where(Footprint.class).equalTo("key", createMomentKey).findFirst();
+            //上传图片
+            RealmList<Pic> pics = ft.getPics();
+
+            for (int i = 0; i < pics.size(); i++) {
+                final Pic item = pics.get(i);
+                if (item.getStatus().equals(PicStatus.NET.toString())) {
+                    continue;
+                }
+                final byte[] tmpData = item.getLocalData();
+                final String key = item.getKey();
+                PPJSONObject jBody = new PPJSONObject();
+                jBody
+                        .put("type", "public")
+                        .put("filename", key);
+
+                final Observable<String> apiResult1 = PPRetrofit.getInstance().api("system.generateUploadToken", jBody.getJSONObject());
+
+                obsList.add(apiResult1.flatMap(new Function<String, ObservableSource<String>>() {
+                    @Override
+                    public ObservableSource<String> apply(String tokenMsg) throws Exception {
+                        PPWarn ppWarn = ppWarning(tokenMsg);
+                        if (ppWarn != null) {
+                            throw new Exception("ppError:" + ppWarn.msg + ":" + key);
+                        }
+                        String token = PPHelper.ppFromString(tokenMsg, "data.token").getAsString();
+                        return uploadSingleImage(tmpData, key, token);
+                    }
+                }));
+            }
+
+            JSONArray jsonArrayPics = new JSONArray();
+
+            for (Pic pic : pics) {
+                jsonArrayPics.put(pic.getKey());
+            }
+
+            JSONArray geoJsonArray = new JSONArray();
+            String tmpBody = ft.getBody();
+            JsonArray geo = PPHelper.ppFromString(tmpBody, "detail.location.geo").getAsJsonArray();
+
+            try {
+                geoJsonArray.put(geo.get(0).getAsFloat());
+                geoJsonArray.put(geo.get(1).getAsFloat());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            jBody0
+                    .put("pics", jsonArrayPics)
+                    .put("address", ft.getPlace())
+                    .put("geo", geoJsonArray)
+                    .put("content", ft.getContent())
+                    .put("createTime", ft.getCreateTime());
+        }
+
+        final Observable<String> apiResult = PPRetrofit.getInstance()
+                .api("moment.publish", jBody0.getJSONObject());
+
+        disposableList.add(
+                Observable.mergeDelayError(obsList)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .concatWith(apiResult)
+                        .observeOn(Schedulers.io())
+                        .subscribe(new Consumer<String>() {
+                                       @Override
+                                       public void accept(String s) throws Exception {
+                                           Log.v("pplog102", "ok:" + s);
+                                           uploadMomentOK();
+                                       }
+                                   },
+                                new Consumer<Throwable>() {
+                                    @Override
+                                    public void accept(Throwable t) throws Exception {
+                                        Log.v("pplog102", "error:" + t);
+                                        uploadMomentFailed();
+                                    }
+                                }));
+    }
+
+    private void uploadMomentFailed() {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            realm.beginTransaction();
+            realm.where(Footprint.class)
+                    .equalTo("key", createMomentKey)
+                    .findFirst()
+                    .setStatus(FootprintStatus.FAILED);
+            realm.commitTransaction();
+        }
+    }
+
+    private void uploadMomentOK() {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            realm.beginTransaction();
+            realm.where(Footprint.class)
+                    .equalTo("key", createMomentKey)
+                    .findFirst()
+                    .setStatus(FootprintStatus.NET);
+            realm.commitTransaction();
+        }
+    }
+
+    private Observable<String> uploadSingleImage(final byte[] data, final String key, final String token) {
+        return Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
+                uploadManager.put(data, key, token,
+                        new UpCompletionHandler() {
+                            @Override
+                            public void complete(String key, ResponseInfo info, JSONObject res) {
+                                //res包含hash、key等信息，具体字段取决于上传策略的设置
+                                if (info.isOK()) {
+                                    Log.i("qiniu", "Upload Success:" + key);
+                                    //修改本地数据库对应图片状态为NET
+                                    try (Realm realm = Realm.getDefaultInstance()) {
+                                        realm.beginTransaction();
+                                        Pic pic = realm.where(Pic.class).equalTo("key", key).findFirst();
+                                        if (pic != null) {
+                                            pic.setStatus(PicStatus.NET);
+                                        } else {
+                                            Exception apiError = new Exception("七牛上传:" + key + "失败", new Throwable("realm中没有找到指定图片"));
+                                            emitter.onError(apiError);
+                                        }
+                                        realm.commitTransaction();
+                                    }
+                                    emitter.onNext(key);
+                                    emitter.onComplete();
+                                } else {
+                                    Log.i("qiniu", "Upload Fail");
+                                    //如果失败，这里可以把info信息上报自己的服务器，便于后面分析上传错误原因
+                                    Exception apiError = new Exception("七牛上传:" + key + "失败", new Throwable(info.error.toString()));
+                                    emitter.onError(apiError);
+                                }
+                                Log.i("qiniu", key + ",\r\n " + info + ",\r\n " + res);
+                            }
+                        }, null);
+
+            }
+        });
     }
 }

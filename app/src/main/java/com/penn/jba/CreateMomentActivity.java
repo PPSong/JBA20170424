@@ -63,10 +63,6 @@ public class CreateMomentActivity extends AppCompatActivity {
 
     private Realm realm;
 
-    private Configuration config = new Configuration.Builder().build();
-
-    private UploadManager uploadManager = new UploadManager(config);
-
     private String key;
 
     @Override
@@ -222,8 +218,7 @@ public class CreateMomentActivity extends AppCompatActivity {
             footprint.setStatus(FootprintStatus.LOCAL);
             realm.commitTransaction();
 
-            uploadMoment();
-
+            setResult(RESULT_OK);
             finish();
 
         } catch (JSONException e) {
@@ -231,142 +226,6 @@ public class CreateMomentActivity extends AppCompatActivity {
             PPHelper.ppShowError(e.toString());
 
             return;
-        }
-    }
-
-    private Observable<String> uploadSingleImage(final byte[] data, final String key, final String token) {
-        return Observable.create(new ObservableOnSubscribe<String>() {
-            @Override
-            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
-                uploadManager.put(data, key, token,
-                        new UpCompletionHandler() {
-                            @Override
-                            public void complete(String key, ResponseInfo info, JSONObject res) {
-                                //res包含hash、key等信息，具体字段取决于上传策略的设置
-                                if (info.isOK()) {
-                                    Log.i("qiniu", "Upload Success:" + key);
-                                    //修改本地数据库对应图片状态为NET
-                                    try (Realm realm = Realm.getDefaultInstance()) {
-                                        realm.beginTransaction();
-                                        Pic pic = realm.where(Pic.class).equalTo("key", key).findFirst();
-                                        if (pic != null) {
-                                            pic.setStatus(PicStatus.NET);
-                                        } else {
-                                            Exception apiError = new Exception("七牛上传:" + key + "失败", new Throwable("realm中没有找到指定图片"));
-                                            emitter.onError(apiError);
-                                        }
-                                        realm.commitTransaction();
-                                    }
-                                    emitter.onNext(key);
-                                    emitter.onComplete();
-                                } else {
-                                    Log.i("qiniu", "Upload Fail");
-                                    //如果失败，这里可以把info信息上报自己的服务器，便于后面分析上传错误原因
-                                    Exception apiError = new Exception("七牛上传:" + key + "失败", new Throwable(info.error.toString()));
-                                    emitter.onError(apiError);
-                                }
-                                Log.i("qiniu", key + ",\r\n " + info + ",\r\n " + res);
-                            }
-                        }, null);
-
-            }
-        });
-    }
-
-    public void uploadMoment() {
-        ArrayList<Observable<String>> obsList = new ArrayList();
-
-        PPJSONObject jBody0 = new PPJSONObject();
-
-        try (Realm realm = Realm.getDefaultInstance()) {
-            final Footprint ft = realm.where(Footprint.class).equalTo("key", key).findFirst();
-            //上传图片
-            RealmList<Pic> pics = ft.getPics();
-
-            for (int i = 0; i < pics.size(); i++) {
-                final Pic item = pics.get(i);
-                if (item.getStatus().equals(PicStatus.NET.toString())) {
-                    continue;
-                }
-                final byte[] tmpData = item.getLocalData();
-                final String key = item.getKey();
-                PPJSONObject jBody = new PPJSONObject();
-                jBody
-                        .put("type", "public")
-                        .put("filename", key);
-
-                final Observable<String> apiResult1 = PPRetrofit.getInstance().api("system.generateUploadToken", jBody.getJSONObject());
-
-                obsList.add(apiResult1.flatMap(new Function<String, ObservableSource<String>>() {
-                    @Override
-                    public ObservableSource<String> apply(String tokenMsg) throws Exception {
-                        PPWarn ppWarn = ppWarning(tokenMsg);
-                        if (ppWarn != null) {
-                            throw new Exception("ppError:" + ppWarn.msg + ":" + key);
-                        }
-                        String token = PPHelper.ppFromString(tokenMsg, "data.token").getAsString();
-                        return uploadSingleImage(tmpData, key, token);
-                    }
-                }));
-            }
-
-            JSONArray jsonArrayPics = new JSONArray();
-
-            for (Pic pic : pics) {
-                jsonArrayPics.put(pic.getKey());
-            }
-            jBody0
-                    .put("pics", jsonArrayPics)
-                    .put("address", ft.getPlace())
-                    .put("geo", geoJsonArray)
-                    .put("content", ft.getContent())
-                    .put("createTime", ft.getCreateTime());
-        }
-
-        final Observable<String> apiResult = PPRetrofit.getInstance()
-                .api("moment.publish", jBody0.getJSONObject());
-
-        disposableList.add(
-                Observable.mergeDelayError(obsList)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(Schedulers.io())
-                        .concatWith(apiResult)
-                        .observeOn(Schedulers.io())
-                        .subscribe(new Consumer<String>() {
-                                       @Override
-                                       public void accept(String s) throws Exception {
-                                           Log.v("pplog102", "ok:" + s);
-                                           uploadMomentOK();
-                                       }
-                                   },
-                                new Consumer<Throwable>() {
-                                    @Override
-                                    public void accept(Throwable t) throws Exception {
-                                        Log.v("pplog102", "error:" + t);
-                                        uploadMomentFailed();
-                                    }
-                                }));
-    }
-
-    private void uploadMomentFailed() {
-        try (Realm realm = Realm.getDefaultInstance()) {
-            realm.beginTransaction();
-            realm.where(Footprint.class)
-                    .equalTo("key", key)
-                    .findFirst()
-                    .setStatus(FootprintStatus.FAILED);
-            realm.commitTransaction();
-        }
-    }
-
-    private void uploadMomentOK() {
-        try (Realm realm = Realm.getDefaultInstance()) {
-            realm.beginTransaction();
-            realm.where(Footprint.class)
-                    .equalTo("key", key)
-                    .findFirst()
-                    .setStatus(FootprintStatus.NET);
-            realm.commitTransaction();
         }
     }
 }
