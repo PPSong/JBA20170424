@@ -29,8 +29,9 @@ public abstract class PPRefreshLoadController implements SwipeRefreshLayout.OnRe
             final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView
                     .getLayoutManager();
 
+            //用setOnScrollListener, 而不用addOnScrollListener, 因为addOnScrollListener和MaterialViewPager插件冲突
             recyclerView
-                    .addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    .setOnScrollListener(new RecyclerView.OnScrollListener() {
                         @Override
                         public void onScrolled(final RecyclerView recyclerView,
                                                int dx, int dy) {

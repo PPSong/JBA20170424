@@ -1,14 +1,17 @@
 package com.penn.jba.footprint;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.penn.jba.PPApplication;
 import com.penn.jba.R;
 
+import com.penn.jba.dailyReport.DailyReportActivity;
 import com.penn.jba.databinding.FootprintType8Binding;
 import com.penn.jba.databinding.FootprintType9Binding;
 import com.penn.jba.databinding.FootprintType1Binding;
@@ -75,7 +78,7 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
     }
 
     @Override
-    public void onBindRealViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindRealViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof FootprintType8ViewHolder) {
             ((FootprintType8ViewHolder) holder).bind(data.get(position));
         } else if (holder instanceof FootprintType9ViewHolder) {
@@ -91,6 +94,18 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
         } else {
             ((PPViewHolder) holder).bind(data.get(position));
         }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Footprint ft = data.get(position);
+                if (ft.getType() == 10) {
+                    Intent intent = new Intent(context, DailyReportActivity.class);
+                    intent.putExtra("dailyReportId", ft.getId());
+                    context.startActivity(intent);
+                }
+            }
+        });
     }
 
     public static class PPViewHolder extends RecyclerView.ViewHolder {

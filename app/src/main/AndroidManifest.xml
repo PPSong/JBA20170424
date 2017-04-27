@@ -44,13 +44,18 @@
         <activity
             android:name=".TabsActivity"
             android:label="@string/title_activity_tabs"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".CreateMomentActivity"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".CreateMomentActivity" />
         <activity
             android:name="org.lasque.tusdk.impl.activity.TuFragmentActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity android:name=".dailyReport.DailyReportActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            >
+
+        </activity>
     </application>
 
 </manifest>

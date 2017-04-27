@@ -74,9 +74,20 @@ public class PPHelper {
     //pptodo end testing block
 
     public static String get80ImageUrl(String imageName) {
-        String result = qiniuBase + imageName + "?imageView2/1/w/80/h/80/interlace/1/";
-        Log.v("pplog1", result);
-        return result;
+        return getImageUrl(imageName, 80);
+    }
+
+    public static String get800ImageUrl(String imageName) {
+        return getImageUrl(imageName, 800);
+    }
+
+    private static String getImageUrl(String imageName, int size) {
+        if (imageName.startsWith("http")) {
+            return imageName;
+        } else {
+            String result = qiniuBase + imageName + "?imageView2/1/w/" + size + "/h/" + size + "/interlace/1/";
+            return result;
+        }
     }
 
     public static void ppShowError(String msg) {
