@@ -68,5 +68,9 @@
     <string name="error_invalid_place">地名不得超过70字</string>
     <string name="moment_content_place_required">内容和地址都不能为空</string>
     <string name="loading">处理中...</string>
+    <string name="go_to_see">去看看</string>
+    <string name="be_your_fans">成为了你的粉丝</string>
+    <string name="collect_ta_moment">迹录了Ta的片刻</string>
+    <string name="collect_your_moment">迹录了你的片刻</string>
 
 </resources>

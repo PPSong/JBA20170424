@@ -41,6 +41,7 @@ import com.penn.jba.util.FootprintStatus;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPJSONObject;
 import com.penn.jba.util.PPRetrofit;
+import com.penn.jba.util.PPValueType;
 import com.penn.jba.util.PPWarn;
 import com.penn.jba.util.PicStatus;
 import com.qiniu.android.http.ResponseInfo;
@@ -480,7 +481,17 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                                        @Override
                                        public void accept(String s) throws Exception {
                                            Log.v("pplog102", "ok:" + s);
-                                           uploadMomentOK();
+                                           //判断是moment.publish返回的结果
+                                           if (PPHelper.ppFromString(s, "code", PPValueType.INT).getAsInt() != 0) {
+                                               PPWarn ppWarn = ppWarning(s);
+                                               if (ppWarn != null) {
+                                                   Log.v("pplog", "error:" + ppWarn.msg);
+                                                   uploadMomentFailed();
+                                                   return;
+                                               }
+
+                                               uploadMomentOK();
+                                           }
                                        }
                                    },
                                 new Consumer<Throwable>() {

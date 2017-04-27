@@ -4,15 +4,21 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.github.florent37.materialviewpager.header.MaterialViewPagerHeaderDecorator;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.penn.jba.R;
 import com.penn.jba.databinding.FragmentReportListBinding;
 import com.penn.jba.footprint.FootprintAdapter;
 import com.penn.jba.model.realm.CurrentUser;
 import com.penn.jba.model.realm.Footprint;
+import com.penn.jba.util.PPHelper;
 
 import java.util.ArrayList;
 
@@ -25,7 +31,8 @@ public class ReportListFragment extends Fragment {
 
     private ArrayList<Disposable> disposableList = new ArrayList<Disposable>();
 
-    //private RealmResults<Footprint> footprints;
+    private String type;
+    private String data = "";
 
     //private FootprintAdapter footprintAdapter;
 
@@ -35,8 +42,12 @@ public class ReportListFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static ReportListFragment newInstance() {
+    public static ReportListFragment newInstance(String type, String data) {
         ReportListFragment fragment = new ReportListFragment();
+        Bundle args = new Bundle();
+        args.putString("type", type);
+        args.putString("data", data);
+        fragment.setArguments(args);
 
         return fragment;
     }
@@ -44,6 +55,10 @@ public class ReportListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            type = getArguments().getString("type");
+            data = getArguments().getString("data");
+        }
     }
 
     @Override
@@ -58,10 +73,15 @@ public class ReportListFragment extends Fragment {
 
         setup();
 
-        return  view;
+        return view;
     }
 
     private void setup() {
-
+        binding.mainRv.setLayoutManager(new LinearLayoutManager(activityContext));
+        binding.mainRv.setHasFixedSize(true);
+        JsonArray tmpData = new Gson().fromJson(data, JsonArray.class);
+        Log.v("pplog121", tmpData.toString());
+        binding.mainRv.addItemDecoration(new MaterialViewPagerHeaderDecorator());
+        binding.mainRv.setAdapter(new ReportListAdapter(type, tmpData));
     }
 }

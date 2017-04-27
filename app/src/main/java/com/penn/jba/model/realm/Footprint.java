@@ -152,7 +152,7 @@ public class Footprint extends RealmObject {
             int fansNum = ppFromString(body, "detail.fansNum").getAsInt();
             int collectNum = ppFromString(body, "detail.collectNum").getAsInt();
             int beCollectedNum = ppFromString(body, "detail.beCollectedNum").getAsInt();
-            String result = PPApplication.getContext().getString(R.string.daily_report);
+            String result = PPApplication.getContext().getString(R.string.daily_report) + getId();
 
             return String.format(result, beCollectedNum, collectNum, fansNum);
         } else if (type == 0) {
