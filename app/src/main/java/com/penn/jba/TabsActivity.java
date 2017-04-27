@@ -135,7 +135,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CREATE_MOMENT && resultCode == RESULT_OK) {
-            uploadMoment();
+            uploadMoment(createMomentKey);
         }
     }
 
@@ -405,13 +405,13 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         }
     }
 
-    public void uploadMoment() {
+    public void uploadMoment(String needUploadKey) {
         ArrayList<Observable<String>> obsList = new ArrayList();
 
         PPJSONObject jBody0 = new PPJSONObject();
 
         try (Realm realm = Realm.getDefaultInstance()) {
-            final Footprint ft = realm.where(Footprint.class).equalTo("key", createMomentKey).findFirst();
+            final Footprint ft = realm.where(Footprint.class).equalTo("key", needUploadKey).findFirst();
             //上传图片
             RealmList<Pic> pics = ft.getPics();
 
