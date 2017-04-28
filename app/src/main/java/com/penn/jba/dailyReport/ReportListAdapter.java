@@ -1,5 +1,7 @@
 package com.penn.jba.dailyReport;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,6 +10,7 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.load.engine.Resource;
 import com.google.gson.JsonArray;
+import com.penn.jba.OtherMainPageActivity;
 import com.penn.jba.PPApplication;
 import com.penn.jba.R;
 import com.penn.jba.databinding.ListReportRecordBinding;
@@ -17,6 +20,7 @@ import com.squareup.picasso.Picasso;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import static android.R.attr.type;
 import static com.penn.jba.util.PPValueType.STRING;
 
 /**
@@ -26,12 +30,13 @@ import static com.penn.jba.util.PPValueType.STRING;
 public class ReportListAdapter extends RecyclerView.Adapter<ReportListAdapter.ReportRecord> {
     private JsonArray data;
     private String desWords;
+    private Context activityContext;
 
     public ReportListAdapter() {
         super();
     }
 
-    public ReportListAdapter(String type, JsonArray data) {
+    public ReportListAdapter(Context activityContext, String type, JsonArray data) {
         super();
         if (type == "fans") {
             desWords = PPApplication.getContext().getResources().getString(R.string.be_your_fans);
@@ -42,6 +47,7 @@ public class ReportListAdapter extends RecyclerView.Adapter<ReportListAdapter.Re
         }
 
         this.data = data;
+        this.activityContext = activityContext;
     }
 
     @Override
@@ -72,7 +78,7 @@ public class ReportListAdapter extends RecyclerView.Adapter<ReportListAdapter.Re
             this.binding = binding;
         }
 
-        public void bind(String recordStr) {
+        public void bind(final String recordStr) {
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(PPHelper.ppFromString(recordStr, "head", STRING).getAsString()))
                     .placeholder(R.drawable.profile)
@@ -86,6 +92,15 @@ public class ReportListAdapter extends RecyclerView.Adapter<ReportListAdapter.Re
             } catch (Exception e) {
                 Log.v("pplog", "error:" + e);
             }
+
+            binding.goBt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(activityContext, OtherMainPageActivity.class);
+                    intent.putExtra("targetId", PPHelper.ppFromString(recordStr, "id", STRING).getAsString());
+                    activityContext.startActivity(intent);
+                }
+            });
         }
     }
 }

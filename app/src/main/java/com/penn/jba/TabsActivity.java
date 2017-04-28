@@ -142,6 +142,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
 
     //-----helper-----
     private void setup() {
+        tryRepublishMoment();
+
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
         binding.mainVp.setAdapter(adapterViewPager);
 
@@ -358,7 +360,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         // comp.componentOption().albumMultipleComponentOption().albumListOption().setPhotosSortDescriptor(PhotoSortDescriptor.Date_Added);
 
         // 设置最大支持的图片尺寸 默认：8000 * 8000
-		 comp.componentOption().albumMultipleComponentOption().albumListOption().setMaxSelectionImageSize(new TuSdkSize(1000, 1000));
+        comp.componentOption().albumMultipleComponentOption().albumListOption().setMaxSelectionImageSize(new TuSdkSize(1000, 1000));
 
         // 操作完成后是否自动关闭页面
         comp.setAutoDismissWhenCompleted(true)
@@ -406,7 +408,19 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         }
     }
 
-    public void uploadMoment(String needUploadKey) {
+    private void tryRepublishMoment() {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            RealmResults<Footprint> fts = realm.where(Footprint.class)
+                    .equalTo("status", FootprintStatus.LOCAL.toString())
+                    .findAll();
+
+            for (Footprint ft : fts) {
+                uploadMoment(ft.getKey());
+            }
+        }
+    }
+
+    private void uploadMoment(final String needUploadKey) {
         ArrayList<Observable<String>> obsList = new ArrayList();
 
         PPJSONObject jBody0 = new PPJSONObject();
@@ -486,11 +500,11 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                                                PPWarn ppWarn = ppWarning(s);
                                                if (ppWarn != null) {
                                                    Log.v("pplog", "error:" + ppWarn.msg);
-                                                   uploadMomentFailed();
+                                                   uploadMomentFailed(needUploadKey);
                                                    return;
                                                }
 
-                                               uploadMomentOK();
+                                               uploadMomentOK(needUploadKey);
                                            }
                                        }
                                    },
@@ -498,27 +512,27 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                                     @Override
                                     public void accept(Throwable t) throws Exception {
                                         Log.v("pplog102", "error:" + t);
-                                        uploadMomentFailed();
+                                        uploadMomentFailed(needUploadKey);
                                     }
                                 }));
     }
 
-    private void uploadMomentFailed() {
+    private void uploadMomentFailed(String key) {
         try (Realm realm = Realm.getDefaultInstance()) {
             realm.beginTransaction();
             realm.where(Footprint.class)
-                    .equalTo("key", createMomentKey)
+                    .equalTo("key", key)
                     .findFirst()
                     .setStatus(FootprintStatus.FAILED);
             realm.commitTransaction();
         }
     }
 
-    private void uploadMomentOK() {
+    private void uploadMomentOK(String key) {
         try (Realm realm = Realm.getDefaultInstance()) {
             realm.beginTransaction();
             realm.where(Footprint.class)
-                    .equalTo("key", createMomentKey)
+                    .equalTo("key", key)
                     .findFirst()
                     .setStatus(FootprintStatus.NET);
             realm.commitTransaction();

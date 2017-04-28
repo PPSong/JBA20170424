@@ -85,6 +85,7 @@ public class PPHelper {
         if (imageName.startsWith("http")) {
             return imageName;
         } else {
+            //pptodo 如果是"", 返回默认图片
             String result = qiniuBase + imageName + "?imageView2/1/w/" + size + "/h/" + size + "/interlace/1/";
             return result;
         }
