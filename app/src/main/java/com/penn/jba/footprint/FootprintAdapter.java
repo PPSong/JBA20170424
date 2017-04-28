@@ -349,8 +349,6 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
                     .placeholder(R.drawable.profile).into(binding.avatarIv);
-
-            binding.placeTv.setText(ft.getPlace());
         }
     }
 }
