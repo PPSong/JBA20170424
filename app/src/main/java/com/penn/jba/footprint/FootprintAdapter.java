@@ -8,10 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.JsonArray;
+import com.penn.jba.FootprintBelong;
 import com.penn.jba.PPApplication;
 import com.penn.jba.R;
 
 import com.penn.jba.dailyReport.DailyReportActivity;
+import com.penn.jba.databinding.FootprintType11Binding;
 import com.penn.jba.databinding.FootprintType8Binding;
 import com.penn.jba.databinding.FootprintType9Binding;
 import com.penn.jba.databinding.FootprintType1Binding;
@@ -39,8 +42,8 @@ import io.realm.RealmList;
 public class FootprintAdapter extends PPLoadAdapter<Footprint> {
     private Context context;
 
-    public FootprintAdapter(Context context, List<Footprint> data, boolean isMine) {
-        super(data, isMine);
+    public FootprintAdapter(Context context, List<Footprint> data, FootprintBelong footprintBelong) {
+        super(data, footprintBelong);
         this.context = context;
     }
 
@@ -71,6 +74,9 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             case 0:
                 FootprintType0Binding binding0 = FootprintType0Binding.inflate(layoutInflater, parent, false);
                 return new FootprintType0ViewHolder(binding0);
+            case 11:
+                FootprintType11Binding binding11 = FootprintType11Binding.inflate(layoutInflater, parent, false);
+                return new FootprintType11ViewHolder(binding11);
             default:
                 ListRowAllMomentBinding binding = ListRowAllMomentBinding.inflate(layoutInflater, parent, false);
                 return new PPViewHolder(binding);
@@ -91,6 +97,8 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             ((FootprintType10ViewHolder) holder).bind(data.get(position));
         } else if (holder instanceof FootprintType0ViewHolder) {
             ((FootprintType0ViewHolder) holder).bind(data.get(position));
+        } else if (holder instanceof FootprintType11ViewHolder) {
+            ((FootprintType11ViewHolder) holder).bind(data.get(position));
         } else {
             ((PPViewHolder) holder).bind(data.get(position));
         }
@@ -250,6 +258,29 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.setPresenter(ft);
             binding.executePendingBindings();
             binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
+        }
+    }
+
+    public class FootprintType11ViewHolder extends RecyclerView.ViewHolder {
+        private final FootprintType11Binding binding;
+
+        public FootprintType11ViewHolder(FootprintType11Binding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(Footprint ft) {
+            binding.setPresenter(ft);
+            binding.executePendingBindings();
+            binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
+                    .placeholder(R.drawable.profile).into(binding.avatarIv);
+
+            JsonArray geo = PPHelper.ppFromString(ft.getBody(), "detail.geo").getAsJsonArray();
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.getBaiduMap(geo))
+                    .placeholder(R.drawable.header).into(binding.mapIv);
         }
     }
 }

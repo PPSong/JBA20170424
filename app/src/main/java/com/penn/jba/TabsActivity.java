@@ -300,7 +300,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
             ft.setCreateTime(now);
             ft.setStatus(FootprintStatus.PREPARE);
             ft.setType(3);
-            ft.setMine(true);
+            ft.setFootprintBelong(FootprintBelong.MINE);
 
             ft.setPics(new RealmList<Pic>());
 

@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.penn.jba.FootprintBelong;
 import com.penn.jba.R;
 import com.penn.jba.databinding.FragmentFootprintAllBinding;
 import com.penn.jba.model.realm.Footprint;
@@ -107,11 +108,11 @@ public class FootprintAllFragment extends Fragment {
     //-----helper-----
     public void setup() {
         realm = Realm.getDefaultInstance();
-        footprints = realm.where(Footprint.class).equalTo("isMine", false).findAllSorted("createTime", Sort.DESCENDING);
+        footprints = realm.where(Footprint.class).equalTo("footprintBelong", FootprintBelong.ALL.toString()).findAllSorted("createTime", Sort.DESCENDING);
         footprints.addChangeListener(changeListener);
 
         binding.mainRv.setLayoutManager(new LinearLayoutManager(getActivity()));
-        footprintAdapter = new FootprintAdapter(activityContext, footprints, false);
+        footprintAdapter = new FootprintAdapter(activityContext, footprints, FootprintBelong.ALL);
         binding.mainRv.setAdapter(footprintAdapter);
 
         binding.mainRv.setHasFixedSize(true);
@@ -152,7 +153,7 @@ public class FootprintAllFragment extends Fragment {
             realm.beginTransaction();
 
             if (refresh) {
-                RealmResults<Footprint> r = realm.where(Footprint.class).equalTo("isMine", false).findAll();
+                RealmResults<Footprint> r = realm.where(Footprint.class).equalTo("footprintBelong", FootprintBelong.ALL.toString()).findAll();
                 for (Footprint f : r) {
                     f.getPics().deleteAllFromRealm();
                 }
@@ -172,7 +173,7 @@ public class FootprintAllFragment extends Fragment {
                 createTime = PPHelper.ppFromString(s, "data." + i + ".createTime").getAsLong();
                 type = PPHelper.ppFromString(s, "data." + i + ".type").getAsInt();
                 String createdBy = PPHelper.ppFromString(s, "data." + i + ".createdBy").getAsString();
-                String key = "" + createTime + "_" + type + "_" + createdBy + "_" + false;
+                String key = "" + createTime + "_" + type + "_" + createdBy + "_" + FootprintBelong.ALL.toString();
 
                 Footprint ft = realm.where(Footprint.class)
                         .equalTo("key", key)
@@ -190,7 +191,7 @@ public class FootprintAllFragment extends Fragment {
                 ft.setStatus(FootprintStatus.NET);
                 ft.setType(type);
                 ft.setHash(hash);
-                ft.setMine(false);
+                ft.setFootprintBelong(FootprintBelong.ALL);
                 ft.setBody(PPHelper.ppFromString(s, "data." + i + "").getAsJsonObject().toString());
 
                 //处理图片s

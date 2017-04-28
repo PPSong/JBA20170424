@@ -1,5 +1,6 @@
 package com.penn.jba.model.realm;
 
+import com.penn.jba.FootprintBelong;
 import com.penn.jba.PPApplication;
 import com.penn.jba.R;
 import com.penn.jba.util.FootprintStatus;
@@ -11,6 +12,7 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 import static android.R.attr.type;
+import static com.penn.jba.R.string.mine;
 import static com.penn.jba.util.PPHelper.ppFromString;
 
 /**
@@ -26,7 +28,8 @@ public class Footprint extends RealmObject {
     private String status;
     private int type;
     private String body;
-    private boolean isMine;
+
+    private String footprintBelong;
 
     private RealmList<Pic> pics;
 
@@ -86,12 +89,12 @@ public class Footprint extends RealmObject {
         this.body = body;
     }
 
-    public boolean isMine() {
-        return isMine;
+    public String getFootprintBelong() {
+        return footprintBelong;
     }
 
-    public void setMine(boolean mine) {
-        isMine = mine;
+    public void setFootprintBelong(FootprintBelong value) {
+        footprintBelong = value.toString();
     }
 
     public RealmList<Pic> getPics() {
@@ -157,9 +160,11 @@ public class Footprint extends RealmObject {
             return String.format(result, beCollectedNum, collectNum, fansNum);
         } else if (type == 0) {
             return PPApplication.getContext().getString((R.string.welcome));
+        } else if (type == 11) {
+            return PPApplication.getContext().getString((R.string.i_meet_ta_shoulder)) + PPHelper.ppFromString(body, "detail.geo").getAsJsonArray().toString();
         }
 
-        return getBody();
+        return getType() + "," + getHash();
     }
 
     public String getAvatarNetFileName() {
@@ -182,6 +187,15 @@ public class Footprint extends RealmObject {
                 return ppFromString(body, "relatedUsers.0.head").getAsString();
             }
         } else if (type == 1) {
+            String idA = ppFromString(body, "relatedUsers.0.id").getAsString();
+            String idB = ppFromString(body, "relatedUsers.1.id").getAsString();
+
+            if (idA == PPHelper.currentUserId) {
+                return ppFromString(body, "relatedUsers.1.head").getAsString();
+            } else {
+                return ppFromString(body, "relatedUsers.0.head").getAsString();
+            }
+        } else if (type == 11) {
             String idA = ppFromString(body, "relatedUsers.0.id").getAsString();
             String idB = ppFromString(body, "relatedUsers.1.id").getAsString();
 

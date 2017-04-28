@@ -97,31 +97,21 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <!--<android.support.v7.widget.RecyclerView-->
-        <!--android:id="@+id/main_rv"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent">-->
-
-        <!--</android.support.v7.widget.RecyclerView>-->
-        <android.support.v4.widget.NestedScrollView
-            android:id="@+id/user_rv"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/main_swipe_refresh_layout"
+            android:visibility="invisible"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="invisible"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <LinearLayout
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/user_rv"
                 android:layout_width="match_parent"
-                android:layout_height="2000dp">
+                android:layout_height="match_parent"
+                >
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/md_yellow_50"
-                    android:text="user_rv" />
-            </LinearLayout>
-
-        </android.support.v4.widget.NestedScrollView>
+            </android.support.v7.widget.RecyclerView>
+        </android.support.v4.widget.SwipeRefreshLayout>
 
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/user_nsv"
