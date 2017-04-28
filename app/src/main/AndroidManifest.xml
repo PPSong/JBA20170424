@@ -51,9 +51,9 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
-        <activity android:name=".dailyReport.DailyReportActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
+        <activity
+            android:name=".dailyReport.DailyReportActivity"
+            android:theme="@style/DailyReport">
 
         </activity>
     </application>

@@ -147,7 +147,7 @@ public class Footprint extends RealmObject {
 //            for (Pic pic: pics) {
 //                tmp += pic.getKey() + ",";
 //            }
-            return ppFromString(body, "detail.content").getAsString() + hash;
+            return ppFromString(body, "detail.content").getAsString();
         } else if (type == 10) {
             int fansNum = ppFromString(body, "detail.fansNum").getAsInt();
             int collectNum = ppFromString(body, "detail.collectNum").getAsInt();

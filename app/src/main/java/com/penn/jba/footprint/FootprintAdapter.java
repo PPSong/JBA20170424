@@ -2,8 +2,10 @@ package com.penn.jba.footprint;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -122,6 +124,7 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
         }
     }
 
+    // x寄了一封信给我
     public class FootprintType8ViewHolder extends RecyclerView.ViewHolder {
         private final FootprintType8Binding binding;
 
@@ -134,12 +137,18 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.setPresenter(ft);
             binding.executePendingBindings();
             binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
+            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type8);
+            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#483D8B"));
+            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#483D8B"));
+            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#483D8B"));
+            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#483D8B"));
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
                     .placeholder(R.drawable.profile).into(binding.avatarIv);
         }
     }
 
+    // x给我回信
     public class FootprintType9ViewHolder extends RecyclerView.ViewHolder {
         private final FootprintType9Binding binding;
 
@@ -152,12 +161,18 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.setPresenter(ft);
             binding.executePendingBindings();
             binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
+            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type9);
+            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#7B68EE"));
+            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#7B68EE"));
+            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#7B68EE"));
+            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#7B68EE"));
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
                     .placeholder(R.drawable.profile).into(binding.avatarIv);
         }
     }
 
+    // x 关注了我
     public class FootprintType1ViewHolder extends RecyclerView.ViewHolder {
         private final FootprintType1Binding binding;
 
@@ -170,12 +185,18 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.setPresenter(ft);
             binding.executePendingBindings();
             binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
+            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type1);
+            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#FFA500"));
+            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#FFA500"));
+            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#FFA500"));
+            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#FFA500"));
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
                     .placeholder(R.drawable.profile).into(binding.avatarIv);
         }
     }
 
+    // 我的moment
     public class FootprintType3ViewHolder extends RecyclerView.ViewHolder {
         private final FootprintType3Binding binding;
 
@@ -188,7 +209,11 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.setPresenter(ft);
             binding.executePendingBindings();
             binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
-
+            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type3);
+            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#45BB7D"));
+            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#45BB7D"));
+            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#45BB7D"));
+            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#45BB7D"));
             binding.contentTv.setText(ft.getContent());
             binding.placeTv.setText(ft.getPlace());
 
@@ -223,6 +248,7 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
         }
     }
 
+    // 我被x人记录了片刻
     public class FootprintType10ViewHolder extends RecyclerView.ViewHolder {
         private final FootprintType10Binding binding;
 
@@ -235,9 +261,15 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.setPresenter(ft);
             binding.executePendingBindings();
             binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
+            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type10);
+            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#B22222"));
+            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#B22222"));
+            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#B22222"));
+            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#B22222"));
         }
     }
 
+    // 第一次足迹
     public class FootprintType0ViewHolder extends RecyclerView.ViewHolder {
         private final FootprintType0Binding binding;
 
@@ -250,6 +282,11 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.setPresenter(ft);
             binding.executePendingBindings();
             binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
+            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type0);
+            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#FF1493"));
+            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#FF1493"));
+            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#FF1493"));
+            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#FF1493"));
         }
     }
 }
