@@ -9,12 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.penn.jba.FootprintBelong;
 import com.penn.jba.PPApplication;
 import com.penn.jba.R;
 
 import com.penn.jba.dailyReport.DailyReportActivity;
 import com.penn.jba.databinding.FootprintType11Binding;
+import com.penn.jba.databinding.FootprintType4Binding;
 import com.penn.jba.databinding.FootprintType8Binding;
 import com.penn.jba.databinding.FootprintType9Binding;
 import com.penn.jba.databinding.FootprintType1Binding;
@@ -25,9 +27,11 @@ import com.penn.jba.databinding.ListRowAllMomentBinding;
 import com.penn.jba.model.realm.Footprint;
 
 import com.penn.jba.model.realm.Pic;
+import com.penn.jba.util.CollectMomentImageAdapter;
 import com.penn.jba.util.MomentImageAdapter;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPLoadAdapter;
+import com.penn.jba.util.PPValueType;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -77,6 +81,9 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             case 11:
                 FootprintType11Binding binding11 = FootprintType11Binding.inflate(layoutInflater, parent, false);
                 return new FootprintType11ViewHolder(binding11);
+            case 4:
+                FootprintType4Binding binding4 = FootprintType4Binding.inflate(layoutInflater, parent, false);
+                return new FootprintType4ViewHolder(binding4);
             default:
                 ListRowAllMomentBinding binding = ListRowAllMomentBinding.inflate(layoutInflater, parent, false);
                 return new PPViewHolder(binding);
@@ -99,6 +106,8 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             ((FootprintType0ViewHolder) holder).bind(data.get(position));
         } else if (holder instanceof FootprintType11ViewHolder) {
             ((FootprintType11ViewHolder) holder).bind(data.get(position));
+        } else if (holder instanceof FootprintType4ViewHolder) {
+            ((FootprintType4ViewHolder) holder).bind(data.get(position));
         } else {
             ((PPViewHolder) holder).bind(data.get(position));
         }
@@ -281,6 +290,67 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.getBaiduMap(geo))
                     .placeholder(R.drawable.header).into(binding.mapIv);
+        }
+    }
+
+    public class FootprintType4ViewHolder extends RecyclerView.ViewHolder {
+        private final FootprintType4Binding binding;
+
+        public FootprintType4ViewHolder(FootprintType4Binding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(Footprint ft) {
+            binding.setPresenter(ft);
+            binding.executePendingBindings();
+            binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
+
+            binding.contentTv.setText(ft.getContent());
+            binding.placeTv.setText(ft.getPlace());
+
+            //设置图片
+            ArrayList<String> pics = new ArrayList<>();
+            String body = ft.getBody();
+            Log.v("pplog133", body);
+            JsonArray moments = PPHelper.ppFromString(body, "detail.moments").getAsJsonArray();
+            int size = moments.size();
+
+            for (int i = 0; i < size; i++) {
+                pics.add(PPHelper.ppFromString(body, "detail.moments." + i + ".pics.0", PPValueType.STRING).getAsString());
+            }
+
+            int picNum = pics.size();
+            int width = 0;
+            if (picNum == 0) {
+                //do nothing
+            } else if (picNum == 1) {
+                binding.mainGv.setNumColumns(1);
+                width = PPHelper.MomentGridViewWidth;
+            } else if (picNum == 2) {
+                binding.mainGv.setNumColumns(2);
+                width = PPHelper.MomentGridViewWidth / 2;
+            } else if (picNum == 3) {
+                binding.mainGv.setNumColumns(2);
+                width = PPHelper.MomentGridViewWidth / 2;
+            } else if (picNum == 4) {
+                binding.mainGv.setNumColumns(2);
+                width = PPHelper.MomentGridViewWidth / 2;
+            } else {
+                binding.mainGv.setNumColumns(3);
+                width = PPHelper.MomentGridViewWidth / 3;
+            }
+
+            final float scale = context.getResources().getDisplayMetrics().density;
+            int pixels = (int) (width * scale + 0.5f);
+            CollectMomentImageAdapter collectMomentImageAdapter = new CollectMomentImageAdapter(context, pics, pixels);
+            binding.mainGv.setAdapter(collectMomentImageAdapter);
+            binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
+                    .placeholder(R.drawable.profile).into(binding.avatarIv);
+
+            binding.placeTv.setText(ft.getPlace());
         }
     }
 }

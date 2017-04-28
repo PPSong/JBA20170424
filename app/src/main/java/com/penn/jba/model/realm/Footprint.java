@@ -12,7 +12,9 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 import static android.R.attr.type;
+import static com.penn.jba.R.string.i_follow_to_sb;
 import static com.penn.jba.R.string.mine;
+import static com.penn.jba.R.string.sb_follow_to_me;
 import static com.penn.jba.util.PPHelper.ppFromString;
 
 /**
@@ -21,7 +23,7 @@ import static com.penn.jba.util.PPHelper.ppFromString;
 
 public class Footprint extends RealmObject {
     @PrimaryKey
-    private String key; //createTime+"_"+type+"_"+createdBy+"_"+isMine
+    private String key; //createTime+"_"+type+"_"+createdBy+"_"+FootprintBelong
     private String hash;
     private long createTime;
     private String id;
@@ -161,7 +163,21 @@ public class Footprint extends RealmObject {
         } else if (type == 0) {
             return PPApplication.getContext().getString((R.string.welcome));
         } else if (type == 11) {
-            return PPApplication.getContext().getString((R.string.i_meet_ta_shoulder)) + PPHelper.ppFromString(body, "detail.geo").getAsJsonArray().toString();
+            return PPApplication.getContext().getString((R.string.i_meet_ta_shoulder));
+        } else if (type == 4) {
+            String idA = ppFromString(body, "relatedUsers.0.id").getAsString();
+            String idB = ppFromString(body, "relatedUsers.1.id").getAsString();
+            String nicknameA = ppFromString(body, "relatedUsers.0.nickname").getAsString();
+            String nicknameB = ppFromString(body, "relatedUsers.1.nickname").getAsString();
+            if (idA == PPHelper.currentUserId) {
+                String i_collect_ta_moment = PPApplication.getContext().getString(R.string.i_collect_ta_moment);
+
+                return i_collect_ta_moment;
+            } else {
+                String ta_collect_my_moment = PPApplication.getContext().getString(R.string.ta_collect_my_moment);
+
+                return ta_collect_my_moment;
+            }
         }
 
         return getType() + "," + getHash();
@@ -204,12 +220,23 @@ public class Footprint extends RealmObject {
             } else {
                 return ppFromString(body, "relatedUsers.0.head").getAsString();
             }
+        } else if (type == 4) {
+            String idA = ppFromString(body, "relatedUsers.0.id").getAsString();
+            String idB = ppFromString(body, "relatedUsers.1.id").getAsString();
+
+            if (idA == PPHelper.currentUserId) {
+                return ppFromString(body, "relatedUsers.1.head").getAsString();
+            } else {
+                return ppFromString(body, "relatedUsers.0.head").getAsString();
+            }
         }
         return "no avatar";
     }
 
     public String getPlace() {
         if (type == 3) {
+            return ppFromString(body, "detail.location.city", PPValueType.STRING).getAsString() + ppFromString(body, "detail.location.detail").getAsString();
+        } else if (type == 4) {
             return ppFromString(body, "detail.location.city", PPValueType.STRING).getAsString() + ppFromString(body, "detail.location.detail").getAsString();
         } else {
             return "";
