@@ -25,7 +25,7 @@
             app:viewpager_disableToolbar="false"
             app:viewpager_displayToolbarWhenSwipe="true"
             app:viewpager_enableToolbarElevation="true"
-            app:viewpager_headerAdditionalHeight="0dp"
+            app:viewpager_headerAdditionalHeight="5=dp"
             app:viewpager_headerAlpha="1.0"
             app:viewpager_headerHeight="250dp"
             app:viewpager_hideLogoWithFade="true"
