@@ -8,8 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.penn.jba.CollectDetailActivity;
 import com.penn.jba.FootprintBelong;
 import com.penn.jba.PPApplication;
 import com.penn.jba.R;
@@ -24,6 +26,7 @@ import com.penn.jba.databinding.FootprintType3Binding;
 import com.penn.jba.databinding.FootprintType10Binding;
 import com.penn.jba.databinding.FootprintType0Binding;
 import com.penn.jba.databinding.ListRowAllMomentBinding;
+import com.penn.jba.model.CollectMoment;
 import com.penn.jba.model.realm.Footprint;
 
 import com.penn.jba.model.realm.Pic;
@@ -38,6 +41,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.RealmList;
+
+import static com.penn.jba.util.PPHelper.ppFromString;
 
 /**
  * Created by penn on 14/04/2017.
@@ -119,6 +124,25 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
                 if (ft.getType() == 10) {
                     Intent intent = new Intent(context, DailyReportActivity.class);
                     intent.putExtra("dailyReportId", ft.getId());
+                    context.startActivity(intent);
+                } else if (ft.getType() == 4) {
+                    Intent intent = new Intent(context, CollectDetailActivity.class);
+                    intent.putExtra("avatarStr", ft.getAvatarNetFileName());
+                    intent.putExtra("nickname", ft.getOtherUserNickname());
+                    Log.v("pplog139", ft.getBody());
+                    intent.putExtra("content", ft.getContent() + ":" + ppFromString(ft.getBody(), "detail.num").getAsInt());
+                    intent.putExtra("geoStr", ppFromString(ft.getBody(), "detail.location.geo").getAsJsonArray().toString());
+
+                    JsonArray moments = PPHelper.ppFromString(ft.getBody(), "detail.moments").getAsJsonArray();
+                    ArrayList<CollectMoment> collectMoments = new ArrayList<>();
+                    for (int i = 0; i < moments.size(); i++) {
+                        String id = PPHelper.ppFromString(ft.getBody(), "detail.moments." + i + ".id").getAsString();
+                        String picStr = PPHelper.ppFromString(ft.getBody(), "detail.moments." + i + ".pics." + 0).getAsString();
+                        collectMoments.add(new CollectMoment(id, picStr));
+                    }
+
+                    intent.putExtra("collectMomentsStr", new Gson().toJson(collectMoments));
+
                     context.startActivity(intent);
                 }
             }
@@ -286,7 +310,7 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
                     .placeholder(R.drawable.profile).into(binding.avatarIv);
 
-            JsonArray geo = PPHelper.ppFromString(ft.getBody(), "detail.geo").getAsJsonArray();
+            JsonArray geo = ppFromString(ft.getBody(), "detail.geo").getAsJsonArray();
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.getBaiduMap(geo))
                     .placeholder(R.drawable.header).into(binding.mapIv);
@@ -313,11 +337,11 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             ArrayList<String> pics = new ArrayList<>();
             String body = ft.getBody();
             Log.v("pplog133", body);
-            JsonArray moments = PPHelper.ppFromString(body, "detail.moments").getAsJsonArray();
+            JsonArray moments = ppFromString(body, "detail.moments").getAsJsonArray();
             int size = moments.size();
 
             for (int i = 0; i < size; i++) {
-                pics.add(PPHelper.ppFromString(body, "detail.moments." + i + ".pics.0", PPValueType.STRING).getAsString());
+                pics.add(ppFromString(body, "detail.moments." + i + ".pics.0", PPValueType.STRING).getAsString());
             }
 
             int picNum = pics.size();

@@ -348,17 +348,25 @@ public class OtherMainPageActivity extends AppCompatActivity {
         }
     };
 
-    private int processFootprintOther(String s, boolean refresh) {
+    private void clearOldDate() {
         try (Realm realm = Realm.getDefaultInstance()) {
             realm.beginTransaction();
-
-            if (refresh) {
-                RealmResults<Footprint> r = realm.where(Footprint.class).equalTo("footprintBelong", FootprintBelong.OTHER.toString()).findAll();
-                for (Footprint f : r) {
-                    f.getPics().deleteAllFromRealm();
-                }
-                r.deleteAllFromRealm();
+            RealmResults<Footprint> r = realm.where(Footprint.class).equalTo("footprintBelong", FootprintBelong.OTHER.toString()).findAll();
+            for (Footprint f : r) {
+                f.getPics().deleteAllFromRealm();
             }
+            r.deleteAllFromRealm();
+            realm.commitTransaction();
+        }
+    }
+
+    private int processFootprintOther(String s, boolean refresh) {
+        if (refresh) {
+            clearOldDate();
+        }
+
+        try (Realm realm = Realm.getDefaultInstance()) {
+            realm.beginTransaction();
 
             JsonArray ja = PPHelper.ppFromString(s, "data").getAsJsonArray();
 
@@ -395,17 +403,15 @@ public class OtherMainPageActivity extends AppCompatActivity {
                 ft.setBody(PPHelper.ppFromString(s, "data." + i + "").getAsJsonObject().toString());
 
                 //处理图片s
-                if (type == 3) {
-                    JsonArray pics = PPHelper.ppFromString(s, "data." + i + ".detail.pics").getAsJsonArray();
+                if (type == 4) {
                     //如果是重复记录, 先删除当前的pics, 要不然会出现重复图片
-                    if (ft.getPics().size() > 0) {
-                        Log.v("pplog103", ft.getHash());
-                    }
                     ft.getPics().deleteAllFromRealm();
-                    for (JsonElement item : pics) {
+                    JsonArray moments = PPHelper.ppFromString(s, "data." + i + ".detail.moments", PPValueType.ARRAY).getAsJsonArray();
+                    for (int j = 0; j < moments.size(); j++) {
+                        String picStr = PPHelper.ppFromString(s, "data." + i + ".detail.moments." + j + ".pics.0").getAsString();
                         Pic pic = new Pic();
-                        pic.setKey(item.getAsString());
-                        pic.setNetFileName(item.getAsString());
+                        pic.setKey(picStr);
+                        pic.setNetFileName(picStr);
                         pic.setStatus(PicStatus.NET);
                         ft.getPics().add(pic);
                     }
@@ -420,6 +426,9 @@ public class OtherMainPageActivity extends AppCompatActivity {
 
     private void setupUserRv() {
         realm = Realm.getDefaultInstance();
+
+        clearOldDate();
+
         footprints = realm.where(Footprint.class).equalTo("footprintBelong", FootprintBelong.OTHER.toString()).findAllSorted("createTime", Sort.DESCENDING);
         footprints.addChangeListener(changeListener);
 

@@ -53,12 +53,12 @@
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name=".dailyReport.DailyReportActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".OtherMainPageActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".CollectDetailActivity"></activity>
     </application>
 
 </manifest>

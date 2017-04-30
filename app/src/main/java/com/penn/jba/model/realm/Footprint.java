@@ -107,6 +107,19 @@ public class Footprint extends RealmObject {
         this.pics = pics;
     }
 
+    //pptodo 改进以下的function, 使用getOtherUserNickname
+    public String getOtherUserNickname() {
+        String idA = ppFromString(body, "relatedUsers.0.id").getAsString();
+        String idB = ppFromString(body, "relatedUsers.1.id").getAsString();
+        String nicknameA = ppFromString(body, "relatedUsers.0.nickname").getAsString();
+        String nicknameB = ppFromString(body, "relatedUsers.1.nickname").getAsString();
+        if (idA == PPHelper.currentUserId) {
+            return nicknameB;
+        } else {
+            return nicknameA;
+        }
+    }
+
     public String getContent() {
         if (type == 8) {
             String idA = ppFromString(body, "detail.createdBy").getAsString();
@@ -172,11 +185,11 @@ public class Footprint extends RealmObject {
             if (idA == PPHelper.currentUserId) {
                 String i_collect_ta_moment = PPApplication.getContext().getString(R.string.i_collect_ta_moment);
 
-                return i_collect_ta_moment;
+                return i_collect_ta_moment + "," + getHash();
             } else {
                 String ta_collect_my_moment = PPApplication.getContext().getString(R.string.ta_collect_my_moment);
 
-                return ta_collect_my_moment;
+                return ta_collect_my_moment + "," + getHash();
             }
         }
 
