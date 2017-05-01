@@ -84,5 +84,8 @@
     <string name="ta_collect_my_moment">Ta迹录了我的片刻</string>
     <string name="private_reply">私密回复</string>
     <string name="send">发送</string>
+    <string name="reply_to">回复</string>
+    <string name="click_to_load_more">点击加载更多</string>
+    <string name="no_more_data">没有更多了</string>
 
 </resources>

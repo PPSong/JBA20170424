@@ -4,18 +4,29 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.text.Html;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
+import com.google.gson.JsonArray;
+import com.jakewharton.rxbinding2.view.RxView;
 import com.penn.jba.databinding.ActivityLoginBinding;
 import com.penn.jba.databinding.ActivityMomentDetailBinding;
+import com.penn.jba.footprint.FootprintAdapter;
+import com.penn.jba.util.CommentListAdapter;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPJSONObject;
 import com.penn.jba.util.PPRetrofit;
+import com.penn.jba.util.PPValueType;
 import com.penn.jba.util.PPWarn;
 import com.squareup.picasso.Picasso;
+import com.synnapps.carouselview.ImageListener;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -26,9 +37,12 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function3;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.penn.jba.util.PPHelper.ppFromString;
 import static com.penn.jba.util.PPHelper.ppWarning;
 
 public class MomentDetailActivity extends AppCompatActivity {
+    private static final int pageSize = 10;
+
     private Context activityContext;
 
     private ActivityMomentDetailBinding binding;
@@ -39,6 +53,9 @@ public class MomentDetailActivity extends AppCompatActivity {
     private String momentId;
     private String momentStr;
     private String commentsStr;
+    private long oldestTimeStamp = System.currentTimeMillis();
+
+    private CommentListAdapter commentListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +68,17 @@ public class MomentDetailActivity extends AppCompatActivity {
 
         momentId = getIntent().getStringExtra("momentId");
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         setup();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -66,6 +93,54 @@ public class MomentDetailActivity extends AppCompatActivity {
 
     private void setup() {
         getMomentDetailAndComment();
+    }
+
+    private void loadMoreComment() {
+        PPJSONObject jBody = new PPJSONObject();
+
+        jBody
+                .put("id", momentId)
+                .put("beforeTime", oldestTimeStamp);
+
+        final Observable<String> apiResult = PPRetrofit.getInstance()
+                .api("moment.getReplies", jBody.getJSONObject());
+
+        disposableList.add(
+                apiResult
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                        new Consumer<String>() {
+                            @Override
+                            public void accept(String s) throws Exception {
+                                JsonArray comments = ppFromString(s, "data.list", PPValueType.ARRAY).getAsJsonArray();
+
+                                if (comments.size() < pageSize) {
+                                    setNoMore();
+                                }
+
+                                int lastCount = commentListAdapter.getItemCount();
+
+                                commentListAdapter.loadMore(comments);
+
+                                if (comments.size() > 0) {
+                                    binding.mainRv.scrollToPosition(lastCount);
+                                }
+                            }
+                        },
+                        new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable t) throws Exception {
+                                Log.v("pplog", "error:" + t);
+                                PPHelper.ppShowError(t.toString());
+                            }
+                        })
+        );
+    }
+
+    private void setNoMore() {
+        binding.loadMoreBt.setText(activityContext.getResources().getString(R.string.no_more_data));
+        binding.loadMoreBt.setEnabled(false);
     }
 
     private void getMomentDetailAndComment() {
@@ -120,6 +195,7 @@ public class MomentDetailActivity extends AppCompatActivity {
                             @Override
                             public void run() throws Exception {
                                 binding.pb.setVisibility(View.INVISIBLE);
+                                binding.loadMoreBt.setVisibility(View.VISIBLE);
                             }
                         })
                         .subscribe(
@@ -142,15 +218,62 @@ public class MomentDetailActivity extends AppCompatActivity {
 
     private void loadContent() {
         Picasso.with(activityContext)
-                .load(PPHelper.get80ImageUrl(PPHelper.ppFromString(momentStr, "data._creator.head").getAsString()))
+                .load(PPHelper.get80ImageUrl(ppFromString(momentStr, "data._creator.head").getAsString()))
                 .placeholder(R.drawable.profile)
                 .into(binding.avatarCiv);
 
-        binding.line1Tv.setText(PPHelper.ppFromString(momentStr, "data._creator.nickname").getAsString());
-        binding.line2Tv.setText(PPHelper.ppFromString(momentStr, "data.location.geo").getAsJsonArray().toString());
-        binding.mainTv.setText(PPHelper.ppFromString(momentStr, "data.pics").getAsJsonArray().toString());
-        binding.contentTv.setText(PPHelper.ppFromString(momentStr, "data.content").getAsString());
-        binding.createTimeRttv.setReferenceTime(PPHelper.ppFromString(momentStr, "data.createTime").getAsLong());
-        binding.placeTv.setText(PPHelper.ppFromString(momentStr, "data.location.detail").getAsString());
+        binding.line1Tv.setText(ppFromString(momentStr, "data._creator.nickname").getAsString());
+        binding.line2Tv.setText(ppFromString(momentStr, "data.location.geo").getAsJsonArray().toString());
+        binding.contentTv.setText(ppFromString(momentStr, "data.content").getAsString());
+        binding.createTimeRttv.setReferenceTime(ppFromString(momentStr, "data.createTime").getAsLong());
+        binding.placeTv.setText(ppFromString(momentStr, "data.location.detail").getAsString());
+
+        final JsonArray pics = ppFromString(momentStr, "data.pics").getAsJsonArray();
+
+        binding.mainCv.setImageListener(new ImageListener() {
+            @Override
+            public void setImageForPosition(int position, ImageView imageView) {
+                Picasso.with(activityContext)
+                        .load(PPHelper.get800ImageUrl(pics.get(position).getAsString()))
+                        .placeholder(R.drawable.header)
+                        .into(imageView);
+            }
+        });
+
+        binding.mainCv.setPageCount(pics.size());
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(activityContext);
+        binding.mainRv.setLayoutManager(linearLayoutManager);
+
+        JsonArray comments = ppFromString(commentsStr, "data.list", PPValueType.ARRAY).getAsJsonArray();
+        commentListAdapter = new CommentListAdapter(activityContext, comments);
+        int size = comments.size();
+        if (size > 0) {
+            oldestTimeStamp = ppFromString(commentsStr, "data.list." + (size - 1) + ".createTime").getAsLong();
+        }
+
+        if (size < pageSize) {
+            setNoMore();
+        }
+
+        binding.mainRv.setAdapter(commentListAdapter);
+
+        binding.mainRv.setHasFixedSize(true);
+
+        //loadMore按钮监控
+        Observable<Object> loadMoreButtonObservable = RxView.clicks(binding.loadMoreBt)
+                .debounce(200, TimeUnit.MILLISECONDS);
+
+        disposableList.add(loadMoreButtonObservable
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Consumer<Object>() {
+                            public void accept(Object o) {
+                                loadMoreComment();
+                            }
+                        }
+                )
+        );
     }
 }

@@ -3,7 +3,10 @@ package com.penn.jba.util;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.Build;
 import android.support.design.widget.Snackbar;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -471,5 +474,14 @@ public class PPHelper {
     public static Geo getLatestGeo() {
         //pptodo implement it
         return new Geo(121.52619934082031f, 31.216968536376953f);
+    }
+
+    @SuppressWarnings("deprecation")
+    public static Spanned fromHtml(String source) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(source);
+        }
     }
 }
