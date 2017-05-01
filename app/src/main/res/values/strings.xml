@@ -82,5 +82,7 @@
     <string name="i_meet_ta_shoulder">我和Ta擦肩而过了</string>
     <string name="i_collect_ta_moment">我迹录了Ta的片刻</string>
     <string name="ta_collect_my_moment">Ta迹录了我的片刻</string>
+    <string name="private_reply">私密回复</string>
+    <string name="send">发送</string>
 
 </resources>

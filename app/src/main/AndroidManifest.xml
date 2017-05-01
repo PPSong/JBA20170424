@@ -56,9 +56,11 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".OtherMainPageActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity
-            android:name=".CollectDetailActivity"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".CollectDetailActivity" />
+        <activity android:name=".MomentDetailActivity">
+
+        </activity>
     </application>
 
 </manifest>

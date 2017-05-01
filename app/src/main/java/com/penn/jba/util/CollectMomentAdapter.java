@@ -6,6 +6,7 @@ package com.penn.jba.util;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.penn.jba.MomentDetailActivity;
 import com.penn.jba.R;
 import com.penn.jba.databinding.CollectMomentFlowViewBinding;
 import com.penn.jba.model.CollectMoment;
@@ -69,6 +71,10 @@ public class CollectMomentAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 Log.v("pplog", "position:" + position + "clicked");
+                Intent intent = new Intent(context, MomentDetailActivity.class);
+                intent.putExtra("momentId", data.get(position).id);
+
+                context.startActivity(intent);
             }
         };
     }
