@@ -11,6 +11,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -53,6 +55,8 @@ public class NearbyListModeFragment extends Fragment {
 
     //custom
     private JsonArray data;
+
+    private Menu menu;
 
     public NearbyListModeFragment() {
         // Required empty public constructor
@@ -101,7 +105,9 @@ public class NearbyListModeFragment extends Fragment {
 
     //-----helper-----
 
-    private void loadContent() {
+    public void loadContent() {
+        binding.mainPc.setVisibility(View.INVISIBLE);
+        binding.pb.setVisibility(View.VISIBLE);
         PPJSONObject jBody = new PPJSONObject();
 
         Geo tmpGeo = PPHelper.getLatestGeo();
@@ -121,7 +127,8 @@ public class NearbyListModeFragment extends Fragment {
                         .doFinally(new Action() {
                             @Override
                             public void run() throws Exception {
-
+                                binding.mainPc.setVisibility(View.VISIBLE);
+                                binding.pb.setVisibility(View.INVISIBLE);
                             }
                         })
                         .subscribe(

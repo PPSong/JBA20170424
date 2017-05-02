@@ -91,5 +91,6 @@
     <string name="distance_to">距离%1$d米</string>
     <string name="followed">已关注</string>
     <string name="cancel_follow">取消关注</string>
+    <string name="refresh">刷新</string>
 
 </resources>
