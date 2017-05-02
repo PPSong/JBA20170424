@@ -480,7 +480,7 @@ public class PPHelper {
 
     public static Geo getLatestGeo() {
         //pptodo implement it
-        return new Geo(121.52619934082031f, 31.216968536376953f);
+        return new Geo(121.52619934082031f,31.216968536376953f);
     }
 
     @SuppressWarnings("deprecation")

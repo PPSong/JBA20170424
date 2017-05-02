@@ -5,15 +5,15 @@ package com.penn.jba.model;
  */
 
 public class Geo {
-    public float lon;
-    public float lat;
+    public double lon;
+    public double lat;
 
-    public Geo(float lon, float lat) {
+    public Geo(double lon, double lat) {
         this.lon = lon;
         this.lat = lat;
     }
 
     public static Geo getDefaultGeo() {
-        return new Geo(121.52619934082031f, 31.216968536376953f);
+        return new Geo(121.52619934082031d, 31.216968536376953d);
     }
 }

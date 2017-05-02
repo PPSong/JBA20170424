@@ -37,6 +37,7 @@ import com.penn.jba.footprint.FootprintFragment;
 import com.penn.jba.model.realm.CurrentUser;
 import com.penn.jba.model.realm.Footprint;
 import com.penn.jba.model.realm.Pic;
+import com.penn.jba.nearby.NearbyFragment;
 import com.penn.jba.util.FootprintStatus;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPJSONObject;
