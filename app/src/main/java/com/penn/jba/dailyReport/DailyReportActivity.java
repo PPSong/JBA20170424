@@ -96,7 +96,6 @@ public class DailyReportActivity extends AppCompatActivity {
         }
     }
 
-    //-----helper-----
     private void setup() {
         //获取dailyReport数据
         PPJSONObject jBodyFans = new PPJSONObject();
@@ -138,6 +137,7 @@ public class DailyReportActivity extends AppCompatActivity {
 
                                        @Override
                                        public void accept(String s) throws Exception {
+                                           //pptodo 这里如果有ppwarn的话需要抛出exception
                                            Log.v("pplog121", s);
                                            Log.v("pplog121", "pptest:" + PPHelper.ppFromString(s, "data.detail.fans"));
                                            if (PPHelper.ppFromString(s, "data.detail.fans") != null) {
@@ -184,6 +184,7 @@ public class DailyReportActivity extends AppCompatActivity {
         }
     }
 
+    //-----helper-----
     private void setupPage() {
         Log.v("pplog121", "setupPage");
         binding.materialViewPager.getViewPager().setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {

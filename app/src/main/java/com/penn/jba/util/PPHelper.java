@@ -32,7 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-import de.jonasrottmann.realmbrowser.RealmBrowser;
+//import de.jonasrottmann.realmbrowser.RealmBrowser;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -77,10 +77,10 @@ public class PPHelper {
 
     //pptodo remove testing block
     public static void startRealmModelsActivity() {
-        try (Realm realm = Realm.getDefaultInstance()) {
-            RealmConfiguration configuration = realm.getConfiguration();
-            RealmBrowser.startRealmModelsActivity(PPApplication.getContext(), configuration);
-        }
+//        try (Realm realm = Realm.getDefaultInstance()) {
+//            RealmConfiguration configuration = realm.getConfiguration();
+//            RealmBrowser.startRealmModelsActivity(PPApplication.getContext(), configuration);
+//        }
     }
     //pptodo end testing block
 

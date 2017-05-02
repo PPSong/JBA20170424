@@ -34,6 +34,7 @@ import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.penn.jba.databinding.ActivityTabsBinding;
 import com.penn.jba.footprint.FootprintFragment;
+import com.penn.jba.message.MessageActivity;
 import com.penn.jba.model.realm.CurrentUser;
 import com.penn.jba.model.realm.Footprint;
 import com.penn.jba.model.realm.Pic;
@@ -69,7 +70,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import de.jonasrottmann.realmbrowser.RealmBrowser;
+//import de.jonasrottmann.realmbrowser.RealmBrowser;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -85,6 +86,7 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 
 import static android.R.attr.key;
+import static android.R.attr.start;
 import static com.penn.jba.util.PPHelper.ppWarning;
 
 public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener, TuSdkComponent.TuSdkComponentDelegate {
@@ -158,6 +160,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.footprint).withIcon(R.drawable.ic_collections_black_24dp);
         PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(R.string.nearby).withIcon(R.drawable.ic_near_me_black_24dp);
         PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName("test").withIcon(R.drawable.ic_near_me_black_24dp);
+        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName("message").withIcon(R.drawable.ic_near_me_black_24dp);
 
         PrimaryDrawerItem item0 = new PrimaryDrawerItem().withIdentifier(0).withName(R.string.logout).withIcon(R.drawable.ic_eject_black_24dp);
 
@@ -200,7 +203,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                         item1,
                         new DividerDrawerItem(),
                         item2,
-                        item3
+                        item3,
+                        item4
                 )
                 .withOnDrawerItemClickListener(this)
                 .build();
@@ -259,6 +263,12 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
             case 3:
                 //test
                 PPHelper.startRealmModelsActivity();
+                drawerResult.closeDrawer();
+                break;
+            case 4:
+                //test
+                Intent intent1 = new Intent(activityContext, MessageActivity.class);
+                startActivity(intent1);
                 drawerResult.closeDrawer();
                 break;
             default:
