@@ -63,6 +63,10 @@ public class PPHelper {
 
     public static String currentUserId;
 
+    public static String currentUserNickname;
+
+    public static String getCurrentUserHead;
+
     public static Toast ppToast;
 
     public static final int MomentGridViewWidth = 192;
@@ -232,6 +236,9 @@ public class PPHelper {
                                 pic.setStatus(PicStatus.NET);
                                 pics.add(pic);
                             }
+
+                            currentUserNickname = currentUser.getNickname();
+                            getCurrentUserHead = currentUser.getHead();
 
                             //设置baiduAk
                             baiduAk = tmpAk;

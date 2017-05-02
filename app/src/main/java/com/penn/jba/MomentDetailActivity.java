@@ -6,12 +6,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.penn.jba.databinding.ActivityLoginBinding;
 import com.penn.jba.databinding.ActivityMomentDetailBinding;
@@ -96,6 +98,8 @@ public class MomentDetailActivity extends AppCompatActivity {
     }
 
     private void loadMoreComment() {
+        binding.loadMoreBt.setEnabled(false);
+
         PPJSONObject jBody = new PPJSONObject();
 
         jBody
@@ -109,37 +113,136 @@ public class MomentDetailActivity extends AppCompatActivity {
                 apiResult
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                        new Consumer<String>() {
+                        .doFinally(new Action() {
                             @Override
-                            public void accept(String s) throws Exception {
-                                JsonArray comments = ppFromString(s, "data.list", PPValueType.ARRAY).getAsJsonArray();
-
-                                if (comments.size() < pageSize) {
-                                    setNoMore();
+                            public void run() throws Exception {
+                                if (binding.loadMoreBt.getText() != getString(R.string.no_more_data)) {
+                                    binding.loadMoreBt.setEnabled(true);
                                 }
-
-                                int lastCount = commentListAdapter.getItemCount();
-
-                                commentListAdapter.loadMore(comments);
-
-                                if (comments.size() > 0) {
-                                    binding.mainRv.scrollToPosition(lastCount);
-                                }
-                            }
-                        },
-                        new Consumer<Throwable>() {
-                            @Override
-                            public void accept(Throwable t) throws Exception {
-                                Log.v("pplog", "error:" + t);
-                                PPHelper.ppShowError(t.toString());
                             }
                         })
+                        .subscribe(
+                                new Consumer<String>() {
+                                    @Override
+                                    public void accept(String s) throws Exception {
+                                        Log.v("pplog142", s);
+                                        PPWarn ppWarn1 = ppWarning(s);
+                                        if (ppWarn1 != null) {
+                                            throw new Exception(ppWarn1.msg);
+                                        }
+
+                                        JsonArray comments = ppFromString(s, "data.list", PPValueType.ARRAY).getAsJsonArray();
+
+                                        int size = comments.size();
+
+                                        if (size > 0) {
+                                            Log.v("pplog142", "oldestTimeStamp before:" + oldestTimeStamp);
+                                            oldestTimeStamp = ppFromString(s, "data.list." + (size - 1) + ".createTime").getAsLong();
+                                            Log.v("pplog142", "oldestTimeStamp after:" + oldestTimeStamp);
+                                        }
+
+                                        if (size < pageSize) {
+                                            setNoMore();
+                                        }
+
+                                        int lastCount = commentListAdapter.getItemCount();
+
+                                        commentListAdapter.loadMore(comments);
+
+                                        if (comments.size() > 0) {
+                                            binding.mainRv.scrollToPosition(lastCount);
+                                        }
+                                    }
+                                },
+                                new Consumer<Throwable>() {
+                                    @Override
+                                    public void accept(Throwable t) throws Exception {
+                                        Log.v("pplog", "error:" + t);
+                                        PPHelper.ppShowError(t.toString());
+                                    }
+                                })
+        );
+    }
+
+    private void sendComment() {
+        //检查内容合法性
+        String content = binding.replyEt.getText().toString();
+        if (TextUtils.isEmpty(content) == true) {
+            PPHelper.ppShowError(getString(R.string.content_can_not_be_empty));
+            return;
+        }
+
+        //清空输入框内容
+        binding.replyEt.setText("");
+        binding.privateCb.setChecked(false);
+
+        binding.sendBt.setEnabled(false);
+
+        boolean isPrivate = binding.privateCb.isChecked();
+
+        //延迟补偿
+        JsonObject tmpReply = new JsonObject();
+        tmpReply.addProperty("content", content);
+        tmpReply.addProperty("isPrivate", isPrivate ? 1 : 0);
+        tmpReply.addProperty("createTime", System.currentTimeMillis());
+
+        JsonObject tmpCreator = new JsonObject();
+        tmpCreator.addProperty("nickname", PPHelper.currentUserNickname);
+        tmpCreator.addProperty("head", PPHelper.getCurrentUserHead);
+
+        tmpReply.add("_creator", tmpCreator);
+
+        Log.v("pplog141", tmpReply.toString());
+        commentListAdapter.fake(tmpReply);
+        binding.mainSv.scrollTo(0, 0);
+        binding.mainRv.scrollToPosition(0);
+        //end 延迟补偿
+
+        PPJSONObject jBody = new PPJSONObject();
+
+        jBody
+                .put("id", momentId)
+                .put("content", content)
+                .put("isPrivate", "" + isPrivate);
+
+        final Observable<String> apiResult = PPRetrofit.getInstance()
+                .api("moment.reply", jBody.getJSONObject());
+
+        disposableList.add(
+                apiResult
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doFinally(new Action() {
+                            @Override
+                            public void run() throws Exception {
+                                binding.sendBt.setEnabled(true);
+                            }
+                        })
+                        .subscribe(
+                                new Consumer<String>() {
+                                    @Override
+                                    public void accept(String s) throws Exception {
+                                        PPWarn ppWarn1 = ppWarning(s);
+                                        if (ppWarn1 != null) {
+                                            throw new Exception(ppWarn1.msg);
+                                        }
+                                    }
+                                },
+                                new Consumer<Throwable>() {
+                                    @Override
+                                    public void accept(Throwable t) throws Exception {
+                                        Log.v("pplog", "error:" + t);
+                                        PPHelper.ppShowError(t.toString());
+                                        //清除延迟补偿数据
+                                        commentListAdapter.removeFirstItem();
+                                        //end 清除延迟补偿数据
+                                    }
+                                })
         );
     }
 
     private void setNoMore() {
-        binding.loadMoreBt.setText(activityContext.getResources().getString(R.string.no_more_data));
+        binding.loadMoreBt.setText(getString(R.string.no_more_data));
         binding.loadMoreBt.setEnabled(false);
     }
 
@@ -271,6 +374,22 @@ public class MomentDetailActivity extends AppCompatActivity {
                         new Consumer<Object>() {
                             public void accept(Object o) {
                                 loadMoreComment();
+                            }
+                        }
+                )
+        );
+
+        //发送按钮监控
+        Observable<Object> sendButtonObservable = RxView.clicks(binding.sendBt)
+                .debounce(200, TimeUnit.MILLISECONDS);
+
+        disposableList.add(sendButtonObservable
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Consumer<Object>() {
+                            public void accept(Object o) {
+                                sendComment();
                             }
                         }
                 )

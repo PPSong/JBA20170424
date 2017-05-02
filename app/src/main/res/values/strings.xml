@@ -87,5 +87,6 @@
     <string name="reply_to">回复</string>
     <string name="click_to_load_more">点击加载更多</string>
     <string name="no_more_data">没有更多了</string>
+    <string name="content_can_not_be_empty">内容不能为空</string>
 
 </resources>

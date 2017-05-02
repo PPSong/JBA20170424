@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.penn.jba.OtherMainPageActivity;
 import com.penn.jba.PPApplication;
 import com.penn.jba.R;
@@ -62,6 +63,21 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
         return data.size();
     }
 
+    public void fake(JsonObject fakeRecord) {
+        JsonArray tmpData = new JsonArray();
+        tmpData.add(fakeRecord);
+        tmpData.addAll(data);
+
+        data = tmpData;
+
+        notifyItemInserted(0);
+    }
+
+    public void removeFirstItem() {
+        data.remove(0);
+        notifyItemRemoved(0);
+    }
+
     public void loadMore(JsonArray moreData) {
         data.addAll(moreData);
         notifyItemRangeInserted(data.size(), moreData.size());
@@ -76,6 +92,7 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
         }
 
         public void bind(final String recordStr) {
+            Log.v("pplog141", recordStr);
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(PPHelper.ppFromString(recordStr, "_creator.head", STRING).getAsString()))
                     .placeholder(R.drawable.profile)
