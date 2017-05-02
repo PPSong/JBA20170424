@@ -1,10 +1,12 @@
 package com.penn.jba.nearby;
 
 import android.content.Context;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,12 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.gson.JsonArray;
+import com.penn.jba.MomentDetailActivity;
 import com.penn.jba.R;
 import com.penn.jba.databinding.FragmentFootprintBinding;
 import com.penn.jba.databinding.FragmentNearbyListModeBinding;
+import com.penn.jba.footprint.FootprintFragment;
 import com.penn.jba.model.Geo;
 import com.penn.jba.util.CollectMomentAdapter;
-import com.penn.jba.util.NearbyMomentAdapter;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPJSONObject;
 import com.penn.jba.util.PPRetrofit;
@@ -34,7 +37,10 @@ import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import it.moondroid.coverflow.components.ui.containers.FeatureCoverFlow;
+import me.crosswall.lib.coverflow.CoverFlow;
+import me.crosswall.lib.coverflow.core.PageItemClickListener;
 
+import static com.penn.jba.R.id.container;
 import static com.penn.jba.util.PPHelper.ppFromString;
 import static com.penn.jba.util.PPHelper.ppWarning;
 
@@ -46,7 +52,7 @@ public class NearbyListModeFragment extends Fragment {
     private ArrayList<Disposable> disposableList = new ArrayList<Disposable>();
 
     //custom
-    private NearbyMomentAdapter nearbyMomentAdapter;
+    private JsonArray data;
 
     public NearbyListModeFragment() {
         // Required empty public constructor
@@ -90,9 +96,6 @@ public class NearbyListModeFragment extends Fragment {
     }
 
     public void setup() {
-        JsonArray tmp = new JsonArray();
-        tmp.add("empty");
-        setupList(tmp);
         loadContent();
     }
 
@@ -130,9 +133,17 @@ public class NearbyListModeFragment extends Fragment {
                                             throw new Exception(ppWarn1.msg);
                                         }
 
-                                        JsonArray userGroups = ppFromString(s, "data.list", PPValueType.ARRAY).getAsJsonArray();
+                                        final JsonArray userGroups = ppFromString(s, "data.list", PPValueType.ARRAY).getAsJsonArray();
+                                        data = userGroups;
+                                        binding.mainVp.setAdapter(new MyPagerAdapter(getChildFragmentManager()));
 
-                                        nearbyMomentAdapter.resetData(userGroups);
+                                        new CoverFlow.Builder()
+                                                .with(binding.mainVp)
+                                                .scale(0.1f)
+                                                .rotationY(0f)
+                                                .build();
+
+                                        binding.mainVp.setOffscreenPageLimit(3);
                                     }
                                 },
                                 new Consumer<Throwable>() {
@@ -145,24 +156,28 @@ public class NearbyListModeFragment extends Fragment {
         );
     }
 
-    private void setupList(JsonArray userGroups) {
-        nearbyMomentAdapter = new NearbyMomentAdapter(activityContext, userGroups);
-        binding.mainFcf.setAdapter(nearbyMomentAdapter);
+    private class MyPagerAdapter extends FragmentPagerAdapter {
 
-        binding.mainFcf.setOnScrollPositionListener(onScrollListener());
-    }
+        public MyPagerAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
+        }
 
-    private FeatureCoverFlow.OnScrollPositionListener onScrollListener() {
-        return new FeatureCoverFlow.OnScrollPositionListener() {
-            @Override
-            public void onScrolledToPosition(int position) {
-                Log.v("NearbyListModeFragment", "position: " + position);
-            }
+        // Returns total number of pages
+        @Override
+        public int getCount() {
+            return data.size();
+        }
 
-            @Override
-            public void onScrolling() {
-                Log.i("NearbyListModeFragment", "scrolling");
-            }
-        };
+        // Returns the fragment to display for that page
+        @Override
+        public Fragment getItem(int position) {
+            return NearbyListMomentGroupItemFragment.newInstance(data.get(position).toString());
+        }
+
+        // Returns the page title for the top indicator
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return getResources().getString(R.string.nearby);
+        }
     }
 }
