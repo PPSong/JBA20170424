@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.penn.jba.FootprintBelong;
 import com.penn.jba.R;
 import com.penn.jba.model.realm.Footprint;
 
@@ -23,18 +24,18 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
 
     public List<T> data;
 
-    public boolean isMine;
+    public FootprintBelong footprintBelong;
 
-    public PPLoadAdapter(List<T> data, boolean isMine) {
+    public PPLoadAdapter(List<T> data, FootprintBelong footprintBelong) {
         this.data = data;
-        this.isMine = isMine;
+        this.footprintBelong = footprintBelong;
     }
 
     public void needLoadMoreCell() {
         try (Realm realm = Realm.getDefaultInstance()) {
             Footprint footprint = new Footprint();
             footprint.setKey("loadMore");
-            footprint.setMine(isMine);
+            footprint.setFootprintBelong(footprintBelong);
             footprint.setType(VIEW_PROG);
 
             realm.beginTransaction();
@@ -47,7 +48,7 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
         try (Realm realm = Realm.getDefaultInstance()) {
             final Footprint ft = realm.where(Footprint.class)
                     .equalTo("key", "loadMore")
-                    .equalTo("isMine", isMine)
+                    .equalTo("footprintBelong", footprintBelong.toString())
                     .findFirst();
 
             realm.beginTransaction();

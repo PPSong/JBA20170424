@@ -54,6 +54,11 @@
         <activity
             android:name=".dailyReport.DailyReportActivity"
             android:theme="@style/DailyReport">
+        <activity
+            android:name=".OtherMainPageActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".CollectDetailActivity" />
+        <activity android:name=".MomentDetailActivity">
 
         </activity>
     </application>

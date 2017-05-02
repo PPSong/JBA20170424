@@ -3,7 +3,10 @@ package com.penn.jba.util;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.Build;
 import android.support.design.widget.Snackbar;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -42,7 +45,9 @@ import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 
 import static android.R.attr.value;
+import static android.R.attr.width;
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static org.lasque.tusdk.core.exif.ExifInterface.ComponentsConfiguration.B;
 
 /**
  * Created by penn on 02/04/2017.
@@ -58,11 +63,17 @@ public class PPHelper {
 
     public static String currentUserId;
 
+    public static String currentUserNickname;
+
+    public static String getCurrentUserHead;
+
     public static Toast ppToast;
 
     public static final int MomentGridViewWidth = 192;
 
     public static ProgressDialog dialog;
+
+    public static String baiduAk = "";
 
     //pptodo remove testing block
     public static void startRealmModelsActivity() {
@@ -85,9 +96,15 @@ public class PPHelper {
         if (imageName.startsWith("http")) {
             return imageName;
         } else {
+            //pptodo 如果是"", 返回默认图片
             String result = qiniuBase + imageName + "?imageView2/1/w/" + size + "/h/" + size + "/interlace/1/";
             return result;
         }
+    }
+
+    public static String getBaiduMap(JsonArray geo) {
+        String geoStr = geo.get(0).getAsFloat() + "," + geo.get(1).getAsFloat();
+        return "http://api.map.baidu.com/staticimage/v2?ak=" + baiduAk + "&mcode=666666&center=" + geoStr + "&width=300&height=200&zoom=17&markers=" + geoStr + "&markerStyles=-1";
     }
 
     public static void ppShowError(String msg) {
@@ -186,13 +203,15 @@ public class PPHelper {
                             CurrentUser currentUser = realm.where(CurrentUser.class)
                                     .findFirst();
 
+                            String tmpAk = ppFromString(s, "data.settings.geo.ak_browser").getAsString();
+
                             currentUser.setPhone(ppFromString(s, "data.userInfo.phone").getAsString());
                             currentUser.setNickname(ppFromString(s, "data.userInfo.nickname").getAsString());
                             currentUser.setGender(ppFromString(s, "data.userInfo.gender").getAsInt());
                             currentUser.setBirthday(ppFromString(s, "data.userInfo.birthday").getAsLong());
                             currentUser.setHead(ppFromString(s, "data.userInfo.head").getAsString());
                             currentUser.setBaiduApiUrl(ppFromString(s, "data.settings.geo.api").getAsString());
-                            currentUser.setBaiduAkBrowser(ppFromString(s, "data.settings.geo.ak_browser").getAsString());
+                            currentUser.setBaiduAkBrowser(tmpAk);
                             currentUser.setSocketHost(ppFromString(s, "data.settings.socket.host").getAsString());
                             currentUser.setSocketPort(ppFromString(s, "data.settings.socket.port").getAsInt());
                             currentUser.setUnreadMessageMoment(ppFromString(s, "data.stats.message.moment", PPValueType.INT).getAsInt());
@@ -217,6 +236,12 @@ public class PPHelper {
                                 pic.setStatus(PicStatus.NET);
                                 pics.add(pic);
                             }
+
+                            currentUserNickname = currentUser.getNickname();
+                            getCurrentUserHead = currentUser.getHead();
+
+                            //设置baiduAk
+                            baiduAk = tmpAk;
                             realm.commitTransaction();
                         }
                         return "OK";
@@ -455,6 +480,15 @@ public class PPHelper {
 
     public static Geo getLatestGeo() {
         //pptodo implement it
-        return new Geo(121.52619934082031f, 31.216968536376953f);
+        return new Geo(121.52619934082031f,31.216968536376953f);
+    }
+
+    @SuppressWarnings("deprecation")
+    public static Spanned fromHtml(String source) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(source);
+        }
     }
 }

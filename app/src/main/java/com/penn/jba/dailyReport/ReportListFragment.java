@@ -55,6 +55,7 @@ public class ReportListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activityContext = getActivity();
         if (getArguments() != null) {
             type = getArguments().getString("type");
             data = getArguments().getString("data");
@@ -82,6 +83,6 @@ public class ReportListFragment extends Fragment {
         JsonArray tmpData = new Gson().fromJson(data, JsonArray.class);
         Log.v("pplog121", tmpData.toString());
         binding.mainRv.addItemDecoration(new MaterialViewPagerHeaderDecorator());
-        binding.mainRv.setAdapter(new ReportListAdapter(type, tmpData));
+        binding.mainRv.setAdapter(new ReportListAdapter(activityContext, type, tmpData));
     }
 }

@@ -72,5 +72,21 @@
     <string name="be_your_fans">成为了你的粉丝</string>
     <string name="collect_ta_moment">迹录了Ta的片刻</string>
     <string name="collect_your_moment">迹录了你的片刻</string>
+    <string name="years_old">岁</string>
+    <string name="follow">follow</string>
+    <string name="like">like</string>
+    <string name="follow_ta">关注Ta, 展开我们的时空线</string>
+    <string name="we_meet_shoulder_n_times">我们%1$d次擦肩而过</string>
+    <string name="ta_meet_your_n_moments">Ta遇见过你的%1$d条片刻</string>
+    <string name="i_meet_ta_n_moments">我遇见过Ta的%1$d条片刻</string>
+    <string name="i_meet_ta_shoulder">我和Ta擦肩而过了</string>
+    <string name="i_collect_ta_moment">我迹录了Ta的片刻</string>
+    <string name="ta_collect_my_moment">Ta迹录了我的片刻</string>
+    <string name="private_reply">私密回复</string>
+    <string name="send">发送</string>
+    <string name="reply_to">回复</string>
+    <string name="click_to_load_more">点击加载更多</string>
+    <string name="no_more_data">没有更多了</string>
+    <string name="content_can_not_be_empty">内容不能为空</string>
 
 </resources>
