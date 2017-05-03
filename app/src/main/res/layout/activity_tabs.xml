@@ -32,7 +32,9 @@
                 android:minHeight="?attr/actionBarSize"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
+
+            </android.support.v7.widget.Toolbar>
 
             <com.penn.jba.util.LockableViewPager
                 android:id="@+id/main_vp"
@@ -48,6 +50,27 @@
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
             app:srcCompat="@android:drawable/ic_input_add" />
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp">
+
+            <TextView
+                android:id="@+id/bd_tv"
+                android:background="@drawable/rounded_corner"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:visibility="invisible"
+                android:layout_marginRight="0dp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="8dp">
+
+            </TextView>
+
+        </android.support.constraint.ConstraintLayout>
 
     </FrameLayout>
 
