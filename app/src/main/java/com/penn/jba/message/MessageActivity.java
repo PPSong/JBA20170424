@@ -103,5 +103,7 @@ public class MessageActivity extends AppCompatActivity {
 
         binding.mainStl.setViewPager(binding.mainVp);
         binding.mainVp.setOffscreenPageLimit(3);
+
+        //binding.mainStl.getTabAt(1).
     }
 }

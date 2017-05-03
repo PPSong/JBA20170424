@@ -23,6 +23,7 @@ import com.penn.jba.databinding.FragmentFootprintMineBinding;
 import com.penn.jba.databinding.FragmentMessageListBinding;
 import com.penn.jba.databinding.FragmentReportListBinding;
 import com.penn.jba.footprint.FootprintAdapter;
+import com.penn.jba.model.MessageEvent;
 import com.penn.jba.model.realm.Footprint;
 import com.penn.jba.model.realm.Message;
 import com.penn.jba.model.realm.Pic;
@@ -35,6 +36,8 @@ import com.penn.jba.util.PPRefreshLoadController;
 import com.penn.jba.util.PPRetrofit;
 import com.penn.jba.util.PPWarn;
 import com.penn.jba.util.PicStatus;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 
@@ -51,6 +54,7 @@ import io.realm.RealmResults;
 import io.realm.Sort;
 
 import static android.R.attr.key;
+import static com.penn.jba.util.PPHelper.ppWarning;
 
 public class MessageListFragment extends Fragment {
 
@@ -210,8 +214,8 @@ public class MessageListFragment extends Fragment {
         }
     }
 
-    private void setUnreadNum(int total, int currentType) {
-
+    private void setUnreadNum(int totalNum, int currentTypeNum) {
+        EventBus.getDefault().post(new MessageEvent("updateMessageBadge", "" + totalNum));
     }
 
     private class InnerPPRefreshLoadController extends PPRefreshLoadController {
@@ -231,32 +235,26 @@ public class MessageListFragment extends Fragment {
             disposableList.add(
                     apiResult
                             .subscribeOn(Schedulers.io())
-                            .map(new Function<String, String>() {
-                                @Override
-                                public String apply(String s) throws Exception {
-                                    PPWarn ppWarn = PPHelper.ppWarning(s);
-
-                                    if (ppWarn != null) {
-                                        return ppWarn.msg;
-                                    } else {
-                                        processMessage(s, true);
-                                        return "OK";
-                                    }
-                                }
-                            })
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(
                                     new Consumer<String>() {
-                                        public void accept(String s) {
-                                            if (s != "OK") {
-                                                PPHelper.ppShowError(s);
+                                        public void accept(String s) throws Exception {
 
-                                                return;
+                                            PPWarn ppWarn = ppWarning(s);
+                                            if (ppWarn != null) {
+                                                throw new Exception(ppWarn.msg);
                                             }
+
+                                            processMessage(s, true);
+
                                             swipeRefreshLayout.setRefreshing(false);
                                             end();
                                             reset();
-                                            setUnreadNum(2, 1);
+
+                                            int totalUnread = PPHelper.ppFromString(s, "data.totalUnread").getAsInt();
+                                            int curTypeUnread = PPHelper.ppFromString(s, "data.unRead." + groupName).getAsInt();
+
+                                            setUnreadNum(totalUnread, curTypeUnread);
                                         }
                                     },
                                     new Consumer<Throwable>() {
@@ -291,7 +289,7 @@ public class MessageListFragment extends Fragment {
                                 public String apply(String s) throws Exception {
                                     Log.v("pplog5", s);
 
-                                    PPWarn ppWarn = PPHelper.ppWarning(s);
+                                    PPWarn ppWarn = ppWarning(s);
 
                                     if (ppWarn != null) {
                                         return ppWarn.msg;

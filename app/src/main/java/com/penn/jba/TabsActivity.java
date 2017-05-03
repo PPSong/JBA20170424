@@ -37,6 +37,7 @@ import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.penn.jba.databinding.ActivityTabsBinding;
 import com.penn.jba.footprint.FootprintFragment;
 import com.penn.jba.message.MessageActivity;
+import com.penn.jba.model.MessageEvent;
 import com.penn.jba.model.realm.CurrentUser;
 import com.penn.jba.model.realm.Footprint;
 import com.penn.jba.model.realm.Pic;
@@ -54,6 +55,9 @@ import com.qiniu.android.storage.UpCompletionHandler;
 import com.qiniu.android.storage.UploadManager;
 import com.squareup.picasso.Picasso;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -126,6 +130,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         binding.setPresenter(this);
         //end common
 
+        EventBus.getDefault().register(this);
+
         setup();
     }
 
@@ -137,6 +143,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                 d.dispose();
             }
         }
+
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -147,7 +155,6 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         }
     }
 
-    //-----helper-----
     private void setup() {
         tryRepublishMoment();
 
@@ -243,7 +250,15 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         );
     }
 
-    private void updateMessageBadge(int num) {
+    //-----helper-----
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        if (event.type == "updateMessageBadge") {
+            updateMessageBadge(event.data);
+        }
+    }
+
+    private void updateMessageBadge(String num) {
         //modify an item of the drawer
         item4.withBadge(num).withBadgeStyle(new BadgeStyle().withTextColor(Color.WHITE).withColorRes(R.color.md_red_700));
         drawerResult.updateItem(item4);
