@@ -68,4 +68,8 @@ dependencies {
     compile 'com.ogaclejapan.smarttablayout:utils-v13:1.6.1@aar'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.nex3z:notification-badge:0.2.0'
+    compile ('io.socket:socket.io-client:0.8.3') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
 }

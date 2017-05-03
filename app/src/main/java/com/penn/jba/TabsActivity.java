@@ -48,6 +48,7 @@ import com.penn.jba.util.FootprintStatus;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPJSONObject;
 import com.penn.jba.util.PPRetrofit;
+import com.penn.jba.util.PPSocketSingleton;
 import com.penn.jba.util.PPValueType;
 import com.penn.jba.util.PPWarn;
 import com.penn.jba.util.PicStatus;
@@ -158,6 +159,10 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
     }
 
     private void setup() {
+
+        Intent intent = new Intent(this, new PPService().getClass());
+        startService(intent);
+
         tryRepublishMoment();
 
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
@@ -279,6 +284,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
             case 0:
                 //logout
                 PPHelper.setPrefBooleanValue("autoLogin", false);
+                PPSocketSingleton.close();
+                stopService(new Intent(activityContext, PPService.class));
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
                 break;
