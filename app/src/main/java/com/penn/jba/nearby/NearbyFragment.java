@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,6 +29,8 @@ public class NearbyFragment extends Fragment {
 
     private Menu menu;
 
+    private NearbyListModeFragment nearbyListModeFragment;
+
     public NearbyFragment() {
         // Required empty public constructor
     }
@@ -42,6 +46,7 @@ public class NearbyFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityContext = getActivity();
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -57,6 +62,28 @@ public class NearbyFragment extends Fragment {
         setup();
 
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.nearby_option, menu);
+        this.menu = menu;
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.refresh:
+                nearbyListModeFragment.loadContent();
+
+                return true;
+            default:
+                break;
+        }
+
+        return false;
     }
 
     public void setup() {
@@ -84,7 +111,8 @@ public class NearbyFragment extends Fragment {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0: // Fragment # 0 - This will show FirstFragment
-                    return NearbyListModeFragment.newInstance();
+                    nearbyListModeFragment = NearbyListModeFragment.newInstance();
+                    return nearbyListModeFragment;
                 default:
                     return null;
             }

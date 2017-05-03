@@ -73,7 +73,7 @@
     <string name="collect_ta_moment">迹录了Ta的片刻</string>
     <string name="collect_your_moment">迹录了你的片刻</string>
     <string name="years_old">岁</string>
-    <string name="follow">follow</string>
+    <string name="follow">关注</string>
     <string name="like">like</string>
     <string name="follow_ta">关注Ta, 展开我们的时空线</string>
     <string name="we_meet_shoulder_n_times">我们%1$d次擦肩而过</string>
@@ -88,5 +88,12 @@
     <string name="click_to_load_more">点击加载更多</string>
     <string name="no_more_data">没有更多了</string>
     <string name="content_can_not_be_empty">内容不能为空</string>
+    <string name="distance_to">距离%1$d米</string>
+    <string name="followed">已关注</string>
+    <string name="cancel_follow">取消关注</string>
+    <string name="refresh">刷新</string>
+    <string name="moment">片刻</string>
+    <string name="friend">伴友</string>
+    <string name="system">系统</string>
 
 </resources>

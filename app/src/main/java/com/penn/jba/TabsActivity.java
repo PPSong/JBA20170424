@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.BadgeStyle;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
@@ -34,6 +36,8 @@ import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.penn.jba.databinding.ActivityTabsBinding;
 import com.penn.jba.footprint.FootprintFragment;
+import com.penn.jba.message.MessageActivity;
+import com.penn.jba.model.MessageEvent;
 import com.penn.jba.model.realm.CurrentUser;
 import com.penn.jba.model.realm.Footprint;
 import com.penn.jba.model.realm.Pic;
@@ -51,6 +55,9 @@ import com.qiniu.android.storage.UpCompletionHandler;
 import com.qiniu.android.storage.UploadManager;
 import com.squareup.picasso.Picasso;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,7 +76,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import de.jonasrottmann.realmbrowser.RealmBrowser;
+//import de.jonasrottmann.realmbrowser.RealmBrowser;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -85,6 +92,7 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 
 import static android.R.attr.key;
+import static android.R.attr.start;
 import static com.penn.jba.util.PPHelper.ppWarning;
 
 public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener, TuSdkComponent.TuSdkComponentDelegate {
@@ -110,6 +118,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
 
     private UploadManager uploadManager = new UploadManager(config);
 
+    private PrimaryDrawerItem item4;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,6 +129,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         binding = DataBindingUtil.setContentView(this, R.layout.activity_tabs);
         binding.setPresenter(this);
         //end common
+
+        EventBus.getDefault().register(this);
 
         setup();
     }
@@ -131,6 +143,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                 d.dispose();
             }
         }
+
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -141,7 +155,6 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         }
     }
 
-    //-----helper-----
     private void setup() {
         tryRepublishMoment();
 
@@ -158,6 +171,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.footprint).withIcon(R.drawable.ic_collections_black_24dp);
         PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(R.string.nearby).withIcon(R.drawable.ic_near_me_black_24dp);
         PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName("test").withIcon(R.drawable.ic_near_me_black_24dp);
+        item4 = new PrimaryDrawerItem().withIdentifier(4).withName("message").withIcon(R.drawable.ic_near_me_black_24dp);
 
         PrimaryDrawerItem item0 = new PrimaryDrawerItem().withIdentifier(0).withName(R.string.logout).withIcon(R.drawable.ic_eject_black_24dp);
 
@@ -200,7 +214,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                         item1,
                         new DividerDrawerItem(),
                         item2,
-                        item3
+                        item3,
+                        item4
                 )
                 .withOnDrawerItemClickListener(this)
                 .build();
@@ -235,6 +250,20 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         );
     }
 
+    //-----helper-----
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        if (event.type == "updateMessageBadge") {
+            updateMessageBadge(event.data);
+        }
+    }
+
+    private void updateMessageBadge(String num) {
+        //modify an item of the drawer
+        item4.withBadge(num).withBadgeStyle(new BadgeStyle().withTextColor(Color.WHITE).withColorRes(R.color.md_red_700));
+        drawerResult.updateItem(item4);
+    }
+
     @Override
     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
         switch ((int) drawerItem.getIdentifier()) {
@@ -259,6 +288,12 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
             case 3:
                 //test
                 PPHelper.startRealmModelsActivity();
+                drawerResult.closeDrawer();
+                break;
+            case 4:
+                //test
+                Intent intent1 = new Intent(activityContext, MessageActivity.class);
+                startActivity(intent1);
                 drawerResult.closeDrawer();
                 break;
             default:
