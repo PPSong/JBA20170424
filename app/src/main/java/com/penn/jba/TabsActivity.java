@@ -208,7 +208,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         //create the drawer and remember the `Drawer` result object
         drawerResult = new DrawerBuilder()
                 .withActivity(this)
-                .withToolbar(binding.tl)
+                //.withToolbar(binding.tl)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         item1,

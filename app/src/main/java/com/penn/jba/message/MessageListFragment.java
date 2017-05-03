@@ -216,6 +216,13 @@ public class MessageListFragment extends Fragment {
 
     private void setUnreadNum(int totalNum, int currentTypeNum) {
         EventBus.getDefault().post(new MessageEvent("updateMessageBadge", "" + totalNum));
+        if (messageType == MessageType.MOMENT) {
+            EventBus.getDefault().post(new MessageEvent("updateMomentMessageBadge", "" + currentTypeNum));
+        } else if (messageType == MessageType.FRIEND) {
+            EventBus.getDefault().post(new MessageEvent("updateFriendMessageBadge", "" + currentTypeNum));
+        } else if (messageType == MessageType.SYSTEM) {
+            EventBus.getDefault().post(new MessageEvent("updateSystemMessageBadge", "" + currentTypeNum));
+        }
     }
 
     private class InnerPPRefreshLoadController extends PPRefreshLoadController {
