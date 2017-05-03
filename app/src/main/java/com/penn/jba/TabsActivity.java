@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.BadgeStyle;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
@@ -112,6 +114,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
 
     private UploadManager uploadManager = new UploadManager(config);
 
+    private PrimaryDrawerItem item4;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -160,7 +164,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.footprint).withIcon(R.drawable.ic_collections_black_24dp);
         PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(R.string.nearby).withIcon(R.drawable.ic_near_me_black_24dp);
         PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName("test").withIcon(R.drawable.ic_near_me_black_24dp);
-        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName("message").withIcon(R.drawable.ic_near_me_black_24dp);
+        item4 = new PrimaryDrawerItem().withIdentifier(4).withName("message").withIcon(R.drawable.ic_near_me_black_24dp);
 
         PrimaryDrawerItem item0 = new PrimaryDrawerItem().withIdentifier(0).withName(R.string.logout).withIcon(R.drawable.ic_eject_black_24dp);
 
@@ -237,6 +241,12 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                         }
                 )
         );
+    }
+
+    private void updateMessageBadge(int num) {
+        //modify an item of the drawer
+        item4.withBadge(num).withBadgeStyle(new BadgeStyle().withTextColor(Color.WHITE).withColorRes(R.color.md_red_700));
+        drawerResult.updateItem(item4);
     }
 
     @Override

@@ -81,11 +81,10 @@ public class MessageListFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static MessageListFragment newInstance(MessageType type, String data) {
+    public static MessageListFragment newInstance(MessageType type) {
         MessageListFragment fragment = new MessageListFragment();
         Bundle args = new Bundle();
         args.putString("messageType", type.toString());
-        args.putString("data", data);
         fragment.setArguments(args);
 
         return fragment;
@@ -98,7 +97,6 @@ public class MessageListFragment extends Fragment {
         if (getArguments() != null) {
             String tmpMessageType = getArguments().getString("messageType");
             messageType = MessageType.valueOf(tmpMessageType);
-            data = getArguments().getString("data");
         }
     }
 
@@ -136,6 +134,8 @@ public class MessageListFragment extends Fragment {
         binding.mainRv.setHasFixedSize(true);
 
         ppRefreshLoadController = new InnerPPRefreshLoadController(binding.mainSwipeRefreshLayout, binding.mainRv);
+
+        ppRefreshLoadController.onRefresh();
     }
 
     private final OrderedRealmCollectionChangeListener<RealmResults<Message>> changeListener = new OrderedRealmCollectionChangeListener<RealmResults<Message>>() {
@@ -210,6 +210,10 @@ public class MessageListFragment extends Fragment {
         }
     }
 
+    private void setUnreadNum(int total, int currentType) {
+
+    }
+
     private class InnerPPRefreshLoadController extends PPRefreshLoadController {
 
         public InnerPPRefreshLoadController(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView) {
@@ -252,6 +256,7 @@ public class MessageListFragment extends Fragment {
                                             swipeRefreshLayout.setRefreshing(false);
                                             end();
                                             reset();
+                                            setUnreadNum(2, 1);
                                         }
                                     },
                                     new Consumer<Throwable>() {

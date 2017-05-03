@@ -41,9 +41,6 @@ public class MessageActivity extends AppCompatActivity {
     private ArrayList<Disposable> disposableList = new ArrayList<Disposable>();
 
     //custom
-    private String momentMessages;
-    private String friendMessages;
-    private String systemMessages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,77 +65,6 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void setup() {
-        //获取dailyReport数据
-        PPJSONObject jBodyMoment = new PPJSONObject();
-        jBodyMoment
-                .put("group", "moment");
-
-        final Observable<String> apiResultMoment = PPRetrofit.getInstance()
-                .api("message.list", jBodyMoment.getJSONObject());
-
-        PPJSONObject jBodyFriend = new PPJSONObject();
-        jBodyFriend
-                .put("group", "friend");
-
-        final Observable<String> apiResultFriend = PPRetrofit.getInstance()
-                .api("message.list", jBodyFriend.getJSONObject());
-
-        PPJSONObject jBodySystem = new PPJSONObject();
-        jBodySystem
-                .put("group", "system");
-
-        final Observable<String> apiResultSystem = PPRetrofit.getInstance()
-                .api("message.list", jBodySystem.getJSONObject());
-
-        disposableList.add(
-                Observable
-                        .zip(
-                                apiResultMoment,
-                                apiResultFriend,
-                                apiResultSystem,
-                                new Function3<String, String, String, String>() {
-                                    @Override
-                                    public String apply(String s, String s2, String s3) throws Exception {
-                                        PPWarn ppWarn = ppWarning(s);
-                                        if (ppWarn != null) {
-                                            throw new Exception(ppWarn.msg);
-                                        }
-
-                                        PPWarn ppWarn2 = ppWarning(s2);
-                                        if (ppWarn2 != null) {
-                                            throw new Exception(ppWarn2.msg);
-                                        }
-
-                                        PPWarn ppWarn3 = ppWarning(s3);
-                                        if (ppWarn3 != null) {
-                                            throw new Exception(ppWarn3.msg);
-                                        }
-
-                                        momentMessages = s;
-                                        friendMessages = s2;
-                                        systemMessages = s3;
-
-                                        return "OK";
-                                    }
-                                }
-                        )
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                new Consumer<String>() {
-                                    @Override
-                                    public void accept(String s) throws Exception {
-
-                                    }
-                                },
-                                new Consumer<Throwable>() {
-                                    @Override
-                                    public void accept(Throwable t) throws Exception {
-                                        Log.v("pplog102", "error102:" + t);
-                                        PPHelper.ppShowError(t.toString());
-                                    }
-                                }));
-
         binding.mainVp.setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
 
             @Override
@@ -146,11 +72,11 @@ public class MessageActivity extends AppCompatActivity {
                 Log.v("pplog121", "getItem");
                 switch (position) {
                     case 0:
-                        return MessageListFragment.newInstance(MessageType.MOMENT, momentMessages);
+                        return MessageListFragment.newInstance(MessageType.MOMENT);
                     case 1:
-                        return MessageListFragment.newInstance(MessageType.FRIEND, friendMessages);
+                        return MessageListFragment.newInstance(MessageType.FRIEND);
                     case 2:
-                        return MessageListFragment.newInstance(MessageType.SYSTEM, systemMessages);
+                        return MessageListFragment.newInstance(MessageType.SYSTEM);
                 }
 
                 return null;
@@ -176,5 +102,6 @@ public class MessageActivity extends AppCompatActivity {
         });
 
         binding.mainStl.setViewPager(binding.mainVp);
+        binding.mainVp.setOffscreenPageLimit(3);
     }
 }
