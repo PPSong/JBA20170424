@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
@@ -62,6 +63,8 @@ public class MessageActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_message);
         //end common
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         EventBus.getDefault().register(this);
 
         setup();
@@ -77,6 +80,14 @@ public class MessageActivity extends AppCompatActivity {
         }
 
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setup() {

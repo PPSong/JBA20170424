@@ -118,6 +118,17 @@ public class MessageListFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realm.close();
+        for (Disposable d : disposableList) {
+            if (!d.isDisposed()) {
+                d.dispose();
+            }
+        }
+    }
+
     private void setup() {
         if (messageType == MessageType.MOMENT) {
             groupName = "moment";
