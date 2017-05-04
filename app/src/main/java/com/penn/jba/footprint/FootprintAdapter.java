@@ -131,7 +131,7 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
                     Intent intent = new Intent(context, CollectDetailActivity.class);
                     intent.putExtra("avatarStr", ft.getAvatarNetFileName());
                     intent.putExtra("nickname", ft.getOtherUserNickname());
-                    Log.v("pplog139", ft.getBody());
+
                     intent.putExtra("content", ft.getContent() + ":" + ppFromString(ft.getBody(), "detail.num").getAsInt());
                     intent.putExtra("geoStr", ppFromString(ft.getBody(), "detail.location.geo").getAsJsonArray().toString());
 
@@ -373,7 +373,6 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             //设置图片
             ArrayList<String> pics = new ArrayList<>();
             String body = ft.getBody();
-            Log.v("pplog133", body);
             JsonArray moments = ppFromString(body, "detail.moments").getAsJsonArray();
             int size = moments.size();
 
