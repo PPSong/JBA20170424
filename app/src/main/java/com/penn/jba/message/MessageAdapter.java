@@ -27,7 +27,15 @@ import com.penn.jba.databinding.FootprintType8Binding;
 import com.penn.jba.databinding.FootprintType9Binding;
 import com.penn.jba.databinding.ListRowAllMessageBinding;
 import com.penn.jba.databinding.ListRowAllMomentBinding;
+import com.penn.jba.databinding.MessageType10Binding;
+import com.penn.jba.databinding.MessageType11Binding;
+import com.penn.jba.databinding.MessageType14Binding;
+import com.penn.jba.databinding.MessageType15Binding;
 import com.penn.jba.databinding.MessageType1Binding;
+import com.penn.jba.databinding.MessageType16Binding;
+import com.penn.jba.databinding.MessageType6Binding;
+import com.penn.jba.databinding.MessageType8Binding;
+import com.penn.jba.databinding.MessageType9Binding;
 import com.penn.jba.model.CollectMoment;
 import com.penn.jba.model.realm.Footprint;
 import com.penn.jba.model.realm.Message;
@@ -150,6 +158,33 @@ public class MessageAdapter extends RecyclerView.Adapter {
             case 1:
                 MessageType1Binding binding1 = MessageType1Binding.inflate(layoutInflater, parent, false);
                 return new MessageType1ViewHolder(binding1);
+//            case 5:
+//                MessageType5Binding binding5 = MessageType5Binding.inflate(layoutInflater, parent, false);
+//                return new MessageType5ViewHolder(binding5);
+            case 6:
+                MessageType6Binding binding6 = MessageType6Binding.inflate(layoutInflater, parent, false);
+                return new MessageType6ViewHolder(binding6);
+            case 8:
+                MessageType8Binding binding8 = MessageType8Binding.inflate(layoutInflater, parent, false);
+                return new MessageType8ViewHolder(binding8);
+            case 9:
+                MessageType9Binding binding9 = MessageType9Binding.inflate(layoutInflater, parent, false);
+                return new MessageType9ViewHolder(binding9);
+            case 10:
+                MessageType10Binding binding10 = MessageType10Binding.inflate(layoutInflater, parent, false);
+                return new MessageType10ViewHolder(binding10);
+            case 11:
+                MessageType11Binding binding11 = MessageType11Binding.inflate(layoutInflater, parent, false);
+                return new MessageType11ViewHolder(binding11);
+            case 14:
+                MessageType14Binding binding14 = MessageType14Binding.inflate(layoutInflater, parent, false);
+                return new MessageType14ViewHolder(binding14);
+            case 15:
+                MessageType15Binding binding15 = MessageType15Binding.inflate(layoutInflater, parent, false);
+                return new MessageType15ViewHolder(binding15);
+            case 16:
+                MessageType16Binding binding16 = MessageType16Binding.inflate(layoutInflater, parent, false);
+                return new MessageType16ViewHolder(binding16);
             default:
                 ListRowAllMessageBinding binding = ListRowAllMessageBinding.inflate(layoutInflater, parent, false);
                 return new PPViewHolder(binding);
@@ -159,7 +194,23 @@ public class MessageAdapter extends RecyclerView.Adapter {
     public void onBindRealViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof MessageType1ViewHolder) {
             ((MessageType1ViewHolder) holder).bind(data.get(position));
-        }else {
+        } else if (holder instanceof MessageType6ViewHolder) {
+            ((MessageType6ViewHolder) holder).bind(data.get(position));
+        } else if (holder instanceof MessageType8ViewHolder) {
+            ((MessageType8ViewHolder) holder).bind(data.get(position));
+        } else if (holder instanceof MessageType9ViewHolder) {
+            ((MessageType9ViewHolder) holder).bind(data.get(position));
+        } else if (holder instanceof MessageType10ViewHolder) {
+            ((MessageType10ViewHolder) holder).bind(data.get(position));
+        } else if (holder instanceof MessageType11ViewHolder) {
+            ((MessageType11ViewHolder) holder).bind(data.get(position));
+        } else if (holder instanceof MessageType14ViewHolder) {
+            ((MessageType14ViewHolder) holder).bind(data.get(position));
+        } else if (holder instanceof MessageType15ViewHolder) {
+            ((MessageType15ViewHolder) holder).bind(data.get(position));
+        } else if (holder instanceof MessageType16ViewHolder) {
+            ((MessageType16ViewHolder) holder).bind(data.get(position));
+        } else {
             ((PPViewHolder) holder).bind(data.get(position));
         }
 
@@ -220,10 +271,185 @@ public class MessageAdapter extends RecyclerView.Adapter {
         public void bind(Message message) {
             binding.setPresenter(message);
             binding.executePendingBindings();
-            binding.timeLineInclude.timeTv.setReferenceTime(message.getCreateTime());
+
+            binding.nameTv.setText(message.getNickname());
+            binding.contentTv.setText(message.getContent());
+            binding.timeTv.setReferenceTime(message.getCreateTime());
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(message.getAvatarNetFileName()))
-                    .placeholder(R.drawable.profile).into(binding.avatarIv);
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.get80ImageUrl(message.getPic()))
+                    .placeholder(R.drawable.pictures_no).into(binding.contentIv);
+        }
+    }
+
+    public class MessageType6ViewHolder extends RecyclerView.ViewHolder {
+        private final MessageType6Binding binding;
+
+        public MessageType6ViewHolder(MessageType6Binding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(Message message) {
+            binding.setPresenter(message);
+            binding.executePendingBindings();
+
+            binding.nameTv.setText(message.getNickname());
+            binding.contentTv.setText(message.getNickname());
+            binding.timeTv.setReferenceTime(message.getCreateTime());
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.get80ImageUrl(message.getAvatarNetFileName()))
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.get80ImageUrl(message.getPic()))
+                    .placeholder(R.drawable.pictures_no).into(binding.contentIv);
+        }
+    }
+
+    public class MessageType8ViewHolder extends RecyclerView.ViewHolder {
+        private final MessageType8Binding binding;
+
+        public MessageType8ViewHolder(MessageType8Binding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(Message message) {
+            binding.setPresenter(message);
+            binding.executePendingBindings();
+
+            binding.nameTv.setText(message.getNickname());
+            binding.contentTv.setText(message.getNickname());
+            binding.timeTv.setReferenceTime(message.getCreateTime());
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.get80ImageUrl(message.getAvatarNetFileName()))
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
+        }
+    }
+
+    public class MessageType9ViewHolder extends RecyclerView.ViewHolder {
+        private final MessageType9Binding binding;
+
+        public MessageType9ViewHolder(MessageType9Binding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(Message message) {
+            binding.setPresenter(message);
+            binding.executePendingBindings();
+
+            binding.nameTv.setText(message.getNickname());
+            binding.contentTv.setText(message.getNickname());
+            binding.timeTv.setReferenceTime(message.getCreateTime());
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.get80ImageUrl(message.getAvatarNetFileName()))
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
+        }
+    }
+
+    public class MessageType10ViewHolder extends RecyclerView.ViewHolder {
+        private final MessageType10Binding binding;
+
+        public MessageType10ViewHolder(MessageType10Binding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(Message message) {
+            binding.setPresenter(message);
+            binding.executePendingBindings();
+
+            binding.nameTv.setText(message.getNickname());
+            binding.contentTv.setText(message.getNickname());
+            binding.timeTv.setReferenceTime(message.getCreateTime());
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.get80ImageUrl(message.getAvatarNetFileName()))
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
+        }
+    }
+
+    public class MessageType11ViewHolder extends RecyclerView.ViewHolder {
+        private final MessageType11Binding binding;
+
+        public MessageType11ViewHolder(MessageType11Binding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(Message message) {
+            binding.setPresenter(message);
+            binding.executePendingBindings();
+
+            binding.nameTv.setText(message.getNickname());
+            binding.contentTv.setText(message.getNickname());
+            binding.timeTv.setReferenceTime(message.getCreateTime());
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.get80ImageUrl(message.getAvatarNetFileName()))
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
+        }
+    }
+
+    public class MessageType14ViewHolder extends RecyclerView.ViewHolder {
+        private final MessageType14Binding binding;
+
+        public MessageType14ViewHolder(MessageType14Binding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(Message message) {
+            binding.setPresenter(message);
+            binding.executePendingBindings();
+
+            binding.timeTv.setReferenceTime(message.getCreateTime());
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.get80ImageUrl(message.getSystemIcon()))
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
+        }
+    }
+
+    public class MessageType15ViewHolder extends RecyclerView.ViewHolder {
+        private final MessageType15Binding binding;
+
+        public MessageType15ViewHolder(MessageType15Binding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(Message message) {
+            binding.setPresenter(message);
+            binding.executePendingBindings();
+
+            binding.nameTv.setText(message.getNickname());
+            binding.contentTv.setText(message.getNickname());
+            binding.timeTv.setReferenceTime(message.getCreateTime());
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.get80ImageUrl(message.getAvatarNetFileName()))
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
+        }
+    }
+
+    public class MessageType16ViewHolder extends RecyclerView.ViewHolder {
+        private final MessageType16Binding binding;
+
+        public MessageType16ViewHolder(MessageType16Binding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(Message message) {
+            binding.setPresenter(message);
+            binding.executePendingBindings();
+
+            binding.nameTv.setText(message.getNickname());
+            binding.contentTv.setText(message.getNickname());
+            binding.timeTv.setReferenceTime(message.getCreateTime());
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.get80ImageUrl(message.getAvatarNetFileName()))
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
         }
     }
 }

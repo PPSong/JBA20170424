@@ -75,23 +75,35 @@ public class Message extends RealmObject {
 
     public String getContent() {
         if (type == 1) {
-          return ppFromString(body, "content").getAsString();
+            return ppFromString(body, "params.content").getAsString();
         }
 
         return getType() + "," + getId();
     }
 
     public String getAvatarNetFileName() {
-        if (type == 1) {
+        if (type == 1 || type == 6 || type == 8 || type == 9 || type == 10 || type == 11 || type == 15 || type == 16) {
             return ppFromString(body, "params.targetUser.head").getAsString();
         }
         return "no avatar";
     }
 
     public String getNickname() {
-        if (type == 1) {
+        if (type == 1 || type == 6 || type == 8 || type == 9 || type == 10 || type == 11 || type == 15 || type == 16) {
             return ppFromString(body, "params.targetUser.nickname").getAsString();
         }
         return "no avatar";
     }
+
+    public String getPic() {
+        if (type == 1 || type == 6) {
+            return ppFromString(body, "params.pic").getAsString();
+        }
+        return "no pic";
+    }
+
+    public String getSystemIcon() {
+        return ppFromString(body, "params.icon").getAsString();
+    }
+
 }

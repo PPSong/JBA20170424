@@ -10,9 +10,11 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.jakewharton.rxbinding2.view.RxView;
 import com.penn.jba.databinding.ActivityLoginBinding;
 import com.penn.jba.databinding.ActivityOtherMainPageBinding;
 import com.penn.jba.footprint.FootprintAdapter;
@@ -30,6 +32,7 @@ import com.penn.jba.util.PicStatus;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -263,12 +266,69 @@ public class OtherMainPageActivity extends AppCompatActivity {
                                            binding.strangerLine3Tv.setText(tmpStr3);
 
                                            binding.userNsv.setVisibility(View.VISIBLE);
+
+                                           Observable<Object> followButtonObservable = RxView.clicks(binding.followTaBt)
+                                                   .debounce(200, TimeUnit.MILLISECONDS);
+
+                                           disposableList.add(followButtonObservable
+                                                   .subscribeOn(AndroidSchedulers.mainThread())
+                                                   .observeOn(AndroidSchedulers.mainThread())
+                                                   .subscribe(
+                                                           new Consumer<Object>() {
+                                                               public void accept(Object o) {
+                                                                   follow();
+                                                               }
+                                                           }
+                                                   )
+                                           );
                                        }
                                    },
                                 new Consumer<Throwable>() {
                                     @Override
                                     public void accept(Throwable t) throws Exception {
                                         Log.v("pplog131", t.toString());
+                                        PPHelper.ppShowError(t.toString());
+                                    }
+                                })
+        );
+    }
+
+    private void follow() {
+        binding.followTaBt.setEnabled(false);
+        PPJSONObject jBody = new PPJSONObject();
+        jBody
+                .put("target", targetId)
+                .put("isFree", "true");
+
+        final Observable<String> apiResult = PPRetrofit.getInstance().api("friend.follow", jBody.getJSONObject());
+
+        disposableList.add(
+                apiResult
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doFinally(new Action() {
+                            @Override
+                            public void run() throws Exception {
+                                binding.followTaBt.setEnabled(true);
+                            }
+                        })
+                        .subscribe(
+                                new Consumer<String>() {
+                                    @Override
+                                    public void accept(String s) throws Exception {
+                                        PPWarn ppWarn = ppWarning(s);
+                                        if (ppWarn != null) {
+                                            throw new Exception(ppWarn.msg);
+                                        }
+
+                                        binding.userNsv.setVisibility(View.INVISIBLE);
+                                        //wengtodo refresh page
+                                        loadTargetContent();
+                                    }
+                                },
+                                new Consumer<Throwable>() {
+                                    @Override
+                                    public void accept(Throwable t) throws Exception {
                                         PPHelper.ppShowError(t.toString());
                                     }
                                 })
@@ -439,6 +499,7 @@ public class OtherMainPageActivity extends AppCompatActivity {
         binding.userRv.setHasFixedSize(true);
 
         ppRefreshLoadController = new InnerPPRefreshLoadController(binding.mainSwipeRefreshLayout, binding.userRv);
+        ppRefreshLoadController.onRefresh();
     }
 
     private class InnerPPRefreshLoadController extends PPRefreshLoadController {
