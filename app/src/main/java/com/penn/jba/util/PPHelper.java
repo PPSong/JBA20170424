@@ -3,6 +3,7 @@ package com.penn.jba.util;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.support.design.widget.Snackbar;
 import android.text.Html;
@@ -18,6 +19,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.penn.jba.PPApplication;
+import com.penn.jba.PPService;
 import com.penn.jba.R;
 import com.penn.jba.model.Geo;
 import com.penn.jba.model.realm.CurrentUser;
@@ -66,6 +68,12 @@ public class PPHelper {
     public static String currentUserNickname;
 
     public static String getCurrentUserHead;
+
+    public static String socketUrl;
+
+    public static String token;
+
+    public static long tokenTimestamp;
 
     public static Toast ppToast;
 
@@ -180,6 +188,8 @@ public class PPHelper {
                                     .toString();
                             PPRetrofit.authBody = authBody;
                             currentUserId = currentUser.getUserId();
+                            token = currentUser.getToken();
+                            tokenTimestamp = currentUser.getTokenTimestamp();
                         }
 
                         return PPRetrofit.getInstance().api("user.startup", null);
@@ -239,6 +249,8 @@ public class PPHelper {
 
                             currentUserNickname = currentUser.getNickname();
                             getCurrentUserHead = currentUser.getHead();
+                            socketUrl = currentUser.getSocketHost() + ":" + currentUser.getSocketPort();
+                            Log.v("pplog162", "testUrl:" + socketUrl);
 
                             //设置baiduAk
                             baiduAk = tmpAk;
@@ -480,7 +492,7 @@ public class PPHelper {
 
     public static Geo getLatestGeo() {
         //pptodo implement it
-        return new Geo(121.52619934082031f,31.216968536376953f);
+        return new Geo(121.52619934082031f, 31.216968536376953f);
     }
 
     @SuppressWarnings("deprecation")

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.penn.jba">
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
     <!-- 允许应用程序写数据到外部存储设备（主要是SD卡） -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- 在sdcard中创建/删除文件的权限 -->
@@ -60,6 +62,7 @@
         <activity android:name=".CollectDetailActivity" />
         <activity android:name=".MomentDetailActivity"></activity>
         <activity android:name=".message.MessageActivity"></activity>
+        <service android:name=".PPService" />
     </application>
 
 </manifest>

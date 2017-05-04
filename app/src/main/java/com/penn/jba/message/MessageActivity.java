@@ -8,18 +8,27 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.penn.jba.R;
 import com.penn.jba.dailyReport.ReportListFragment;
 import com.penn.jba.databinding.ActivityLoginBinding;
 import com.penn.jba.databinding.ActivityMessageBinding;
+import com.penn.jba.databinding.PpTabBinding;
+import com.penn.jba.model.MessageEvent;
+import com.penn.jba.util.InfoType;
 import com.penn.jba.util.MessageType;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPJSONObject;
 import com.penn.jba.util.PPRetrofit;
 import com.penn.jba.util.PPWarn;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
@@ -41,6 +50,9 @@ public class MessageActivity extends AppCompatActivity {
     private ArrayList<Disposable> disposableList = new ArrayList<Disposable>();
 
     //custom
+    private PpTabBinding ppTabBinding1;
+    private PpTabBinding ppTabBinding2;
+    private PpTabBinding ppTabBinding3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +62,10 @@ public class MessageActivity extends AppCompatActivity {
         activityContext = this;
         binding = DataBindingUtil.setContentView(this, R.layout.activity_message);
         //end common
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        EventBus.getDefault().register(this);
 
         setup();
     }
@@ -62,6 +78,16 @@ public class MessageActivity extends AppCompatActivity {
                 d.dispose();
             }
         }
+
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setup() {
@@ -101,9 +127,35 @@ public class MessageActivity extends AppCompatActivity {
             }
         });
 
-        binding.mainStl.setViewPager(binding.mainVp);
+        binding.mainTl.setupWithViewPager(binding.mainVp);
         binding.mainVp.setOffscreenPageLimit(3);
 
-        //binding.mainStl.getTabAt(1).
+        setupTabs();
+    }
+
+    //-----helper-----
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        if (event.type == "updateMomentMessageBadge") {
+            ppTabBinding1.mainBd.setNumber(Integer.parseInt(event.data));
+        } else if (event.type == "updateFriendMessageBadge") {
+            ppTabBinding2.mainBd.setNumber(Integer.parseInt(event.data));
+        } else if (event.type == "updateSystemMessageBadge") {
+            ppTabBinding3.mainBd.setNumber(Integer.parseInt(event.data));
+        }
+    }
+
+    private void setupTabs() {
+        ppTabBinding1 = DataBindingUtil.inflate(getLayoutInflater(), R.layout.pp_tab, null, false);
+        ppTabBinding1.mainTv.setText(getString(R.string.moment));
+        binding.mainTl.getTabAt(0).setCustomView(ppTabBinding1.getRoot());
+
+        ppTabBinding2 = DataBindingUtil.inflate(getLayoutInflater(), R.layout.pp_tab, null, false);
+        ppTabBinding2.mainTv.setText(getString(R.string.friend));
+        binding.mainTl.getTabAt(1).setCustomView(ppTabBinding2.getRoot());
+
+        ppTabBinding3 = DataBindingUtil.inflate(getLayoutInflater(), R.layout.pp_tab, null, false);
+        ppTabBinding3.mainTv.setText(getString(R.string.system));
+        binding.mainTl.getTabAt(2).setCustomView(ppTabBinding3.getRoot());
     }
 }

@@ -5,7 +5,11 @@ dependencies {
 }
 
 android {
+<<<<<<< HEAD
     compileSdkVersion 25
+=======
+    compileSdkVersion 21
+>>>>>>> master
     buildToolsVersion '25.0.0'
 
     sourceSets {

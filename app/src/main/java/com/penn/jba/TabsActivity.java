@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +36,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.penn.jba.databinding.ActivityTabsBinding;
+import com.penn.jba.databinding.PpTabBinding;
 import com.penn.jba.footprint.FootprintFragment;
 import com.penn.jba.message.MessageActivity;
 import com.penn.jba.model.MessageEvent;
@@ -46,6 +48,7 @@ import com.penn.jba.util.FootprintStatus;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPJSONObject;
 import com.penn.jba.util.PPRetrofit;
+import com.penn.jba.util.PPSocketSingleton;
 import com.penn.jba.util.PPValueType;
 import com.penn.jba.util.PPWarn;
 import com.penn.jba.util.PicStatus;
@@ -91,8 +94,6 @@ import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
-import static android.R.attr.key;
-import static android.R.attr.start;
 import static com.penn.jba.util.PPHelper.ppWarning;
 
 public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerItemClickListener, TuSdkComponent.TuSdkComponentDelegate {
@@ -133,6 +134,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         EventBus.getDefault().register(this);
 
         setup();
+
+        //pptodo 取该用户总共未读数
     }
 
     @Override
@@ -156,6 +159,10 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
     }
 
     private void setup() {
+
+        Intent intent = new Intent(this, new PPService().getClass());
+        startService(intent);
+
         tryRepublishMoment();
 
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
@@ -260,6 +267,13 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
 
     private void updateMessageBadge(String num) {
         //modify an item of the drawer
+        if (num.equals("0")) {
+            binding.bdTv.setVisibility(View.INVISIBLE);
+        } else {
+            binding.bdTv.setText(num);
+            binding.bdTv.setVisibility(View.VISIBLE);
+        }
+
         item4.withBadge(num).withBadgeStyle(new BadgeStyle().withTextColor(Color.WHITE).withColorRes(R.color.md_red_700));
         drawerResult.updateItem(item4);
     }
@@ -270,6 +284,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
             case 0:
                 //logout
                 PPHelper.setPrefBooleanValue("autoLogin", false);
+                PPSocketSingleton.close();
+                stopService(new Intent(activityContext, PPService.class));
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
                 break;
