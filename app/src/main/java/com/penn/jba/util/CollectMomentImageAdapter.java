@@ -62,7 +62,7 @@ public class CollectMomentImageAdapter extends BaseAdapter {
         String picStr = data.get(position);
         Picasso.with(mContext)
                 .load(PPHelper.get80ImageUrl(picStr))
-                .placeholder(R.drawable.profile)
+                .placeholder(R.drawable.pictures_no)
                 .into(imageView);
 
         return imageView;

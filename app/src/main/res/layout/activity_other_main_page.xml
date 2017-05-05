@@ -39,10 +39,10 @@
 
                     <ImageView
                         android:id="@+id/background_iv"
-                        android:src="@drawable/header"
-                        android:scaleType="centerCrop"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/header"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintRight_toRightOf="parent"
@@ -76,12 +76,16 @@
                         <TextView
                             android:id="@+id/line1_tv"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/white"
+                            android:textSize="18dp" />
 
                         <TextView
                             android:id="@+id/line2_tv"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/white"
+                            android:textSize="18dp" />
 
                     </LinearLayout>
 
@@ -99,16 +103,15 @@
 
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/main_swipe_refresh_layout"
-            android:visibility="invisible"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:visibility="invisible"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/user_rv"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                >
+                android:layout_height="match_parent">
 
             </android.support.v7.widget.RecyclerView>
         </android.support.v4.widget.SwipeRefreshLayout>
@@ -126,27 +129,29 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_gravity="center"
                     android:id="@+id/stranger_line1_tv"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+
                 <TextView
-                    android:layout_gravity="center"
                     android:id="@+id/stranger_line2_tv"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+
                 <TextView
-                    android:layout_gravity="center"
                     android:id="@+id/stranger_line3_tv"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
 
                 <Button
-                    android:layout_gravity="center"
                     android:id="@+id/follow_ta_bt"
-                    android:text="@string/follow_ta"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/follow_ta" />
 
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>

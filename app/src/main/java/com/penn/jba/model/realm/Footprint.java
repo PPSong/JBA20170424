@@ -151,7 +151,7 @@ public class Footprint extends RealmObject {
             String nicknameA = ppFromString(body, "relatedUsers.0.nickname").getAsString();
             String nicknameB = ppFromString(body, "relatedUsers.1.nickname").getAsString();
             String beFriend = ppFromString(body, "detail.beFriend", PPValueType.INT).getAsInt() == 1 ? PPApplication.getContext().getString(R.string.be_friend) : "";
-            if (idA == PPHelper.currentUserId) {
+            if (idA.equals(PPHelper.currentUserId)) {
                 String i_follow_to_sb = PPApplication.getContext().getString(R.string.i_follow_to_sb);
 
                 return String.format(i_follow_to_sb, nicknameB, beFriend);
@@ -185,11 +185,11 @@ public class Footprint extends RealmObject {
             if (idA == PPHelper.currentUserId) {
                 String i_collect_ta_moment = PPApplication.getContext().getString(R.string.i_collect_ta_moment);
 
-                return i_collect_ta_moment + "," + getHash();
+                return i_collect_ta_moment ;
             } else {
                 String ta_collect_my_moment = PPApplication.getContext().getString(R.string.ta_collect_my_moment);
 
-                return ta_collect_my_moment + "," + getHash();
+                return ta_collect_my_moment;
             }
         }
 

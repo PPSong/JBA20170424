@@ -68,7 +68,7 @@ public class CollectDetailActivity extends AppCompatActivity {
     private void setup() {
         Picasso.with(activityContext)
                 .load(PPHelper.get80ImageUrl(avatarStr))
-                .placeholder(R.drawable.profile)
+                .placeholder(R.drawable.pictures_no)
                 .into(binding.avatarCiv);
 
         binding.nicknameTv.setText(nickname);
@@ -77,7 +77,7 @@ public class CollectDetailActivity extends AppCompatActivity {
 
         Picasso.with(activityContext)
                 .load(PPHelper.getBaiduMap(geoJsonArray))
-                .placeholder(R.drawable.header)
+                .placeholder(R.drawable.pictures_no)
                 .into(binding.mapIv);
 
         ArrayList<CollectMoment> collectMoments = new Gson().fromJson(

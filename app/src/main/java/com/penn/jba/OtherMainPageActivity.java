@@ -208,7 +208,7 @@ public class OtherMainPageActivity extends AppCompatActivity {
         binding.ctbl.setTitle(nickname);
         Picasso.with(activityContext)
                 .load(PPHelper.get80ImageUrl(avatar))
-                .placeholder(R.drawable.profile)
+                .placeholder(R.drawable.pictures_no)
                 .into(binding.avatarCiv);
         binding.line1Tv.setText("" + age + activityContext.getResources().getString(R.string.years_old));
         binding.line2Tv.setText(activityContext.getResources().getString(R.string.follow) + ":" + fans + " " + activityContext.getResources().getString(R.string.like) + ":" + momentBeLiked);

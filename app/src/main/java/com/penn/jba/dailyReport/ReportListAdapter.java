@@ -81,7 +81,7 @@ public class ReportListAdapter extends RecyclerView.Adapter<ReportListAdapter.Re
         public void bind(final String recordStr) {
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(PPHelper.ppFromString(recordStr, "head", STRING).getAsString()))
-                    .placeholder(R.drawable.profile)
+                    .placeholder(R.drawable.pictures_no)
                     .into(binding.avatarIv);
 
             binding.nicknameTv.setText(PPHelper.ppFromString(recordStr, "nickname", STRING).getAsString());

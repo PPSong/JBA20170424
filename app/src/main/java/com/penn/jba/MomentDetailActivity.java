@@ -322,7 +322,7 @@ public class MomentDetailActivity extends AppCompatActivity {
     private void loadContent() {
         Picasso.with(activityContext)
                 .load(PPHelper.get80ImageUrl(ppFromString(momentStr, "data._creator.head").getAsString()))
-                .placeholder(R.drawable.profile)
+                .placeholder(R.drawable.pictures_no)
                 .into(binding.avatarCiv);
 
         binding.line1Tv.setText(ppFromString(momentStr, "data._creator.nickname").getAsString());

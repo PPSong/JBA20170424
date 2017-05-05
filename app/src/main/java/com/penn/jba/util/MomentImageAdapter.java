@@ -73,7 +73,7 @@ public class MomentImageAdapter extends BaseAdapter {
             //net
             Picasso.with(mContext)
                     .load(PPHelper.get80ImageUrl(pic.getNetFileName()))
-                    .placeholder(R.drawable.profile)
+                    .placeholder(R.drawable.pictures_no)
                     .into(imageView);
         }
 

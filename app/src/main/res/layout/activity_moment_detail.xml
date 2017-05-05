@@ -46,12 +46,14 @@
                         android:id="@+id/top_right_ll"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="@dimen/text_margin"
                         android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/line1_tv"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:textSize="18dp" />
 
                         <TextView
                             android:id="@+id/line2_tv"
@@ -66,6 +68,7 @@
                     android:id="@+id/main_cv"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
+                    android:layout_marginTop="@dimen/cardview_margin"
                     app:fillColor="#FFFFFFFF"
                     app:pageColor="#00000000"
                     app:radius="6dp"
@@ -73,20 +76,68 @@
                     app:strokeColor="#FF777777"
                     app:strokeWidth="1dp" />
 
-                <TextView
-                    android:id="@+id/content_tv"
+                <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content">
 
-                <com.github.curioustechizen.ago.RelativeTimeTextView
-                    android:id="@+id/create_time_rttv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/content_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:textSize="18dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/place_tv"
+                    <com.github.curioustechizen.ago.RelativeTimeTextView
+                        android:id="@+id/create_time_rttv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </android.support.constraint.ConstraintLayout>
+
+
+                <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/imageView2"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toLeftOf="@+id/place_tv"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_place_black_24dp" />
+
+                    <TextView
+                        android:id="@+id/place_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="17dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.492" />
+
+                </android.support.constraint.ConstraintLayout>
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/main_rv"
@@ -97,12 +148,12 @@
 
                 <Button
                     android:id="@+id/load_more_bt"
-                    android:visibility="invisible"
-                    android:layout_gravity="center"
-                    android:text="@string/click_to_load_more"
                     style="@style/Widget.AppCompat.Button.Borderless.Colored"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/click_to_load_more"
+                    android:visibility="invisible" />
 
             </LinearLayout>
 
@@ -113,8 +164,10 @@
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent">
@@ -124,8 +177,10 @@
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -137,6 +192,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -148,6 +204,7 @@
                 android:layout_width="80dp"
                 android:layout_height="0dp"
                 android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
@@ -159,9 +216,10 @@
 
             <Button
                 android:id="@+id/send_bt"
-                android:layout_width="60dp"
+                android:layout_width="88dp"
                 android:layout_height="0dp"
                 android:layout_marginBottom="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
@@ -178,8 +236,10 @@
             android:layout_height="64dp"
             android:layout_gravity="center"
             android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"

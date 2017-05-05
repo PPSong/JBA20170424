@@ -125,7 +125,7 @@ public class NearbyListMomentGroupItemFragment extends Fragment {
 
         Picasso.with(activityContext)
                 .load(PPHelper.get80ImageUrl(PPHelper.ppFromString(momentGroupStr, "head").getAsString()))
-                .placeholder(R.drawable.profile)
+                .placeholder(R.drawable.pictures_no)
                 .into(binding.avatarCiv);
 
         binding.nicknameTv.setText(PPHelper.ppFromString(momentGroupStr, "nickname").getAsString());

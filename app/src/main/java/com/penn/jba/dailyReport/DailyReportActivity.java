@@ -171,7 +171,7 @@ public class DailyReportActivity extends AppCompatActivity {
             CurrentUser currentUser = realm.where(CurrentUser.class).findFirst();
             Picasso.with(activityContext)
                     .load(PPHelper.get80ImageUrl(currentUser.getHead()))
-                    .placeholder(R.drawable.profile)
+                    .placeholder(R.drawable.pictures_no)
                     .into((ImageView) binding.materialViewPager.findViewById(R.id.avatar_iv));
             int size = currentUser.getPics().size();
             if (size == 0) {

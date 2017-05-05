@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spanned;
+import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -185,7 +187,7 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#483D8B"));
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
-                    .placeholder(R.drawable.profile).into(binding.avatarIv);
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
         }
     }
 
@@ -209,11 +211,11 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#7B68EE"));
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
-                    .placeholder(R.drawable.profile).into(binding.avatarIv);
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
         }
     }
 
-    // x 关注了我
+    // 我关注了x
     public class FootprintType1ViewHolder extends RecyclerView.ViewHolder {
         private final FootprintType1Binding binding;
 
@@ -233,7 +235,7 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#FFA500"));
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
-                    .placeholder(R.drawable.profile).into(binding.avatarIv);
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
         }
     }
 
@@ -343,9 +345,15 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.setPresenter(ft);
             binding.executePendingBindings();
             binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
+            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type11);
+            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#1EAAF1"));
+            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#1EAAF1"));
+            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#1EAAF1"));
+            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#1EAAF1"));
+
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
-                    .placeholder(R.drawable.profile).into(binding.avatarIv);
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
 
             JsonArray geo = ppFromString(ft.getBody(), "detail.geo").getAsJsonArray();
             Picasso.with(PPApplication.getContext())
@@ -366,6 +374,11 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.setPresenter(ft);
             binding.executePendingBindings();
             binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
+            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type4);
+            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#50AE55"));
+            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#50AE55"));
+            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#50AE55"));
+            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#50AE55"));
 
             binding.contentTv.setText(ft.getContent());
             binding.placeTv.setText(ft.getPlace());
@@ -408,7 +421,7 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
-                    .placeholder(R.drawable.profile).into(binding.avatarIv);
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
         }
     }
 }

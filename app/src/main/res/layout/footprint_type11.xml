@@ -36,7 +36,7 @@
             android:layout_marginLeft="0dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="0dp"
-            android:background="@color/accent"
+            android:background="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/time_line_include"
             app:layout_constraintRight_toRightOf="parent"
@@ -67,9 +67,10 @@
                         android:layout_marginLeft="8dp"
                         android:layout_marginRight="8dp"
                         android:layout_marginTop="8dp"
-                        android:background="@color/md_yellow_50"
+                        android:background="@color/white"
                         android:gravity="center|left"
                         android:text="@{presenter.getContent()}"
+                        android:textSize="15dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintRight_toLeftOf="@+id/avatar_iv"
@@ -90,9 +91,9 @@
 
                 <ImageView
                     android:id="@+id/map_iv"
-                    android:layout_gravity="center"
                     android:layout_width="300dp"
-                    android:layout_height="200dp" />
+                    android:layout_height="200dp"
+                    android:layout_gravity="center" />
 
             </LinearLayout>
 
