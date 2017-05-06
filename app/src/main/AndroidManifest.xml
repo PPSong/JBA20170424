@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.penn.jba">
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- 允许应用程序写数据到外部存储设备（主要是SD卡） -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -44,10 +44,31 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ForgetPasswordActivity"
+            android:label="@string/reset_password"
+            android:parentActivityName=".LoginActivity" />
+        <activity
+            android:name=".SignUp1Activity"
+            android:label="@string/action_sign_up"
+            android:launchMode="singleTask"
+            android:parentActivityName=".LoginActivity" />
+        <activity
+            android:name=".SignUp2Activity"
+            android:label="@string/action_sign_up"
+            android:launchMode="singleTask"
+            android:parentActivityName=".SignUp1Activity" />
+        <activity
+            android:name=".SignUp3Activity"
+            android:label="@string/finish_sign_up"
+            android:launchMode="singleTask"
+            android:parentActivityName=".SignUp2Activity" />
+        <activity
             android:name=".TabsActivity"
             android:label="@string/title_activity_tabs"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".CreateMomentActivity" />
+        <activity
+            android:name=".CreateMomentActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="org.lasque.tusdk.impl.activity.TuFragmentActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -62,6 +83,7 @@
         <activity android:name=".CollectDetailActivity" />
         <activity android:name=".MomentDetailActivity"></activity>
         <activity android:name=".message.MessageActivity"></activity>
+
         <service android:name=".PPService" />
     </application>
 

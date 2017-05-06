@@ -327,7 +327,7 @@ public class MomentDetailActivity extends AppCompatActivity {
 
         binding.line1Tv.setText(ppFromString(momentStr, "data._creator.nickname").getAsString());
         binding.line2Tv.setText(ppFromString(momentStr, "data.location.geo").getAsJsonArray().toString());
-        binding.contentTv.setText(ppFromString(momentStr, "data.content").getAsString());
+        binding.contentTv.setText("\""+ppFromString(momentStr, "data.content").getAsString()+"\"");
         binding.createTimeRttv.setReferenceTime(ppFromString(momentStr, "data.createTime").getAsLong());
         binding.placeTv.setText(ppFromString(momentStr, "data.location.detail").getAsString());
 

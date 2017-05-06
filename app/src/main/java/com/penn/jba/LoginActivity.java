@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
@@ -148,6 +149,38 @@ public class LoginActivity extends AppCompatActivity {
         if (PPHelper.getPrefBooleanValue("autoLogin")) {
             autoLogin();
         }
+
+        //忘记密码按钮监控
+        Observable<Object> forgetPasswordButtonObservable = RxView.clicks(binding.forgetPasswordBt)
+                .debounce(200, TimeUnit.MILLISECONDS);
+
+        disposableList.add(forgetPasswordButtonObservable
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
+                .subscribe(
+                        new Consumer<Object>() {
+                            public void accept(Object o) {
+                                goForgetPassword();
+                            }
+                        }
+                )
+        );
+
+        //注册按钮监控
+        Observable<Object> createNewAccountButtonObservable = RxView.clicks(binding.createNewAccountBt)
+                .debounce(200, TimeUnit.MILLISECONDS);
+
+        disposableList.add(createNewAccountButtonObservable
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(Schedulers.io())
+                .subscribe(
+                        new Consumer<Object>() {
+                            public void accept(Object o) {
+                                goSignUp();
+                            }
+                        }
+                )
+        );
     }
 
     //-----help-----
@@ -190,5 +223,15 @@ public class LoginActivity extends AppCompatActivity {
             PPHelper.ppShowError(e.toString());
             e.printStackTrace();
         }
+    }
+
+    private void goForgetPassword() {
+        Intent intent = new Intent(this, ForgetPasswordActivity.class);
+        startActivity(intent);
+    }
+
+    private void goSignUp() {
+        Intent intent = new Intent(this, SignUp1Activity.class);
+        startActivity(intent);
     }
 }

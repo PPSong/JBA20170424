@@ -134,6 +134,15 @@ public class PPHelper {
         dialog.show();
     }
 
+    public static void showPPToast(Context context, String msg, int length) {
+        if (ppToast != null) {
+            ppToast.cancel();
+        }
+
+        ppToast = Toast.makeText(context, msg, length);
+        ppToast.show();
+    }
+
     public static void endLoading() {
         dialog.cancel();
     }
