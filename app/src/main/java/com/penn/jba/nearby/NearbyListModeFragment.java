@@ -106,6 +106,7 @@ public class NearbyListModeFragment extends Fragment {
     //-----helper-----
 
     public void loadContent() {
+        Log.d("weng","loadContent");
         binding.mainPc.setVisibility(View.INVISIBLE);
         binding.pb.setVisibility(View.VISIBLE);
         PPJSONObject jBody = new PPJSONObject();
@@ -140,7 +141,7 @@ public class NearbyListModeFragment extends Fragment {
                                             throw new Exception(ppWarn1.msg);
                                         }
 
-                                        final JsonArray userGroups = ppFromString(s, "data.list", PPValueType.ARRAY).getAsJsonArray();
+                                        JsonArray userGroups = ppFromString(s, "data.list", PPValueType.ARRAY).getAsJsonArray();
                                         data = userGroups;
                                         binding.mainVp.setAdapter(new MyPagerAdapter(getChildFragmentManager()));
 

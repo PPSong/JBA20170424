@@ -74,7 +74,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.18"
-                        android:text="成为了您的新好友" />
+                        android:text="成为了您的新粉丝" />
 
                 </LinearLayout>
 

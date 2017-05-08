@@ -29,6 +29,8 @@ import com.penn.jba.util.PPWarn;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
@@ -61,6 +63,7 @@ public class DailyReportActivity extends AppCompatActivity {
     private String fans;
     private String collects;
     private String beCollecteds;
+    private JsonArray beCollectedsJsonArray;
 
 
     @Override
@@ -195,6 +198,7 @@ public class DailyReportActivity extends AppCompatActivity {
                 switch (position) {
                     case 0:
                         Log.v("pplog121", "pptest1:" + beCollecteds);
+                        beCollectedsJsonArray = PPHelper.ppFromString(beCollecteds, "").getAsJsonArray();
                         return ReportListFragment.newInstance("beCollecteds", beCollecteds);
                     case 1:
                         Log.v("pplog121", "pptest2:" + collects);
@@ -269,11 +273,13 @@ public class DailyReportActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 if (position == 0) {
-                    setSubTitle("今天我被" + 1 + "人迹录了片刻");
+                    setSubTitle("今天我被" + beCollectedsJsonArray.size() + "人迹录了片刻");
                 } else if (position == 1) {
-                    setSubTitle("今天我迹录了" + 1 + "人片刻");
+                    JsonArray ja = PPHelper.ppFromString(collects, "").getAsJsonArray();
+                    setSubTitle("今天我迹录了" + ja.size() + "人片刻");
                 } else if (position == 2) {
-                    setSubTitle("今天我增加了" + 1 + "个新粉丝");
+                    JsonArray ja = PPHelper.ppFromString(fans, "").getAsJsonArray();
+                    setSubTitle("今天我增加了" + ja.size() + "个新粉丝");
                 }
             }
 
@@ -285,7 +291,7 @@ public class DailyReportActivity extends AppCompatActivity {
 
         Log.v("pplog121", "setupPage9");
 
-        setSubTitle("今天我被" + 1 + "人迹录了片刻");
+        setSubTitle("今天我被" + beCollectedsJsonArray.size() + "人迹录了片刻");
         Log.v("pplog121", "setupPage10");
 
         Toolbar toolbar = binding.materialViewPager.getToolbar();

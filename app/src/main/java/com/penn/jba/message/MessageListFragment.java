@@ -237,6 +237,8 @@ public class MessageListFragment extends Fragment {
     }
 
     private class InnerPPRefreshLoadController extends PPRefreshLoadController {
+        private int totalUnread;
+        private int curTypeUnread;
 
         public InnerPPRefreshLoadController(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView) {
             super(swipeRefreshLayout, recyclerView);
@@ -269,8 +271,19 @@ public class MessageListFragment extends Fragment {
                                             end();
                                             reset();
 
-                                            int totalUnread = PPHelper.ppFromString(s, "data.totalUnread").getAsInt();
-                                            int curTypeUnread = PPHelper.ppFromString(s, "data.unRead." + groupName).getAsInt();
+                                            if (PPHelper.ppFromString(s, "data.totalUnread") != null) {
+                                                totalUnread = PPHelper.ppFromString(s, "data.totalUnread").getAsInt();
+                                            } else {
+                                                totalUnread = 0;
+                                            }
+
+                                            if (PPHelper.ppFromString(s, "data.unRead." + groupName) != null) {
+                                                curTypeUnread = PPHelper.ppFromString(s, "data.unRead." + groupName).getAsInt();
+                                            } else {
+                                                curTypeUnread = 0;
+                                            }
+                                            //int totalUnread = PPHelper.ppFromString(s, "data.totalUnread").getAsInt();
+                                            //int curTypeUnread = PPHelper.ppFromString(s, "data.unRead." + groupName).getAsInt();
 
                                             setUnreadNum(totalUnread, curTypeUnread);
                                         }

@@ -198,6 +198,7 @@ public class NearbyListMomentGroupItemFragment extends Fragment {
                 .put("target", PPHelper.ppFromString(momentGroupStr, "id").getAsString())
                 .put("isFree", "true");
 
+        Log.d("weng121",momentGroupStr);
         final Observable<String> apiResult = PPRetrofit.getInstance().api("friend.follow", jBody.getJSONObject());
 
         disposableList.add(
