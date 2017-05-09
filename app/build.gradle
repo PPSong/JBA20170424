@@ -72,4 +72,5 @@ dependencies {
         // excluding org.json which is provided by Android
         exclude group: 'org.json', module: 'json'
     }
+    compile 'com.marshalchen.ultimaterecyclerview:library:0.7.2'
 }

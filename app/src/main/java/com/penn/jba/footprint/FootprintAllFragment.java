@@ -115,9 +115,16 @@ public class FootprintAllFragment extends Fragment {
         footprintAdapter = new FootprintAdapter(activityContext, footprints, FootprintBelong.ALL);
         binding.mainRv.setAdapter(footprintAdapter);
 
+        setHeaderView(binding.mainRv);
+
         binding.mainRv.setHasFixedSize(true);
 
         ppRefreshLoadController = new InnerPPRefreshLoadController(binding.mainSwipeRefreshLayout, binding.mainRv);
+    }
+
+    private void setHeaderView(RecyclerView view){
+        View header = LayoutInflater.from(activityContext).inflate(R.layout.footprint_profile, view, false);
+        footprintAdapter.setHeaderView(header);
     }
 
     private final OrderedRealmCollectionChangeListener<RealmResults<Footprint>> changeListener = new OrderedRealmCollectionChangeListener<RealmResults<Footprint>>() {

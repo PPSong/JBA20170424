@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.penn.jba.FootprintBelong;
 import com.penn.jba.R;
+import com.penn.jba.databinding.FootprintProfileBinding;
 import com.penn.jba.model.realm.Footprint;
 
 import java.util.List;
@@ -21,14 +22,27 @@ import io.realm.Realm;
 
 public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
     private final int VIEW_PROG = -1;
+    public static final int TYPE_HEADER = -2;
 
     public List<T> data;
 
     public FootprintBelong footprintBelong;
 
+    private View mHeaderView;
+
     public PPLoadAdapter(List<T> data, FootprintBelong footprintBelong) {
         this.data = data;
         this.footprintBelong = footprintBelong;
+    }
+
+    //HeaderView和FooterView的get和set函数
+    public View getHeaderView() {
+        return mHeaderView;
+    }
+
+    public void setHeaderView(View headerView) {
+        mHeaderView = headerView;
+        notifyItemInserted(0);
     }
 
     public void needLoadMoreCell() {
@@ -59,6 +73,10 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
 
     @Override
     public int getItemViewType(int position) {
+        if (mHeaderView == null) return getRealItemViewType(data.get(position));
+        if (position == 0) {
+            return TYPE_HEADER;
+        }
         return getRealItemViewType(data.get(position));
     }
 
@@ -66,7 +84,12 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                       int viewType) {
         RecyclerView.ViewHolder vh;
-        if (viewType == VIEW_PROG) {
+
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+        if (mHeaderView != null && viewType == TYPE_HEADER) {
+            FootprintProfileBinding binding = FootprintProfileBinding.inflate(layoutInflater, parent, false);
+            return new ProfileHeaderViewHolder(binding);
+        }else if (viewType == VIEW_PROG) {
             View v = LayoutInflater.from(parent.getContext()).inflate(
                     R.layout.progress_item, parent, false);
 
@@ -83,7 +106,10 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
             //pptodo try to remove below two lines
             ((ProgressViewHolder) holder).progressBar.setIndeterminate(true);
             ((ProgressViewHolder) holder).bind();
-        } else {
+        }else if (holder instanceof ProfileHeaderViewHolder) {
+            //pptodo try to remove below two lines
+            ((ProfileHeaderViewHolder) holder).bind();
+        }else {
             onBindRealViewHolder(holder, position);
         }
     }
@@ -91,8 +117,11 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
     @Override
     public int getItemCount() {
         int i = data == null ? 0 : data.size();
-
-        return i;
+        if (mHeaderView == null) {
+            return i;
+        } else {
+            return i +1;
+        }
     }
 
     public static class ProgressViewHolder extends RecyclerView.ViewHolder {
@@ -105,6 +134,19 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
         }
 
         public void bind() {
+        }
+    }
+
+    public static class ProfileHeaderViewHolder extends RecyclerView.ViewHolder {
+        private final FootprintProfileBinding binding;
+
+        public ProfileHeaderViewHolder(FootprintProfileBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind() {
+
         }
     }
 
