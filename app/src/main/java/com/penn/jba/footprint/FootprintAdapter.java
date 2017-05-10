@@ -8,6 +8,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -179,12 +180,8 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
         public void bind(Footprint ft) {
             binding.setPresenter(ft);
             binding.executePendingBindings();
-            binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
-            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type8);
-            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#483D8B"));
-            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#483D8B"));
-            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#483D8B"));
-            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#483D8B"));
+            binding.timeLineInclude.dateTv.setText(ft.getDate());
+            binding.timeLineInclude.timedetailTv.setText(ft.getTime());
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
                     .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
@@ -203,12 +200,8 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
         public void bind(Footprint ft) {
             binding.setPresenter(ft);
             binding.executePendingBindings();
-            binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
-            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type9);
-            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#7B68EE"));
-            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#7B68EE"));
-            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#7B68EE"));
-            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#7B68EE"));
+            binding.timeLineInclude.dateTv.setText(ft.getDate());
+            binding.timeLineInclude.timedetailTv.setText(ft.getTime());
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
                     .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
@@ -227,12 +220,8 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
         public void bind(Footprint ft) {
             binding.setPresenter(ft);
             binding.executePendingBindings();
-            binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
-            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type1);
-            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#FFA500"));
-            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#FFA500"));
-            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#FFA500"));
-            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#FFA500"));
+            binding.timeLineInclude.dateTv.setText(ft.getDate());
+            binding.timeLineInclude.timedetailTv.setText(ft.getTime());
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
                     .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
@@ -251,12 +240,8 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
         public void bind(Footprint ft) {
             binding.setPresenter(ft);
             binding.executePendingBindings();
-            binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
-            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type3);
-            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#45BB7D"));
-            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#45BB7D"));
-            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#45BB7D"));
-            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#45BB7D"));
+            binding.timeLineInclude.dateTv.setText(ft.getDate());
+            binding.timeLineInclude.timedetailTv.setText(ft.getTime());
             binding.contentTv.setText(ft.getContent());
             binding.placeTv.setText(ft.getPlace());
 
@@ -303,12 +288,9 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
         public void bind(Footprint ft) {
             binding.setPresenter(ft);
             binding.executePendingBindings();
-            binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
-            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type10);
-            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#B22222"));
-            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#B22222"));
-            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#B22222"));
-            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#B22222"));
+            //binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
+            binding.timeLineInclude.dateTv.setText(ft.getDate());
+            binding.timeLineInclude.timedetailTv.setText(ft.getTime());
         }
     }
 
@@ -324,12 +306,8 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
         public void bind(Footprint ft) {
             binding.setPresenter(ft);
             binding.executePendingBindings();
-            binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
-            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type0);
-            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#FF1493"));
-            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#FF1493"));
-            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#FF1493"));
-            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#FF1493"));
+            binding.timeLineInclude.dateTv.setText(ft.getDate());
+            binding.timeLineInclude.timedetailTv.setText(ft.getTime());
         }
     }
 
@@ -344,12 +322,8 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
         public void bind(Footprint ft) {
             binding.setPresenter(ft);
             binding.executePendingBindings();
-            binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
-            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type11);
-            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#1EAAF1"));
-            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#1EAAF1"));
-            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#1EAAF1"));
-            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#1EAAF1"));
+            binding.timeLineInclude.dateTv.setText(ft.getDate());
+            binding.timeLineInclude.timedetailTv.setText(ft.getTime());
 
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
@@ -373,12 +347,8 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
         public void bind(Footprint ft) {
             binding.setPresenter(ft);
             binding.executePendingBindings();
-            binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
-            binding.timeLineInclude.imageView.setImageResource(R.drawable.ic_type4);
-            binding.timeLineInclude.imageView.setFillColor(Color.parseColor("#50AE55"));
-            binding.timeLineInclude.imageView.setBorderColor(Color.parseColor("#50AE55"));
-            binding.timeLineInclude.aboveBar.setBackgroundColor(Color.parseColor("#50AE55"));
-            binding.timeLineInclude.belowBar.setBackgroundColor(Color.parseColor("#50AE55"));
+            binding.timeLineInclude.dateTv.setText(ft.getDate());
+            binding.timeLineInclude.timedetailTv.setText(ft.getTime());
 
             binding.contentTv.setText(ft.getContent());
             binding.placeTv.setText(ft.getPlace());
@@ -418,7 +388,7 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             int pixels = (int) (width * scale + 0.5f);
             CollectMomentImageAdapter collectMomentImageAdapter = new CollectMomentImageAdapter(context, pics, pixels);
             binding.mainGv.setAdapter(collectMomentImageAdapter);
-            binding.timeLineInclude.timeTv.setReferenceTime(ft.getCreateTime());
+            binding.timeLineInclude.timedetailTv.setText(ft.getTime());
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
                     .placeholder(R.drawable.pictures_no).into(binding.avatarIv);

@@ -2,6 +2,10 @@ package com.penn.jba.footprint;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -28,6 +32,8 @@ import com.penn.jba.util.PPRefreshLoadController;
 import com.penn.jba.util.PPRetrofit;
 import com.penn.jba.util.PPWarn;
 import com.penn.jba.util.PicStatus;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 
@@ -43,8 +49,10 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
+import static android.R.attr.color;
 import static android.R.attr.key;
 import static android.R.attr.type;
+import static com.penn.jba.footprint.FastBlurUtil.doBlur;
 
 public class FootprintAllFragment extends Fragment {
     private final static int pageSize = 15;
@@ -113,9 +121,12 @@ public class FootprintAllFragment extends Fragment {
 
         binding.mainRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         footprintAdapter = new FootprintAdapter(activityContext, footprints, FootprintBelong.ALL);
+
+        binding.mainRv.setBackgroundColor(Color.parseColor("#000000"));
+
         binding.mainRv.setAdapter(footprintAdapter);
 
-        setHeaderView(binding.mainRv);
+        //setHeaderView(binding.mainRv);
 
         binding.mainRv.setHasFixedSize(true);
 

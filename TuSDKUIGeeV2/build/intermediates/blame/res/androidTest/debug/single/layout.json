@@ -8,12 +8,12 @@
         "source": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/bundles/debug/res/layout/tusdk_geev2_impl_component_widget_group_filter_bar.xml"
     },
     {
-        "merged": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/res/merged/androidTest/debug/layout/tusdk_geev2_impl_component_album_empty_view.xml",
-        "source": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/bundles/debug/res/layout/tusdk_geev2_impl_component_album_empty_view.xml"
-    },
-    {
         "merged": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/res/merged/androidTest/debug/layout/tusdk_geev2_impl_component_album_photo_list_cell.xml",
         "source": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/bundles/debug/res/layout/tusdk_geev2_impl_component_album_photo_list_cell.xml"
+    },
+    {
+        "merged": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/res/merged/androidTest/debug/layout/tusdk_geev2_impl_component_album_empty_view.xml",
+        "source": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/bundles/debug/res/layout/tusdk_geev2_impl_component_album_empty_view.xml"
     },
     {
         "merged": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/res/merged/androidTest/debug/layout/tusdk_geev2_impl_component_widget_filter_bar.xml",

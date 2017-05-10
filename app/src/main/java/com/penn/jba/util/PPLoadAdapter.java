@@ -1,6 +1,7 @@
 package com.penn.jba.util;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,9 +75,8 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         if (mHeaderView == null) return getRealItemViewType(data.get(position));
-        if (position == 0) {
-            return TYPE_HEADER;
-        }
+        if (position == 0) return TYPE_HEADER;
+
         return getRealItemViewType(data.get(position));
     }
 
@@ -89,7 +89,7 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
         if (mHeaderView != null && viewType == TYPE_HEADER) {
             FootprintProfileBinding binding = FootprintProfileBinding.inflate(layoutInflater, parent, false);
             return new ProfileHeaderViewHolder(binding);
-        }else if (viewType == VIEW_PROG) {
+        } else if (viewType == VIEW_PROG) {
             View v = LayoutInflater.from(parent.getContext()).inflate(
                     R.layout.progress_item, parent, false);
 
@@ -106,10 +106,10 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
             //pptodo try to remove below two lines
             ((ProgressViewHolder) holder).progressBar.setIndeterminate(true);
             ((ProgressViewHolder) holder).bind();
-        }else if (holder instanceof ProfileHeaderViewHolder) {
+        } else if (holder instanceof ProfileHeaderViewHolder) {
             //pptodo try to remove below two lines
             ((ProfileHeaderViewHolder) holder).bind();
-        }else {
+        } else {
             onBindRealViewHolder(holder, position);
         }
     }
@@ -120,7 +120,7 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
         if (mHeaderView == null) {
             return i;
         } else {
-            return i +1;
+            return i + 1;
         }
     }
 

@@ -1,11 +1,15 @@
 package com.penn.jba.model.realm;
 
+
 import com.penn.jba.FootprintBelong;
 import com.penn.jba.PPApplication;
 import com.penn.jba.R;
 import com.penn.jba.util.FootprintStatus;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPValueType;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -113,11 +117,25 @@ public class Footprint extends RealmObject {
         String idB = ppFromString(body, "relatedUsers.1.id").getAsString();
         String nicknameA = ppFromString(body, "relatedUsers.0.nickname").getAsString();
         String nicknameB = ppFromString(body, "relatedUsers.1.nickname").getAsString();
-        if (idA == PPHelper.currentUserId) {
+        if (idA.equals(PPHelper.currentUserId)) {
             return nicknameB;
         } else {
             return nicknameA;
         }
+    }
+
+    public String getDate() {
+        Long timestamp=getCreateTime();
+        SimpleDateFormat format =  new SimpleDateFormat("MM/dd");
+        String date=format.format(timestamp);
+        return date;
+    }
+
+    public String getTime() {
+        Long timestamp=getCreateTime();
+        SimpleDateFormat format =  new SimpleDateFormat("HH:mm");
+        String time=format.format(timestamp);
+        return time;
     }
 
     public String getContent() {
@@ -126,7 +144,7 @@ public class Footprint extends RealmObject {
             String idB = ppFromString(body, "detail.receivedBy").getAsString();
             String nicknameA = ppFromString(body, "relatedUsers.0.nickname").getAsString();
             String nicknameB = ppFromString(body, "relatedUsers.1.nickname").getAsString();
-            if (idA == PPHelper.currentUserId) {
+            if (idA.equals(PPHelper.currentUserId)) {
                 return PPApplication.getContext().getString(R.string.i_send_a_mail_to) + nicknameB;
             } else {
                 return nicknameA + PPApplication.getContext().getString(R.string.send_a_mail_to_me);
@@ -136,7 +154,7 @@ public class Footprint extends RealmObject {
             String idB = ppFromString(body, "detail.receivedBy").getAsString();
             String nicknameA = ppFromString(body, "relatedUsers.0.nickname").getAsString();
             String nicknameB = ppFromString(body, "relatedUsers.1.nickname").getAsString();
-            if (idA == PPHelper.currentUserId) {
+            if (idA.equals(PPHelper.currentUserId)) {
                 String i_reply_to_sb = PPApplication.getContext().getString((R.string.i_reply_to_sb));
 
                 return String.format(i_reply_to_sb, nicknameB);
@@ -170,7 +188,7 @@ public class Footprint extends RealmObject {
             int fansNum = ppFromString(body, "detail.fansNum").getAsInt();
             int collectNum = ppFromString(body, "detail.collectNum").getAsInt();
             int beCollectedNum = ppFromString(body, "detail.beCollectedNum").getAsInt();
-            String result = PPApplication.getContext().getString(R.string.daily_report) + getId();
+            String result = PPApplication.getContext().getString(R.string.daily_report);
 
             return String.format(result, beCollectedNum, collectNum, fansNum);
         } else if (type == 0) {
@@ -182,7 +200,7 @@ public class Footprint extends RealmObject {
             String idB = ppFromString(body, "relatedUsers.1.id").getAsString();
             String nicknameA = ppFromString(body, "relatedUsers.0.nickname").getAsString();
             String nicknameB = ppFromString(body, "relatedUsers.1.nickname").getAsString();
-            if (idA == PPHelper.currentUserId) {
+            if (idA.equals(PPHelper.currentUserId)) {
                 String i_collect_ta_moment = PPApplication.getContext().getString(R.string.i_collect_ta_moment);
 
                 return i_collect_ta_moment ;
@@ -201,7 +219,7 @@ public class Footprint extends RealmObject {
             String idA = ppFromString(body, "detail.createdBy").getAsString();
             String idB = ppFromString(body, "detail.receivedBy").getAsString();
 
-            if (idA == PPHelper.currentUserId) {
+            if (idA.equals(PPHelper.currentUserId) ) {
                 return ppFromString(body, "relatedUsers.1.head").getAsString();
             } else {
                 return ppFromString(body, "relatedUsers.0.head").getAsString();
@@ -210,7 +228,7 @@ public class Footprint extends RealmObject {
             String idA = ppFromString(body, "detail.createdBy").getAsString();
             String idB = ppFromString(body, "detail.receivedBy").getAsString();
 
-            if (idA == PPHelper.currentUserId) {
+            if (idA.equals(PPHelper.currentUserId) ){
                 return ppFromString(body, "relatedUsers.1.head").getAsString();
             } else {
                 return ppFromString(body, "relatedUsers.0.head").getAsString();
@@ -219,7 +237,7 @@ public class Footprint extends RealmObject {
             String idA = ppFromString(body, "relatedUsers.0.id").getAsString();
             String idB = ppFromString(body, "relatedUsers.1.id").getAsString();
 
-            if (idA == PPHelper.currentUserId) {
+            if (idA.equals(PPHelper.currentUserId)) {
                 return ppFromString(body, "relatedUsers.1.head").getAsString();
             } else {
                 return ppFromString(body, "relatedUsers.0.head").getAsString();
@@ -228,7 +246,7 @@ public class Footprint extends RealmObject {
             String idA = ppFromString(body, "relatedUsers.0.id").getAsString();
             String idB = ppFromString(body, "relatedUsers.1.id").getAsString();
 
-            if (idA == PPHelper.currentUserId) {
+            if (idA.equals(PPHelper.currentUserId)) {
                 return ppFromString(body, "relatedUsers.1.head").getAsString();
             } else {
                 return ppFromString(body, "relatedUsers.0.head").getAsString();
@@ -237,7 +255,7 @@ public class Footprint extends RealmObject {
             String idA = ppFromString(body, "relatedUsers.0.id").getAsString();
             String idB = ppFromString(body, "relatedUsers.1.id").getAsString();
 
-            if (idA == PPHelper.currentUserId) {
+            if (idA.equals(PPHelper.currentUserId)) {
                 return ppFromString(body, "relatedUsers.1.head").getAsString();
             } else {
                 return ppFromString(body, "relatedUsers.0.head").getAsString();

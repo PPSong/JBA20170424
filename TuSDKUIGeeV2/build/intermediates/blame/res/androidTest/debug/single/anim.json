@@ -40,12 +40,12 @@
         "source": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/bundles/debug/res/anim/lsq_scale_out.xml"
     },
     {
-        "merged": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/res/merged/androidTest/debug/anim/lsq_pull_in.xml",
-        "source": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/bundles/debug/res/anim/lsq_pull_in.xml"
-    },
-    {
         "merged": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/res/merged/androidTest/debug/anim/lsq_empty.xml",
         "source": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/bundles/debug/res/anim/lsq_empty.xml"
+    },
+    {
+        "merged": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/res/merged/androidTest/debug/anim/lsq_pull_in.xml",
+        "source": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/bundles/debug/res/anim/lsq_pull_in.xml"
     },
     {
         "merged": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/res/merged/androidTest/debug/anim/lsq_push_bottom_out.xml",
