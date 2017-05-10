@@ -2,6 +2,9 @@ package com.penn.jba.footprint;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -30,6 +33,8 @@ import com.penn.jba.util.PPRefreshLoadController;
 import com.penn.jba.util.PPRetrofit;
 import com.penn.jba.util.PPWarn;
 import com.penn.jba.util.PicStatus;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 
@@ -44,6 +49,8 @@ import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
+
+import static com.penn.jba.footprint.FastBlurUtil.doBlur;
 
 public class FootprintMineFragment extends Fragment {
     private final static int pageSize = 15;
@@ -106,6 +113,30 @@ public class FootprintMineFragment extends Fragment {
 
     //-----helper-----
     public void setup() {
+        // rv background blur
+        String url = "http://www.jcodecraeer.com/uploads/20160312/1457769957523696.png";
+
+        Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                Bitmap image2=doBlur(bitmap,60,false);
+                Drawable invisibledrawable = new BitmapDrawable(getResources(), image2);
+                binding.mainRv.setBackgroundDrawable(invisibledrawable);
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+            }
+        };
+
+        Picasso.with(activityContext)
+                .load(url)
+                .into(target);
+
         realm = Realm.getDefaultInstance();
         footprints = realm.where(Footprint.class)
                 .equalTo("footprintBelong", FootprintBelong.MINE.toString())

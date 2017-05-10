@@ -97,6 +97,25 @@ public class FootprintAllFragment extends Fragment {
         binding.setPresenter(this);
         //end common
 
+        setup();
+
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realm.close();
+        for (Disposable d : disposableList) {
+            if (!d.isDisposed()) {
+                d.dispose();
+            }
+        }
+    }
+
+    //-----helper-----
+    public void setup() {
+        // rv background blur
         String url = "http://www.jcodecraeer.com/uploads/20160312/1457769957523696.png";
 
         Target target = new Target() {
@@ -120,24 +139,7 @@ public class FootprintAllFragment extends Fragment {
                 .load(url)
                 .into(target);
 
-        setup();
 
-        return view;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        realm.close();
-        for (Disposable d : disposableList) {
-            if (!d.isDisposed()) {
-                d.dispose();
-            }
-        }
-    }
-
-    //-----helper-----
-    public void setup() {
         realm = Realm.getDefaultInstance();
         footprints = realm.where(Footprint.class).equalTo("footprintBelong", FootprintBelong.ALL.toString()).findAllSorted("createTime", Sort.DESCENDING);
         footprints.addChangeListener(changeListener);
@@ -147,7 +149,7 @@ public class FootprintAllFragment extends Fragment {
 
         binding.mainRv.setAdapter(footprintAdapter);
 
-        //setHeaderView(binding.mainRv);
+        setHeaderView(binding.mainRv);
 
         binding.mainRv.setHasFixedSize(true);
 
