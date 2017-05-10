@@ -97,6 +97,29 @@ public class FootprintAllFragment extends Fragment {
         binding.setPresenter(this);
         //end common
 
+        String url = "http://www.jcodecraeer.com/uploads/20160312/1457769957523696.png";
+
+        Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                Bitmap image2=doBlur(bitmap,60,false);
+                Drawable invisibledrawable = new BitmapDrawable(getResources(), image2);
+                binding.mainRv.setBackgroundDrawable(invisibledrawable);
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+            }
+        };
+
+        Picasso.with(activityContext)
+                .load(url)
+                .into(target);
+
         setup();
 
         return view;
@@ -121,8 +144,6 @@ public class FootprintAllFragment extends Fragment {
 
         binding.mainRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         footprintAdapter = new FootprintAdapter(activityContext, footprints, FootprintBelong.ALL);
-
-        binding.mainRv.setBackgroundColor(Color.parseColor("#000000"));
 
         binding.mainRv.setAdapter(footprintAdapter);
 

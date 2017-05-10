@@ -74,30 +74,34 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
 
     @Override
     public int getItemViewType(int position) {
-        if (mHeaderView == null) return getRealItemViewType(data.get(position));
-        if (position == 0) return TYPE_HEADER;
-
-        return getRealItemViewType(data.get(position));
+        if (mHeaderView == null ){
+            return getRealItemViewType(data.get(position));
+        }
+        if (position == 0) {
+            return TYPE_HEADER;
+        } else {
+            return getRealItemViewType(data.get(position));
+        }
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                       int viewType) {
-        RecyclerView.ViewHolder vh;
+        //RecyclerView.ViewHolder vh;
 
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         if (mHeaderView != null && viewType == TYPE_HEADER) {
             FootprintProfileBinding binding = FootprintProfileBinding.inflate(layoutInflater, parent, false);
             return new ProfileHeaderViewHolder(binding);
-        } else if (viewType == VIEW_PROG) {
+        }
+        if (viewType == VIEW_PROG) {
             View v = LayoutInflater.from(parent.getContext()).inflate(
                     R.layout.progress_item, parent, false);
 
-            vh = new ProgressViewHolder(v);
-        } else {
-            vh = onCreateRealViewHolder(parent, viewType);
+            return  new ProgressViewHolder(v);
         }
-        return vh;
+        return onCreateRealViewHolder(parent, viewType);
+
     }
 
     @Override

@@ -34,7 +34,8 @@
             app:civ_border_width="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:layout_editor_absoluteX="56dp" />
+            android:layout_marginLeft="50dp"
+            app:layout_constraintLeft_toLeftOf="@+id/main_iv" />
 
         <ImageView
             android:id="@+id/below_bar"
