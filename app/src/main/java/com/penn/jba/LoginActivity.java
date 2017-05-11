@@ -36,9 +36,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private ArrayList<Disposable> disposableList = new ArrayList<Disposable>();
 
-    private SharedPreferences pref;
-    private SharedPreferences.Editor meditor;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

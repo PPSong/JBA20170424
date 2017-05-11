@@ -23,6 +23,7 @@ import com.google.gson.JsonElement;
 import com.penn.jba.FootprintBelong;
 import com.penn.jba.R;
 import com.penn.jba.databinding.FragmentFootprintMineBinding;
+import com.penn.jba.model.realm.CurrentUser;
 import com.penn.jba.model.realm.Footprint;
 import com.penn.jba.model.realm.Pic;
 import com.penn.jba.util.FootprintStatus;
@@ -60,6 +61,7 @@ public class FootprintMineFragment extends Fragment {
     private ArrayList<Disposable> disposableList = new ArrayList<Disposable>();
 
     private Realm realm;
+    private CurrentUser currentUser;
 
     private RealmResults<Footprint> footprints;
 
@@ -114,28 +116,36 @@ public class FootprintMineFragment extends Fragment {
     //-----helper-----
     public void setup() {
         // rv background blur
-        String url = "http://www.jcodecraeer.com/uploads/20160312/1457769957523696.png";
+        try (Realm realm = Realm.getDefaultInstance()) {
+            realm.beginTransaction();
+            currentUser = realm.where(CurrentUser.class).findFirst();
+            realm.commitTransaction();
+        }
 
         Target target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Bitmap image2=doBlur(bitmap,60,false);
-                Drawable invisibledrawable = new BitmapDrawable(getResources(), image2);
-                binding.mainRv.setBackgroundDrawable(invisibledrawable);
+                Log.d("weng", "onBitmapLoaded");
+                Bitmap image2 = doBlur(bitmap, 60, false);
+                Drawable background = new BitmapDrawable(getResources(), image2);
+                binding.mainRv.setBackgroundDrawable(background);
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
+                Log.d("weng", "onBitmapFailed");
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
+                Log.d("weng", "onPrepareLoad");
             }
         };
 
         Picasso.with(activityContext)
-                .load(url)
+                .load(PPHelper.get80ImageUrl(currentUser.getBanner()))
                 .into(target);
+
         binding.mainRv.setTag(target);
 
         realm = Realm.getDefaultInstance();
@@ -326,7 +336,7 @@ public class FootprintMineFragment extends Fragment {
         public void doLoadMore() {
             PPJSONObject jBody = new PPJSONObject();
 
-            if (footprints.size() ==1 ) {
+            if (footprints.size() == 1) {
                 final PPLoadAdapter tmp = ((PPLoadAdapter) (recyclerView.getAdapter()));
                 tmp.cancelLoadMoreCell();
                 end();

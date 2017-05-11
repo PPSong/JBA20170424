@@ -90,6 +90,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmResults;
@@ -121,6 +122,10 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
 
     private PrimaryDrawerItem item4;
 
+    private Realm realm;
+
+    private CurrentUser currentUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,23 +136,19 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         binding.setPresenter(this);
         //end common
 
-        EventBus.getDefault().register(this);
-
+        realm = Realm.getDefaultInstance();
         setup();
-
-        //pptodo 取该用户总共未读数
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        realm.close();
         for (Disposable d : disposableList) {
             if (!d.isDisposed()) {
                 d.dispose();
             }
         }
-
-        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -159,7 +160,6 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
     }
 
     private void setup() {
-
         Intent intent = new Intent(this, new PPService().getClass());
         startService(intent);
 
@@ -227,7 +227,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                 .withOnDrawerItemClickListener(this)
                 .build();
 
-       drawerResult.addStickyFooterItem(item0);
+        drawerResult.addStickyFooterItem(item0);
 
 //        //更换个性化背景图
 //        try (Realm realm = Realm.getDefaultInstance()) {
@@ -240,6 +240,20 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
 //        }
 
 //      updateProfile();
+
+        // 获取用户未读消息
+        try (Realm realm = Realm.getDefaultInstance()) {
+            currentUser = realm.where(CurrentUser.class).findFirstAsync();
+        }
+
+        currentUser.addChangeListener(new RealmChangeListener<CurrentUser>() {
+            @Override
+            public void onChange(CurrentUser element) {
+                Log.d("weng", "12343");
+                int num = element.getUnreadMessageFriend() + element.getUnreadMessageSystem() + element.getUnreadMessageMoment();
+                updateMessageBadge(String.valueOf(num));
+            }
+        });
 
         //创建moment按钮监控
         Observable<Object> createMomentButtonObservable = RxView.clicks(binding.createMomentBt)
@@ -256,14 +270,6 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                         }
                 )
         );
-    }
-
-    //-----helper-----
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent event) {
-        if (event.type == "updateMessageBadge") {
-            updateMessageBadge(event.data);
-        }
     }
 
     private void updateMessageBadge(String num) {
@@ -319,26 +325,25 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         return true;
     }
 
-    private void updateProfile() {
-        try (Realm realm = Realm.getDefaultInstance()) {
-            CurrentUser currentUser = realm.where(CurrentUser.class).findFirst();
-            String avatar = currentUser.getHead();
-            if (TextUtils.isEmpty(avatar)) {
-                //pptodo 默认头像路径
-                avatar = "";
-            }
-            String avatarNetFileName = PPHelper.get80ImageUrl(avatar);
-
-            String nickname = currentUser.getNickname();
-            int follows = currentUser.getFollows();
-            int fans = currentUser.getFans();
-
-            profileDrawerItem = profileDrawerItem.withIcon(avatarNetFileName)
-                    .withName(nickname)
-                    .withEmail("Follows:" + follows + ", " + "Fans:" + fans);
-            headerResult.updateProfile(profileDrawerItem);
-        }
-    }
+//    private void updateProfile() {
+//        try (Realm realm = Realm.getDefaultInstance()) {
+//            String avatar = currentUser.getHead();
+//            if (TextUtils.isEmpty(avatar)) {
+//                //pptodo 默认头像路径
+//                avatar = "";
+//            }
+//            String avatarNetFileName = PPHelper.get80ImageUrl(avatar);
+//
+//            String nickname = currentUser.getNickname();
+//            int follows = currentUser.getFollows();
+//            int fans = currentUser.getFans();
+//
+//            profileDrawerItem = profileDrawerItem.withIcon(avatarNetFileName)
+//                    .withName(nickname)
+//                    .withEmail("Follows:" + follows + ", " + "Fans:" + fans);
+//            headerResult.updateProfile(profileDrawerItem);
+//        }
+//    }
 
     @Override
     public void onComponentFinished(TuSdkResult result, Error error, TuFragment tuFragment) {

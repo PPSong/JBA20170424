@@ -121,14 +121,14 @@ public class FootprintAllFragment extends Fragment {
         // rv background blur
         try (Realm realm = Realm.getDefaultInstance()) {
             realm.beginTransaction();
-            currentUser=realm.where(CurrentUser.class).findFirst();
+            currentUser = realm.where(CurrentUser.class).findFirst();
             realm.commitTransaction();
         }
 
         Target target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Log.d("weng121","onBitmapLoaded");
+                Log.d("weng", "onBitmapLoaded");
                 Bitmap image2 = doBlur(bitmap, 60, false);
                 Drawable background = new BitmapDrawable(getResources(), image2);
                 binding.mainRv.setBackgroundDrawable(background);
@@ -136,12 +136,12 @@ public class FootprintAllFragment extends Fragment {
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
-                Log.d("weng121","error");
+                Log.d("weng", "onBitmapFailed");
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
-                Log.d("weng121","onPrepareLoad");
+                Log.d("weng", "onPrepareLoad");
             }
         };
 
@@ -327,7 +327,7 @@ public class FootprintAllFragment extends Fragment {
         public void doLoadMore() {
             PPJSONObject jBody = new PPJSONObject();
 
-            if (footprints.size() ==1 ) {
+            if (footprints.size() == 1) {
                 final PPLoadAdapter tmp = ((PPLoadAdapter) (recyclerView.getAdapter()));
                 tmp.cancelLoadMoreCell();
                 end();
