@@ -136,6 +136,7 @@ public class FootprintMineFragment extends Fragment {
         Picasso.with(activityContext)
                 .load(url)
                 .into(target);
+        binding.mainRv.setTag(target);
 
         realm = Realm.getDefaultInstance();
         footprints = realm.where(Footprint.class)
@@ -146,6 +147,9 @@ public class FootprintMineFragment extends Fragment {
 
         binding.mainRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         footprintAdapter = new FootprintAdapter(activityContext, footprints, FootprintBelong.MINE);
+
+        footprintAdapter.setHeaderView(binding.mainRv);
+
         binding.mainRv.setAdapter(footprintAdapter);
 
         binding.mainRv.setHasFixedSize(true);
@@ -165,17 +169,17 @@ public class FootprintMineFragment extends Fragment {
             OrderedCollectionChangeSet.Range[] deletions = changeSet.getDeletionRanges();
             for (int i = deletions.length - 1; i >= 0; i--) {
                 OrderedCollectionChangeSet.Range range = deletions[i];
-                footprintAdapter.notifyItemRangeRemoved(range.startIndex, range.length);
+                footprintAdapter.notifyItemRangeRemoved(range.startIndex + 1, range.length);
             }
 
             OrderedCollectionChangeSet.Range[] insertions = changeSet.getInsertionRanges();
             for (OrderedCollectionChangeSet.Range range : insertions) {
-                footprintAdapter.notifyItemRangeInserted(range.startIndex, range.length);
+                footprintAdapter.notifyItemRangeInserted(range.startIndex + 1, range.length);
             }
 
             OrderedCollectionChangeSet.Range[] modifications = changeSet.getChangeRanges();
             for (OrderedCollectionChangeSet.Range range : modifications) {
-                footprintAdapter.notifyItemRangeChanged(range.startIndex, range.length);
+                footprintAdapter.notifyItemRangeChanged(range.startIndex + 1, range.length);
             }
         }
     };
@@ -321,6 +325,14 @@ public class FootprintMineFragment extends Fragment {
         @Override
         public void doLoadMore() {
             PPJSONObject jBody = new PPJSONObject();
+
+            if (footprints.size() ==1 ) {
+                final PPLoadAdapter tmp = ((PPLoadAdapter) (recyclerView.getAdapter()));
+                tmp.cancelLoadMoreCell();
+                end();
+                return;
+            }
+
             jBody
                     //因为最后一条记录为"loadmore"的fake记录
                     .put("before", "" + footprints.get(footprints.size() - 2).getCreateTime())

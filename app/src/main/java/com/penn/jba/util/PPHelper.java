@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 //import de.jonasrottmann.realmbrowser.RealmBrowser;
+import de.jonasrottmann.realmbrowser.RealmBrowser;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -85,10 +86,10 @@ public class PPHelper {
 
     //pptodo remove testing block
     public static void startRealmModelsActivity() {
-//        try (Realm realm = Realm.getDefaultInstance()) {
-//            RealmConfiguration configuration = realm.getConfiguration();
-//            RealmBrowser.startRealmModelsActivity(PPApplication.getContext(), configuration);
-//        }
+        try (Realm realm = Realm.getDefaultInstance()) {
+            RealmConfiguration configuration = realm.getConfiguration();
+            RealmBrowser.startRealmModelsActivity(PPApplication.getContext(), configuration);
+        }
     }
     //pptodo end testing block
 
@@ -110,6 +111,15 @@ public class PPHelper {
         }
     }
 
+    public static String getSlimImageUrl(String imageName) {
+        if (imageName.startsWith("http")) {
+            return imageName;
+        } else {
+            //pptodo 如果是"", 返回默认图片
+            String result = qiniuBase + imageName + "?imageslim";
+            return result;
+        }
+    }
     public static String getBaiduMap(JsonArray geo) {
         String geoStr = geo.get(0).getAsFloat() + "," + geo.get(1).getAsFloat();
         return "http://api.map.baidu.com/staticimage/v2?ak=" + baiduAk + "&mcode=666666&center=" + geoStr + "&width=300&height=200&zoom=17&markers=" + geoStr + "&markerStyles=-1";
@@ -229,6 +239,7 @@ public class PPHelper {
                             currentUser.setGender(ppFromString(s, "data.userInfo.gender").getAsInt());
                             currentUser.setBirthday(ppFromString(s, "data.userInfo.birthday").getAsLong());
                             currentUser.setHead(ppFromString(s, "data.userInfo.head").getAsString());
+                            currentUser.setBanner(ppFromString(s, "data.userInfo.params.banner").getAsString());
                             currentUser.setBaiduApiUrl(ppFromString(s, "data.settings.geo.api").getAsString());
                             currentUser.setBaiduAkBrowser(tmpAk);
                             currentUser.setSocketHost(ppFromString(s, "data.settings.socket.host").getAsString());
@@ -237,7 +248,9 @@ public class PPHelper {
                             currentUser.setUnreadMessageIndex(ppFromString(s, "data.stats.message.index", PPValueType.INT).getAsInt());
                             currentUser.setUnreadMessageFriend(ppFromString(s, "data.stats.message.friend", PPValueType.INT).getAsInt());
                             currentUser.setUnreadMessageSystem(ppFromString(s, "data.stats.message.system", PPValueType.INT).getAsInt());
+                            currentUser.setMomentBeLiked(ppFromString(s, "data.stats.momentBeLiked", PPValueType.INT).getAsInt());
                             currentUser.setFollows(ppFromString(s, "data.stats.follows", PPValueType.INT).getAsInt());
+                            currentUser.setAge(ppFromString(s, "data.userInfo.age", PPValueType.INT).getAsInt());
                             currentUser.setNewFriend(ppFromString(s, "data.stats.newFriend", PPValueType.INT).getAsInt());
                             currentUser.setFans(ppFromString(s, "data.stats.fans", PPValueType.INT).getAsInt());
                             currentUser.setNewFans(ppFromString(s, "data.stats.newFans", PPValueType.INT).getAsInt());

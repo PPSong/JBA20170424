@@ -57,7 +57,7 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
     private Context context;
 
     public FootprintAdapter(Context context, List<Footprint> data, FootprintBelong footprintBelong) {
-        super(data, footprintBelong);
+        super(context,data, footprintBelong);
         this.context = context;
     }
 

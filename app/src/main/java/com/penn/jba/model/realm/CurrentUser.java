@@ -1,5 +1,6 @@
 package com.penn.jba.model.realm;
 
+import io.realm.PicRealmProxy;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -17,7 +18,9 @@ public class CurrentUser extends RealmObject {
     private String nickname;
     private int gender;
     private long birthday;
+    private int age;
     private String head;
+    private String banner;
     private String baiduApiUrl;
     private String baiduAkBrowser;
     private String socketHost;
@@ -26,6 +29,7 @@ public class CurrentUser extends RealmObject {
     private int unreadMessageIndex;
     private int unreadMessageFriend;
     private int unreadMessageSystem;
+    private int momentBeLiked;
     private int follows;
     private int newFriend;
     private int fans;
@@ -97,6 +101,14 @@ public class CurrentUser extends RealmObject {
 
     public void setHead(String head) {
         this.head = head;
+    }
+
+    public String getBanner() {
+        return banner;
+    }
+
+    public void setBanner(String banner) {
+        this.banner = banner;
     }
 
     public String getBaiduApiUrl() {
@@ -225,5 +237,30 @@ public class CurrentUser extends RealmObject {
 
     public void setPics(RealmList<Pic> pics) {
         this.pics = pics;
+    }
+
+    public int getMomentBeLiked() {
+        return momentBeLiked;
+    }
+
+    public void setMomentBeLiked(int momentBeLiked) {
+        this.momentBeLiked = momentBeLiked;
+    }
+
+    public String getUnreadMessage(){
+        String message="你有"+unreadMessageMoment+"条未读消息";
+        return message;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getMyAge(){
+        return "("+age+")岁";
     }
 }

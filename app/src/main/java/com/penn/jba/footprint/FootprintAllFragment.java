@@ -22,6 +22,7 @@ import com.google.gson.JsonElement;
 import com.penn.jba.FootprintBelong;
 import com.penn.jba.R;
 import com.penn.jba.databinding.FragmentFootprintAllBinding;
+import com.penn.jba.model.realm.CurrentUser;
 import com.penn.jba.model.realm.Footprint;
 import com.penn.jba.model.realm.Pic;
 import com.penn.jba.util.FootprintStatus;
@@ -68,6 +69,8 @@ public class FootprintAllFragment extends Fragment {
     private FootprintAdapter footprintAdapter;
 
     private FragmentFootprintAllBinding binding;
+
+    private CurrentUser currentUser;
 
     private InnerPPRefreshLoadController ppRefreshLoadController;
 
@@ -116,29 +119,37 @@ public class FootprintAllFragment extends Fragment {
     //-----helper-----
     public void setup() {
         // rv background blur
-        String url = "http://www.jcodecraeer.com/uploads/20160312/1457769957523696.png";
+        try (Realm realm = Realm.getDefaultInstance()) {
+            realm.beginTransaction();
+            currentUser=realm.where(CurrentUser.class).findFirst();
+            realm.commitTransaction();
+        }
 
         Target target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Bitmap image2=doBlur(bitmap,60,false);
-                Drawable invisibledrawable = new BitmapDrawable(getResources(), image2);
-                binding.mainRv.setBackgroundDrawable(invisibledrawable);
+                Log.d("weng121","onBitmapLoaded");
+                Bitmap image2 = doBlur(bitmap, 60, false);
+                Drawable background = new BitmapDrawable(getResources(), image2);
+                binding.mainRv.setBackgroundDrawable(background);
             }
 
             @Override
             public void onBitmapFailed(Drawable errorDrawable) {
+                Log.d("weng121","error");
             }
 
             @Override
             public void onPrepareLoad(Drawable placeHolderDrawable) {
+                Log.d("weng121","onPrepareLoad");
             }
         };
 
         Picasso.with(activityContext)
-                .load(url)
+                .load(PPHelper.get80ImageUrl(currentUser.getBanner()))
                 .into(target);
 
+        binding.mainRv.setTag(target);
 
         realm = Realm.getDefaultInstance();
         footprints = realm.where(Footprint.class).equalTo("footprintBelong", FootprintBelong.ALL.toString()).findAllSorted("createTime", Sort.DESCENDING);
@@ -147,18 +158,13 @@ public class FootprintAllFragment extends Fragment {
         binding.mainRv.setLayoutManager(new LinearLayoutManager(getActivity()));
         footprintAdapter = new FootprintAdapter(activityContext, footprints, FootprintBelong.ALL);
 
-        binding.mainRv.setAdapter(footprintAdapter);
+        footprintAdapter.setHeaderView(binding.mainRv);
 
-        setHeaderView(binding.mainRv);
+        binding.mainRv.setAdapter(footprintAdapter);
 
         binding.mainRv.setHasFixedSize(true);
 
         ppRefreshLoadController = new InnerPPRefreshLoadController(binding.mainSwipeRefreshLayout, binding.mainRv);
-    }
-
-    private void setHeaderView(RecyclerView view){
-        View header = LayoutInflater.from(activityContext).inflate(R.layout.footprint_profile, view, false);
-        footprintAdapter.setHeaderView(header);
     }
 
     private final OrderedRealmCollectionChangeListener<RealmResults<Footprint>> changeListener = new OrderedRealmCollectionChangeListener<RealmResults<Footprint>>() {
@@ -173,17 +179,17 @@ public class FootprintAllFragment extends Fragment {
             OrderedCollectionChangeSet.Range[] deletions = changeSet.getDeletionRanges();
             for (int i = deletions.length - 1; i >= 0; i--) {
                 OrderedCollectionChangeSet.Range range = deletions[i];
-                footprintAdapter.notifyItemRangeRemoved(range.startIndex, range.length);
+                footprintAdapter.notifyItemRangeRemoved(range.startIndex + 1, range.length);
             }
 
             OrderedCollectionChangeSet.Range[] insertions = changeSet.getInsertionRanges();
             for (OrderedCollectionChangeSet.Range range : insertions) {
-                footprintAdapter.notifyItemRangeInserted(range.startIndex, range.length);
+                footprintAdapter.notifyItemRangeInserted(range.startIndex + 1, range.length);
             }
 
             OrderedCollectionChangeSet.Range[] modifications = changeSet.getChangeRanges();
             for (OrderedCollectionChangeSet.Range range : modifications) {
-                footprintAdapter.notifyItemRangeChanged(range.startIndex, range.length);
+                footprintAdapter.notifyItemRangeChanged(range.startIndex + 1, range.length);
             }
         }
     };
@@ -320,6 +326,13 @@ public class FootprintAllFragment extends Fragment {
         @Override
         public void doLoadMore() {
             PPJSONObject jBody = new PPJSONObject();
+
+            if (footprints.size() ==1 ) {
+                final PPLoadAdapter tmp = ((PPLoadAdapter) (recyclerView.getAdapter()));
+                tmp.cancelLoadMoreCell();
+                end();
+                return;
+            }
             jBody
                     //因为最后一条记录为"loadmore"的fake记录
                     .put("beforeThan", "" + footprints.get(footprints.size() - 2).getHash())

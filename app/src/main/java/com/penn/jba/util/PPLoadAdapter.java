@@ -1,17 +1,23 @@
 package com.penn.jba.util;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.penn.jba.FootprintBelong;
+import com.penn.jba.PPApplication;
 import com.penn.jba.R;
 import com.penn.jba.databinding.FootprintProfileBinding;
+import com.penn.jba.message.MessageActivity;
+import com.penn.jba.model.realm.CurrentUser;
 import com.penn.jba.model.realm.Footprint;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -31,9 +37,14 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
 
     private View mHeaderView;
 
-    public PPLoadAdapter(List<T> data, FootprintBelong footprintBelong) {
+    private CurrentUser currentUser;
+
+    private static Context activityContext;
+
+    public PPLoadAdapter(Context context, List<T> data, FootprintBelong footprintBelong) {
         this.data = data;
         this.footprintBelong = footprintBelong;
+        this.activityContext =context;
     }
 
     //HeaderView和FooterView的get和set函数
@@ -74,13 +85,13 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
 
     @Override
     public int getItemViewType(int position) {
-        if (mHeaderView == null ){
+        if (mHeaderView == null) {
             return getRealItemViewType(data.get(position));
         }
         if (position == 0) {
             return TYPE_HEADER;
         } else {
-            return getRealItemViewType(data.get(position));
+            return getRealItemViewType(data.get(position - 1));
         }
     }
 
@@ -98,7 +109,7 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
             View v = LayoutInflater.from(parent.getContext()).inflate(
                     R.layout.progress_item, parent, false);
 
-            return  new ProgressViewHolder(v);
+            return new ProgressViewHolder(v);
         }
         return onCreateRealViewHolder(parent, viewType);
 
@@ -111,10 +122,18 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
             ((ProgressViewHolder) holder).progressBar.setIndeterminate(true);
             ((ProgressViewHolder) holder).bind();
         } else if (holder instanceof ProfileHeaderViewHolder) {
-            //pptodo try to remove below two lines
-            ((ProfileHeaderViewHolder) holder).bind();
+            try (Realm realm = Realm.getDefaultInstance()) {
+                realm.beginTransaction();
+                currentUser = realm.where(CurrentUser.class).findFirst();
+                realm.commitTransaction();
+            }
+            ((ProfileHeaderViewHolder) holder).bind(currentUser);
         } else {
-            onBindRealViewHolder(holder, position);
+            if (mHeaderView != null) {
+                onBindRealViewHolder(holder, position - 1);
+            } else {
+                onBindRealViewHolder(holder, position);
+            }
         }
     }
 
@@ -149,8 +168,26 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
             this.binding = binding;
         }
 
-        public void bind() {
+        public void bind(CurrentUser cu) {
+            binding.setPresenter(cu);
+            binding.executePendingBindings();
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.get80ImageUrl(cu.getHead()))
+                    .placeholder(R.drawable.pictures_no).into(binding.headerCiv);
 
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.getSlimImageUrl(cu.getBanner()))
+                    .placeholder(R.drawable.pictures_no).into(binding.mybannerIv);
+
+            binding.unreadMessageTv.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+
+                    Intent intent1 = new Intent(activityContext, MessageActivity.class);
+                    activityContext.startActivity(intent1);
+                    return false;
+                }
+            });
         }
     }
 

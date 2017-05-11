@@ -13,4 +13,5 @@
     <color name="DeepPink">#FF1493</color>
     <color name="SlateGray">#708090</color>
     <color name="Orange">#FFA500</color>
+    <color name="black">#000000</color>
 </resources>

@@ -95,5 +95,6 @@
     <string name="moment">片刻</string>
     <string name="friend">伴友</string>
     <string name="system">系统</string>
+    <string name="message">消息</string>
 
 </resources>

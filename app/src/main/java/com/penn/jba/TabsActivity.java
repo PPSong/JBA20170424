@@ -177,40 +177,40 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
         //if you want to update the items at a later time it is recommended to keep it in a variable
         PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(R.string.footprint).withIcon(R.drawable.ic_collections_black_24dp);
         PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(R.string.nearby).withIcon(R.drawable.ic_near_me_black_24dp);
-        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName("test").withIcon(R.drawable.ic_near_me_black_24dp);
-        item4 = new PrimaryDrawerItem().withIdentifier(4).withName("message").withIcon(R.drawable.ic_near_me_black_24dp);
+        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName("Database").withIcon(R.drawable.ic_near_me_black_24dp);
+        item4 = new PrimaryDrawerItem().withIdentifier(4).withName(R.string.message).withIcon(R.drawable.ic_near_me_black_24dp);
 
         PrimaryDrawerItem item0 = new PrimaryDrawerItem().withIdentifier(0).withName(R.string.logout).withIcon(R.drawable.ic_eject_black_24dp);
 
-        DrawerImageLoader.init(new AbstractDrawerImageLoader() {
-            @Override
-            public void set(ImageView imageView, Uri uri, Drawable placeholder) {
-                Picasso.with(imageView.getContext()).load(uri).placeholder(placeholder).into(imageView);
-            }
-
-            @Override
-            public void cancel(ImageView imageView) {
-                Picasso.with(imageView.getContext()).cancelRequest(imageView);
-            }
-        });
+//        DrawerImageLoader.init(new AbstractDrawerImageLoader() {
+//            @Override
+//            public void set(ImageView imageView, Uri uri, Drawable placeholder) {
+//                Picasso.with(imageView.getContext()).load(uri).placeholder(placeholder).into(imageView);
+//            }
+//
+//            @Override
+//            public void cancel(ImageView imageView) {
+//                Picasso.with(imageView.getContext()).cancelRequest(imageView);
+//            }
+//        });
 
         profileDrawerItem = new ProfileDrawerItem();
 
         // Create the AccountHeader
-        headerResult = new AccountHeaderBuilder()
-                .withActivity(this)
-                .withHeaderBackground(R.drawable.header)
-                .addProfiles(
-                        //new ProfileDrawerItem().withName("Mike Penz").withIcon(R.drawable.profile)
-                        profileDrawerItem
-                )
-                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-                    @Override
-                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
-                        return false;
-                    }
-                })
-                .build();
+//        headerResult = new AccountHeaderBuilder()
+//                .withActivity(this)
+//                .withHeaderBackground(R.drawable.header)
+//                .addProfiles(
+//                        //new ProfileDrawerItem().withName("Mike Penz").withIcon(R.drawable.profile)
+//                        profileDrawerItem
+//                )
+//                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+//                    @Override
+//                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+//                        return false;
+//                    }
+//                })
+//                .build();
 
         //create the drawer and remember the `Drawer` result object
         drawerResult = new DrawerBuilder()
@@ -227,18 +227,19 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
                 .withOnDrawerItemClickListener(this)
                 .build();
 
-        drawerResult.addStickyFooterItem(item0);
-        //更换个性化背景图
-        try (Realm realm = Realm.getDefaultInstance()) {
-            CurrentUser currentUser = realm.where(CurrentUser.class).findFirst();
-            if (currentUser.getPics().size() > 0) {
-                Picasso.with(activityContext)
-                        .load(PPHelper.get80ImageUrl(currentUser.getPics().get(0).getNetFileName()))
-                        .into(headerResult.getHeaderBackgroundView());
-            }
-        }
+       drawerResult.addStickyFooterItem(item0);
 
-        updateProfile();
+//        //更换个性化背景图
+//        try (Realm realm = Realm.getDefaultInstance()) {
+//            CurrentUser currentUser = realm.where(CurrentUser.class).findFirst();
+//            if (currentUser.getPics().size() > 0) {
+//                Picasso.with(activityContext)
+//                        .load(PPHelper.get80ImageUrl(currentUser.getPics().get(0).getNetFileName()))
+//                        .into(headerResult.getHeaderBackgroundView());
+//            }
+//        }
+
+//      updateProfile();
 
         //创建moment按钮监控
         Observable<Object> createMomentButtonObservable = RxView.clicks(binding.createMomentBt)
@@ -396,11 +397,11 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
 
         // 多选相册组件配置
         // 设置相册最大选择数量
-        comp.componentOption().albumMultipleComponentOption().albumListOption().setMaxSelection(9);
+        comp.componentOption().albumMultipleComponentOption().albumListOption().setMaxSelection(1);
 
         // 多功能编辑组件配置项
         // 设置最大编辑数量
-        comp.componentOption().editMultipleComponentOption().setMaxEditImageCount(9);
+        comp.componentOption().editMultipleComponentOption().setMaxEditImageCount(1);
 
         // 设置没有改变的图片是否保存(默认 false)
         // comp.componentOption().editMultipleComponentOption().setEnableAlwaysSaveEditResult(false);

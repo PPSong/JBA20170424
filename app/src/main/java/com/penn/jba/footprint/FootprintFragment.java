@@ -106,10 +106,10 @@ public class FootprintFragment extends Fragment {
             }
 
             if (currentUserSetting.isFootprintMine()) {
-                menu.getItem(0).setIcon(R.drawable.ic_photo_black_24dp);
+                menu.getItem(0).setIcon(R.drawable.ic_photo_white_24dp);
                 binding.mainViewPager.setCurrentItem(0, false);
             } else {
-                menu.getItem(0).setIcon(R.drawable.ic_photo_library_black_24dp);
+                menu.getItem(0).setIcon(R.drawable.ic_photo_library_white_24dp);
                 binding.mainViewPager.setCurrentItem(1, false);
             }
 

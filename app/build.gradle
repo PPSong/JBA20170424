@@ -73,4 +73,5 @@ dependencies {
         exclude group: 'org.json', module: 'json'
     }
     compile 'com.marshalchen.ultimaterecyclerview:library:0.7.2'
+    compile "com.github.jonasrottmann.realm-browser:realm-browser:develop-SNAPSHOT"
 }

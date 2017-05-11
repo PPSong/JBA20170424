@@ -27,9 +27,10 @@
                 android:id="@+id/tl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/colorPrimary"
+                android:background="#353535"
                 android:elevation="16dp"
                 android:minHeight="?attr/actionBarSize"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -56,17 +57,18 @@
             android:layout_height="48dp">
 
             <TextView
-                android:id="@+id/bd_tv"
-                android:background="@drawable/rounded_corner"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:visibility="invisible"
-                android:layout_marginRight="0dp"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="8dp">
+            android:id="@+id/bd_tv"
+            android:background="@drawable/rounded_corner"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:visibility="invisible"
+            android:textSize="10dp"
+            android:layout_marginRight="0dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="8dp">
 
             </TextView>
 
