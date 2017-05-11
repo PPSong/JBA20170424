@@ -226,25 +226,25 @@ public class MessageListFragment extends Fragment {
         }
     }
 
-    private void setUnreadNum(int totalNum, int currentTypeNum) {
-        try (Realm realm = Realm.getDefaultInstance()) {
-            realm.beginTransaction();
-            CurrentUser currentUser = realm.where(CurrentUser.class).findFirst();
-
-            if (messageType == MessageType.MOMENT) {
-                EventBus.getDefault().post(new MessageEvent("updateMomentMessageBadge", "" + currentTypeNum));
-                currentUser.setUnreadMessageMoment(currentTypeNum);
-            } else if (messageType == MessageType.FRIEND) {
-                EventBus.getDefault().post(new MessageEvent("updateFriendMessageBadge", "" + currentTypeNum));
-                currentUser.setUnreadMessageFriend(currentTypeNum);
-            } else if (messageType == MessageType.SYSTEM) {
-                EventBus.getDefault().post(new MessageEvent("updateSystemMessageBadge", "" + currentTypeNum));
-                currentUser.setUnreadMessageSystem(currentTypeNum);
-            }
-
-            realm.commitTransaction();
-        }
-    }
+//    private void setUnreadNum(int totalNum, int currentTypeNum) {
+//        try (Realm realm = Realm.getDefaultInstance()) {
+//            realm.beginTransaction();
+//            CurrentUser currentUser = realm.where(CurrentUser.class).findFirst();
+//
+//            if (messageType == MessageType.MOMENT) {
+//                EventBus.getDefault().post(new MessageEvent("updateMomentMessageBadge", "" + currentTypeNum));
+//                currentUser.setUnreadMessageMoment(currentTypeNum);
+//            } else if (messageType == MessageType.FRIEND) {
+//                EventBus.getDefault().post(new MessageEvent("updateFriendMessageBadge", "" + currentTypeNum));
+//                currentUser.setUnreadMessageFriend(currentTypeNum);
+//            } else if (messageType == MessageType.SYSTEM) {
+//                EventBus.getDefault().post(new MessageEvent("updateSystemMessageBadge", "" + currentTypeNum));
+//                currentUser.setUnreadMessageSystem(currentTypeNum);
+//            }
+//
+//            realm.commitTransaction();
+//        }
+//    }
 
     private class InnerPPRefreshLoadController extends PPRefreshLoadController {
         private int totalUnread;
@@ -295,7 +295,7 @@ public class MessageListFragment extends Fragment {
                                             //int totalUnread = PPHelper.ppFromString(s, "data.totalUnread").getAsInt();
                                             //int curTypeUnread = PPHelper.ppFromString(s, "data.unRead." + groupName).getAsInt();
 
-                                            setUnreadNum(totalUnread, curTypeUnread);
+                                            //setUnreadNum(totalUnread, curTypeUnread);
                                         }
                                     },
                                     new Consumer<Throwable>() {

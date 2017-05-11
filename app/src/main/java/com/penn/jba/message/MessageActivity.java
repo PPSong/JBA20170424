@@ -19,6 +19,7 @@ import com.penn.jba.databinding.ActivityLoginBinding;
 import com.penn.jba.databinding.ActivityMessageBinding;
 import com.penn.jba.databinding.PpTabBinding;
 import com.penn.jba.model.MessageEvent;
+import com.penn.jba.model.realm.CurrentUser;
 import com.penn.jba.util.InfoType;
 import com.penn.jba.util.MessageType;
 import com.penn.jba.util.PPHelper;
@@ -39,6 +40,8 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function3;
 import io.reactivex.schedulers.Schedulers;
+import io.realm.Realm;
+import io.realm.RealmChangeListener;
 
 import static com.penn.jba.util.PPHelper.ppWarning;
 
@@ -46,6 +49,10 @@ public class MessageActivity extends AppCompatActivity {
     private Context activityContext;
 
     private ActivityMessageBinding binding;
+
+    private Realm realm;
+
+    private CurrentUser currentUser;
 
     private ArrayList<Disposable> disposableList = new ArrayList<Disposable>();
 
@@ -65,7 +72,7 @@ public class MessageActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        EventBus.getDefault().register(this);
+        realm = Realm.getDefaultInstance();
 
         setup();
     }
@@ -73,13 +80,13 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        realm.close();
+
         for (Disposable d : disposableList) {
             if (!d.isDisposed()) {
                 d.dispose();
             }
         }
-
-        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -131,18 +138,18 @@ public class MessageActivity extends AppCompatActivity {
         binding.mainVp.setOffscreenPageLimit(3);
 
         setupTabs();
-    }
 
-    //-----helper-----
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent event) {
-        if (event.type == "updateMomentMessageBadge") {
-            ppTabBinding1.mainBd.setNumber(Integer.parseInt(event.data));
-        } else if (event.type == "updateFriendMessageBadge") {
-            ppTabBinding2.mainBd.setNumber(Integer.parseInt(event.data));
-        } else if (event.type == "updateSystemMessageBadge") {
-            ppTabBinding3.mainBd.setNumber(Integer.parseInt(event.data));
+        try (Realm realm = Realm.getDefaultInstance()) {
+            currentUser = realm.where(CurrentUser.class).findFirstAsync();
         }
+        currentUser.addChangeListener(new RealmChangeListener<CurrentUser>() {
+            @Override
+            public void onChange(CurrentUser element) {
+                ppTabBinding1.mainBd.setNumber(element.getUnreadMessageMoment());
+                ppTabBinding2.mainBd.setNumber(element.getUnreadMessageFriend());
+                ppTabBinding3.mainBd.setNumber(element.getUnreadMessageSystem());
+            }
+        });
     }
 
     private void setupTabs() {
