@@ -36,10 +36,8 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.penn.jba.databinding.ActivityTabsBinding;
-import com.penn.jba.databinding.PpTabBinding;
 import com.penn.jba.footprint.FootprintFragment;
 import com.penn.jba.message.MessageActivity;
-import com.penn.jba.model.MessageEvent;
 import com.penn.jba.model.realm.CurrentUser;
 import com.penn.jba.model.realm.Footprint;
 import com.penn.jba.model.realm.Pic;
@@ -48,7 +46,6 @@ import com.penn.jba.util.FootprintStatus;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPJSONObject;
 import com.penn.jba.util.PPRetrofit;
-import com.penn.jba.util.PPSocketSingleton;
 import com.penn.jba.util.PPValueType;
 import com.penn.jba.util.PPWarn;
 import com.penn.jba.util.PicStatus;
@@ -56,11 +53,6 @@ import com.qiniu.android.http.ResponseInfo;
 import com.qiniu.android.storage.Configuration;
 import com.qiniu.android.storage.UpCompletionHandler;
 import com.qiniu.android.storage.UploadManager;
-import com.squareup.picasso.Picasso;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,11 +67,9 @@ import org.lasque.tusdk.impl.activity.TuFragment;
 import org.lasque.tusdk.modules.components.TuSdkComponent;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-//import de.jonasrottmann.realmbrowser.RealmBrowser;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -91,7 +81,6 @@ import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
-import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
@@ -144,6 +133,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
     protected void onDestroy() {
         super.onDestroy();
         realm.close();
+        currentUser.removeAllChangeListeners();
         for (Disposable d : disposableList) {
             if (!d.isDisposed()) {
                 d.dispose();
@@ -241,19 +231,19 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
 
 //      updateProfile();
 
-        // 获取用户未读消息
-        try (Realm realm = Realm.getDefaultInstance()) {
-            currentUser = realm.where(CurrentUser.class).findFirstAsync();
-        }
+
+        currentUser = realm.where(CurrentUser.class).findFirst();
+        int num = currentUser.getUnreadMessageFriend() + currentUser.getUnreadMessageSystem() + currentUser.getUnreadMessageMoment();
+        updateMessageBadge(String.valueOf(num));
 
         currentUser.addChangeListener(new RealmChangeListener<CurrentUser>() {
             @Override
             public void onChange(CurrentUser element) {
-                Log.d("weng", "12343");
                 int num = element.getUnreadMessageFriend() + element.getUnreadMessageSystem() + element.getUnreadMessageMoment();
                 updateMessageBadge(String.valueOf(num));
             }
         });
+
 
         //创建moment按钮监控
         Observable<Object> createMomentButtonObservable = RxView.clicks(binding.createMomentBt)
@@ -291,7 +281,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
             case 0:
                 //logout
                 PPHelper.setPrefBooleanValue("autoLogin", false);
-                PPSocketSingleton.close();
+                //PPSocketSingleton.close();
                 stopService(new Intent(activityContext, PPService.class));
                 Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);

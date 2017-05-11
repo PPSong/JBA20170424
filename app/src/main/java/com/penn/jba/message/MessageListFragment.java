@@ -68,6 +68,8 @@ public class MessageListFragment extends Fragment {
     //custom
     private Realm realm;
 
+    private CurrentUser currentUser;
+
     private RealmResults<Message> messages;
 
     private MessageAdapter messageAdapter;
@@ -226,29 +228,28 @@ public class MessageListFragment extends Fragment {
         }
     }
 
-//    private void setUnreadNum(int totalNum, int currentTypeNum) {
-//        try (Realm realm = Realm.getDefaultInstance()) {
-//            realm.beginTransaction();
-//            CurrentUser currentUser = realm.where(CurrentUser.class).findFirst();
-//
-//            if (messageType == MessageType.MOMENT) {
-//                EventBus.getDefault().post(new MessageEvent("updateMomentMessageBadge", "" + currentTypeNum));
-//                currentUser.setUnreadMessageMoment(currentTypeNum);
-//            } else if (messageType == MessageType.FRIEND) {
-//                EventBus.getDefault().post(new MessageEvent("updateFriendMessageBadge", "" + currentTypeNum));
-//                currentUser.setUnreadMessageFriend(currentTypeNum);
-//            } else if (messageType == MessageType.SYSTEM) {
-//                EventBus.getDefault().post(new MessageEvent("updateSystemMessageBadge", "" + currentTypeNum));
-//                currentUser.setUnreadMessageSystem(currentTypeNum);
-//            }
-//
-//            realm.commitTransaction();
-//        }
-//    }
+    private void setUnreadNum(int currentTypeNum) {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            realm.beginTransaction();
+
+            currentUser=realm.where(CurrentUser.class).findFirst();
+
+            if (messageType == MessageType.MOMENT) {
+                currentUser.setUnreadMessageMoment(currentTypeNum);
+                Log.d("weng232","MessageType.MOMENT");
+            } else if (messageType == MessageType.FRIEND) {
+                currentUser.setUnreadMessageFriend(currentTypeNum);
+                Log.d("weng232","MessageType.FRIEND");
+            } else if (messageType == MessageType.SYSTEM) {
+                currentUser.setUnreadMessageSystem(currentTypeNum);
+                Log.d("weng232","MessageType.SYSTEM");
+            }
+
+            realm.commitTransaction();
+        }
+    }
 
     private class InnerPPRefreshLoadController extends PPRefreshLoadController {
-        private int totalUnread;
-        private int curTypeUnread;
 
         public InnerPPRefreshLoadController(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView) {
             super(swipeRefreshLayout, recyclerView);
@@ -281,21 +282,16 @@ public class MessageListFragment extends Fragment {
                                             end();
                                             reset();
 
-                                            if (PPHelper.ppFromString(s, "data.totalUnread") != null) {
-                                                totalUnread = PPHelper.ppFromString(s, "data.totalUnread").getAsInt();
-                                            } else {
-                                                totalUnread = 0;
+
+                                            int curTypeUnread = 0;
+
+                                            if(PPHelper.ppFromString(s, "data.unRead." + groupName)!=null){
+                                                curTypeUnread=PPHelper.ppFromString(s, "data.unRead." + groupName).getAsInt();
                                             }
 
-                                            if (PPHelper.ppFromString(s, "data.unRead." + groupName) != null) {
-                                                curTypeUnread = PPHelper.ppFromString(s, "data.unRead." + groupName).getAsInt();
-                                            } else {
-                                                curTypeUnread = 0;
-                                            }
-                                            //int totalUnread = PPHelper.ppFromString(s, "data.totalUnread").getAsInt();
-                                            //int curTypeUnread = PPHelper.ppFromString(s, "data.unRead." + groupName).getAsInt();
+                                            Log.d("weng231"," "+groupName+" "+curTypeUnread);
 
-                                            //setUnreadNum(totalUnread, curTypeUnread);
+                                            setUnreadNum(curTypeUnread);
                                         }
                                     },
                                     new Consumer<Throwable>() {

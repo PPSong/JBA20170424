@@ -128,7 +128,7 @@ public class CreateMomentActivity extends AppCompatActivity {
                 );
 
         //地址输入监控
-        Observable<String> placeInputObservable = RxTextView.textChanges(binding.placeEt)
+        Observable<String> placeInputObservable = RxTextView.textChanges(binding.placeTv)
                 .skip(1)
                 .map(new Function<CharSequence, String>() {
                     @Override
@@ -139,7 +139,7 @@ public class CreateMomentActivity extends AppCompatActivity {
                         new Consumer<String>() {
                             @Override
                             public void accept(String error) throws Exception {
-                                binding.placeEt.setError(TextUtils.isEmpty(error) ? null : error);
+                                binding.placeTv.setError(TextUtils.isEmpty(error) ? null : error);
                             }
                         }
                 );
@@ -183,19 +183,54 @@ public class CreateMomentActivity extends AppCompatActivity {
         );
 
         footprint = realm.where(Footprint.class).equalTo("status", FootprintStatus.PREPARE.toString()).findFirst();
-        int widthDp = 64;
-        final float scale = activityContext.getResources().getDisplayMetrics().density;
-        int width = activityContext.getResources().getDisplayMetrics().widthPixels;
-        int pixels = (int) (widthDp * scale + 0.5f);
-        int cols = width / pixels;
-        binding.imagePreviewGv.setNumColumns(cols);
-        MomentImagePreviewAdapter momentImagePreviewAdapter = new MomentImagePreviewAdapter(activityContext, footprint.getPics(), pixels);
-        binding.imagePreviewGv.setAdapter(momentImagePreviewAdapter);
+//        int widthDp = 64;
+//        final float scale = activityContext.getResources().getDisplayMetrics().density;
+//        int width = activityContext.getResources().getDisplayMetrics().widthPixels;
+//        int pixels = (int) (widthDp * scale + 0.5f);
+//        int cols = width / pixels;
+//        binding.imagePreviewGv.setNumColumns(cols);
+//        MomentImagePreviewAdapter momentImagePreviewAdapter = new MomentImagePreviewAdapter(activityContext, footprint.getPics(), pixels);
+//        binding.imagePreviewGv.setAdapter(momentImagePreviewAdapter);
+        getLocal();
+    }
+
+    private void getLocal() {
+
+        PPJSONObject jBody = new PPJSONObject();
+        jBody
+                .put("geo", geoJsonArray);
+
+        final Observable<String> apiResult = PPRetrofit.getInstance().api("location.here", jBody.getJSONObject());
+
+        disposableList.add(
+                apiResult
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                new Consumer<String>() {
+                                    public void accept(String s) {
+
+                                        if (PPHelper.ppFromString(s, "data.address").getAsString() == null) {
+                                            PPHelper.ppShowError(s);
+                                            return;
+                                        }
+                                        binding.placeTv.setText(PPHelper.ppFromString(s, "data.address").getAsString());
+                                    }
+                                },
+                                new Consumer<Throwable>() {
+                                    public void accept(Throwable t1) {
+                                        PPHelper.ppShowError(t1.getMessage());
+                                        t1.printStackTrace();
+                                    }
+                                }
+                        )
+        );
+
     }
 
     private void publishMoment() {
         String content = binding.contentEt.getText().toString();
-        String place = binding.placeEt.getText().toString();
+        String place = binding.placeTv.getText().toString();
 
         if (TextUtils.isEmpty(content) || TextUtils.isEmpty(place)) {
             PPHelper.ppShowError(activityContext.getResources().getString(R.string.moment_content_place_required));

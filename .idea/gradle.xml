@@ -8,6 +8,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/TuSDKUIDefault" />
             <option value="$PROJECT_DIR$/TuSDKUIGeeV2" />
             <option value="$PROJECT_DIR$/app" />
           </set>

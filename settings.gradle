@@ -1,1 +1,1 @@
-include ':app', ':TuSDKUIGeeV2'
+include ':app', ':TuSDKUIGeeV2', ':TuSDKUIDefault'

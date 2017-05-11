@@ -81,7 +81,7 @@ public class MessageActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         realm.close();
-
+        currentUser.removeAllChangeListeners();
         for (Disposable d : disposableList) {
             if (!d.isDisposed()) {
                 d.dispose();
@@ -139,17 +139,23 @@ public class MessageActivity extends AppCompatActivity {
 
         setupTabs();
 
-        try (Realm realm = Realm.getDefaultInstance()) {
-            currentUser = realm.where(CurrentUser.class).findFirstAsync();
-        }
+
+        currentUser = realm.where(CurrentUser.class).findFirst();
+        ppTabBinding1.mainBd.setNumber(currentUser.getUnreadMessageMoment());
+        ppTabBinding2.mainBd.setNumber(currentUser.getUnreadMessageFriend());
+        ppTabBinding3.mainBd.setNumber(currentUser.getUnreadMessageSystem());
+
+        Log.d("weng232", "addChangeListener");
         currentUser.addChangeListener(new RealmChangeListener<CurrentUser>() {
             @Override
             public void onChange(CurrentUser element) {
+                Log.d("weng232", element.getUnreadMessageMoment() + " " + element.getUnreadMessageFriend() + " " + element.getUnreadMessageSystem());
                 ppTabBinding1.mainBd.setNumber(element.getUnreadMessageMoment());
                 ppTabBinding2.mainBd.setNumber(element.getUnreadMessageFriend());
                 ppTabBinding3.mainBd.setNumber(element.getUnreadMessageSystem());
             }
         });
+
     }
 
     private void setupTabs() {

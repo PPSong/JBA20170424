@@ -168,7 +168,7 @@ public class PPSocketSingleton {
                         }
 
                         int totalUnread = PPHelper.ppFromString(s, "data.totalUnread").getAsInt();
-                        EventBus.getDefault().post(new MessageEvent("updateMessageBadge", "" + totalUnread));
+                        //todo weng
                     }
                 }, new Consumer<Throwable>() {
                     @Override

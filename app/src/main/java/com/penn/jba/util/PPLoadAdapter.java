@@ -123,9 +123,7 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
             ((ProgressViewHolder) holder).bind();
         } else if (holder instanceof ProfileHeaderViewHolder) {
             try (Realm realm = Realm.getDefaultInstance()) {
-                realm.beginTransaction();
                 currentUser = realm.where(CurrentUser.class).findFirst();
-                realm.commitTransaction();
             }
             ((ProfileHeaderViewHolder) holder).bind(currentUser);
         } else {
