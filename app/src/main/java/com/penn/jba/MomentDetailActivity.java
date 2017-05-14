@@ -8,9 +8,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -70,18 +73,18 @@ public class MomentDetailActivity extends AppCompatActivity {
 
         momentId = getIntent().getStringExtra("momentId");
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         setup();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        if (item.getItemId() == android.R.id.home) {
+//            finish();
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     @Override
     protected void onDestroy() {
@@ -95,6 +98,19 @@ public class MomentDetailActivity extends AppCompatActivity {
 
     private void setup() {
         getMomentDetailAndComment();
+
+        //修改键盘enter为发送并监听
+        binding.replyEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEND ||
+                        (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                    sendComment();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     private void loadMoreComment() {
@@ -327,7 +343,7 @@ public class MomentDetailActivity extends AppCompatActivity {
 
         binding.line1Tv.setText(ppFromString(momentStr, "data._creator.nickname").getAsString());
         binding.line2Tv.setText(ppFromString(momentStr, "data.location.geo").getAsJsonArray().toString());
-        binding.contentTv.setText("\""+ppFromString(momentStr, "data.content").getAsString()+"\"");
+        binding.contentTv.setText("\"" + ppFromString(momentStr, "data.content").getAsString() + "\"");
         binding.createTimeRttv.setReferenceTime(ppFromString(momentStr, "data.createTime").getAsLong());
         binding.placeTv.setText(ppFromString(momentStr, "data.location.detail").getAsString());
 

@@ -2,48 +2,48 @@
     <string name="app_name">迹伴</string>
 
     <!-- Strings related to login -->
-    <string name="prompt_phone">手机号码*</string>
-    <string name="prompt_password">密码*</string>
-    <string name="action_sign_in">登录</string>
-    <string name="action_sign_in_short">登录</string>
-    <string name="error_invalid_phone">手机号码格式不正确</string>
-    <string name="error_invalid_password">密码至少6位,最多12位</string>
-    <string name="error_incorrect_password">密码错误</string>
-    <string name="error_field_required">此项必填</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
+    <string name="prompt_phone" translatable="false">手机号码*</string>
+    <string name="prompt_password" translatable="false">密码*</string>
+    <string name="action_sign_in" translatable="false">登录</string>
+    <string name="action_sign_in_short" translatable="false">登录</string>
+    <string name="error_invalid_phone" translatable="false">手机号码格式不正确</string>
+    <string name="error_invalid_password" translatable="false">密码至少6位,最多12位</string>
+    <string name="error_incorrect_password" translatable="false">密码错误</string>
+    <string name="error_field_required" translatable="false">此项必填</string>
+    <string name="permission_rationale" translatable="false">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="login">登录</string>
-    <string name="forget_password">忘记密码</string>
-    <string name="create_new_account">注册新账号</string>
-    <string name="verify_code">验证码*</string>
-    <string name="new_password">新密码*</string>
-    <string name="request_verify_code">获取验证码</string>
-    <string name="reset_password">重置密码</string>
-    <string name="title_activity_tabs">TabsActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
-    <string name="next_step">下一步</string>
-    <string name="request">获取</string>
-    <string name="set_password">设置密码*</string>
-    <string name="input_nickname">输入昵称*</string>
-    <string name="get_random">随机生成</string>
-    <string name="action_sign_up">注册</string>
-    <string name="pick_birthday">选择生日*</string>
-    <string name="finish_sign_up">完成注册</string>
-    <string name="male">男</string>
-    <string name="female">女</string>
-    <string name="agreement">我同意遵守\"迹伴用户协议\"</string>
-    <string name="error_date_format">日期格式错误</string>
-    <string name="please_agree">请选择同意</string>
-    <string name="error_invalid_verify_code">验证码格式不正确</string>
-    <string name="reset_password_ok">密码重置成功</string>
-    <string name="error_verify_code">验证码错误</string>
-    <string name="account_existed">账户已存在</string>
-    <string name="error_invalid_nickname">昵称需要3-12个字符</string>
-    <string name="error_invalid_birthday">出生日期有误</string>
-    <string name="must_agree">请同意守则</string>
+    <string name="login" translatable="false">登录</string>
+    <string name="forget_password" translatable="false">忘记密码</string>
+    <string name="create_new_account" translatable="false">注册新账号</string>
+    <string name="verify_code" translatable="false">验证码*</string>
+    <string name="new_password" translatable="false">新密码*</string>
+    <string name="request_verify_code" translatable="false">获取验证码</string>
+    <string name="reset_password" translatable="false">重置密码</string>
+    <string name="title_activity_tabs" translatable="false">TabsActivity</string>
+    <string name="title_home" translatable="false">Home</string>
+    <string name="title_dashboard" translatable="false">Dashboard</string>
+    <string name="title_notifications" translatable="false">Notifications</string>
+    <string name="next_step" translatable="false">下一步</string>
+    <string name="request" translatable="false">获取</string>
+    <string name="set_password" translatable="false">设置密码*</string>
+    <string name="input_nickname" translatable="false">输入昵称*</string>
+    <string name="get_random" translatable="false">随机生成</string>
+    <string name="action_sign_up" translatable="false">注册</string>
+    <string name="pick_birthday" translatable="false">选择生日*</string>
+    <string name="finish_sign_up" translatable="false">完成注册</string>
+    <string name="male" translatable="false">男</string>
+    <string name="female" translatable="false">女</string>
+    <string name="agreement" translatable="false">我同意遵守\"迹伴用户协议\"</string>
+    <string name="error_date_format" translatable="false">日期格式错误</string>
+    <string name="please_agree" translatable="false">请选择同意</string>
+    <string name="error_invalid_verify_code" translatable="false">验证码格式不正确</string>
+    <string name="reset_password_ok" translatable="false">密码重置成功</string>
+    <string name="error_verify_code" translatable="false">验证码错误</string>
+    <string name="account_existed" translatable="false">账户已存在</string>
+    <string name="error_invalid_nickname" translatable="false">昵称需要3-12个字符</string>
+    <string name="error_invalid_birthday" translatable="false">出生日期有误</string>
+    <string name="must_agree" translatable="false">请同意守则</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

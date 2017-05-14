@@ -167,6 +167,7 @@ public class FootprintAllFragment extends Fragment {
         binding.mainRv.setHasFixedSize(true);
 
         ppRefreshLoadController = new InnerPPRefreshLoadController(binding.mainSwipeRefreshLayout, binding.mainRv);
+        ppRefreshLoadController.onRefresh();
     }
 
     private final OrderedRealmCollectionChangeListener<RealmResults<Footprint>> changeListener = new OrderedRealmCollectionChangeListener<RealmResults<Footprint>>() {
