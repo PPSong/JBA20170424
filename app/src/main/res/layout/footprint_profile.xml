@@ -20,7 +20,7 @@
             android:id="@+id/mybanner_iv"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:scaleType="fitXY"
+            android:scaleType="centerCrop"
             android:src="@drawable/header"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -36,12 +36,12 @@
             app:civ_border_color="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginLeft="50dp"
+            android:layout_marginLeft="39dp"
             app:layout_constraintLeft_toLeftOf="@+id/main_cl" />
 
         <ImageView
             android:id="@+id/below_bar"
-            android:layout_width="4dp"
+            android:layout_width="2dp"
             android:layout_height="0dp"
             android:background="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -141,6 +141,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
+            android:visibility="visible"
             android:text="@{presenter.getUnreadMessage()}"
             android:background="@drawable/unread_message_type"
             android:textColor="@color/white"

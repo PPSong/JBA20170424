@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.internal.Streams;
 import com.penn.jba.FootprintBelong;
 import com.penn.jba.R;
 import com.penn.jba.databinding.FragmentFootprintAllBinding;
@@ -145,10 +146,10 @@ public class FootprintAllFragment extends Fragment {
                 Log.d("weng", "onPrepareLoad");
             }
         };
-
-        Picasso.with(activityContext)
-                .load(PPHelper.get80ImageUrl(tmpBanner))
-                .into(target);
+        if (tmpBanner != null)
+            Picasso.with(activityContext)
+                    .load(PPHelper.get80ImageUrl(tmpBanner))
+                    .into(target);
 
         binding.mainRv.setTag(target);
 

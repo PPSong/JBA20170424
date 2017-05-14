@@ -68,12 +68,12 @@
         "source": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/lsq_style_default_filter_adjust.png"
     },
     {
-        "merged": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/lsq_geev2_style_default_camera_button_capture.png",
-        "source": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/lsq_geev2_style_default_camera_button_capture.png"
-    },
-    {
         "merged": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/lsq_geev2_style_default_camera_flash_on_selected.png",
         "source": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/lsq_geev2_style_default_camera_flash_on_selected.png"
+    },
+    {
+        "merged": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/lsq_geev2_style_default_camera_button_capture.png",
+        "source": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/bundles/debug/res/drawable-xhdpi-v4/lsq_geev2_style_default_camera_button_capture.png"
     },
     {
         "merged": "/Users/raighne/JBA_PENN/TuSDKUIGeeV2/build/intermediates/res/merged/androidTest/debug/drawable-xhdpi-v4/lsq_geev2_style_default_edit_icon_exposure.png",

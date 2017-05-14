@@ -116,10 +116,10 @@ public class FootprintMineFragment extends Fragment {
     //-----helper-----
     public void setup() {
         // rv background blur
-        String tmpBanner="";
+        String tmpBanner = "";
         try (Realm realm = Realm.getDefaultInstance()) {
             currentUser = realm.where(CurrentUser.class).findFirst();
-            tmpBanner=currentUser.getBanner();
+            tmpBanner = currentUser.getBanner();
         }
 
         Target target = new Target() {
@@ -141,10 +141,10 @@ public class FootprintMineFragment extends Fragment {
                 Log.d("weng", "onPrepareLoad");
             }
         };
-
-        Picasso.with(activityContext)
-                .load(PPHelper.get80ImageUrl(tmpBanner))
-                .into(target);
+        if (tmpBanner != null)
+            Picasso.with(activityContext)
+                    .load(PPHelper.get80ImageUrl(tmpBanner))
+                    .into(target);
 
         binding.mainRv.setTag(target);
 

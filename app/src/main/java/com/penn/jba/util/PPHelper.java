@@ -120,6 +120,7 @@ public class PPHelper {
             return result;
         }
     }
+
     public static String getBaiduMap(JsonArray geo) {
         String geoStr = geo.get(0).getAsFloat() + "," + geo.get(1).getAsFloat();
         return "http://api.map.baidu.com/staticimage/v2?ak=" + baiduAk + "&mcode=666666&center=" + geoStr + "&width=300&height=200&zoom=17&markers=" + geoStr + "&markerStyles=-1";
@@ -238,8 +239,21 @@ public class PPHelper {
                             currentUser.setNickname(ppFromString(s, "data.userInfo.nickname").getAsString());
                             currentUser.setGender(ppFromString(s, "data.userInfo.gender").getAsInt());
                             currentUser.setBirthday(ppFromString(s, "data.userInfo.birthday").getAsLong());
-                            currentUser.setHead(ppFromString(s, "data.userInfo.head").getAsString());
-                            currentUser.setBanner(ppFromString(s, "data.userInfo.params.banner").getAsString());
+
+                            if (ppFromString(s, "data.userInfo.head").getAsString() != "") {
+                                currentUser.setHead(ppFromString(s, "data.userInfo.head").getAsString());
+                            } else {
+                                if (ppFromString(s, "data.userInfo.gender").getAsInt() == 1) {
+                                    currentUser.setHead("pic_head_man.png");
+                                } else {
+                                    currentUser.setHead("pic_head_woman.png");
+                                }
+                            }
+                            if (ppFromString(s, "data.userInfo.params.banner") != null) {
+                                currentUser.setBanner(ppFromString(s, "data.userInfo.params.banner").getAsString());
+                            } else {
+                                currentUser.setBanner("default_banner.jpg");
+                            }
                             currentUser.setBaiduApiUrl(ppFromString(s, "data.settings.geo.api").getAsString());
                             currentUser.setBaiduAkBrowser(tmpAk);
                             currentUser.setSocketHost(ppFromString(s, "data.settings.socket.host").getAsString());

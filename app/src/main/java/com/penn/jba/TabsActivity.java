@@ -115,6 +115,7 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
 
     private CurrentUser currentUser;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,8 +133,8 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realm.close();
         currentUser.removeAllChangeListeners();
+        realm.close();
         for (Disposable d : disposableList) {
             if (!d.isDisposed()) {
                 d.dispose();
@@ -625,4 +626,6 @@ public class TabsActivity extends AppCompatActivity implements Drawer.OnDrawerIt
             }
         });
     }
+
+
 }

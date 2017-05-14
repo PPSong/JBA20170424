@@ -83,9 +83,7 @@
         <activity android:name=".CollectDetailActivity" />
         <activity android:name=".MomentDetailActivity"></activity>
 
-        <activity
-            android:name=".message.MessageActivity"
-            android:launchMode="singleTask"></activity>
+        <activity android:name=".message.MessageActivity"></activity>
 
         <service android:name=".PPService" />
     </application>

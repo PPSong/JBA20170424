@@ -2,12 +2,7 @@ package com.penn.jba.footprint;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.LayerDrawable;
 import android.support.v7.widget.RecyclerView;
-import android.text.Spanned;
-import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,9 +10,9 @@ import android.view.ViewGroup;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.penn.jba.CollectDetailActivity;
 import com.penn.jba.FootprintBelong;
+import com.penn.jba.MomentDetailActivity;
 import com.penn.jba.PPApplication;
 import com.penn.jba.R;
 
@@ -34,18 +29,15 @@ import com.penn.jba.databinding.ListRowAllMomentBinding;
 import com.penn.jba.model.CollectMoment;
 import com.penn.jba.model.realm.Footprint;
 
-import com.penn.jba.model.realm.Pic;
 import com.penn.jba.util.CollectMomentImageAdapter;
-import com.penn.jba.util.MomentImageAdapter;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPLoadAdapter;
 import com.penn.jba.util.PPValueType;
+import com.penn.jba.view.RoundedTransformation;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.realm.RealmList;
 
 import static com.penn.jba.util.PPHelper.ppFromString;
 
@@ -57,7 +49,7 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
     private Context context;
 
     public FootprintAdapter(Context context, List<Footprint> data, FootprintBelong footprintBelong) {
-        super(context,data, footprintBelong);
+        super(context, data, footprintBelong);
         this.context = context;
     }
 
@@ -148,6 +140,11 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
 
                     intent.putExtra("collectMomentsStr", new Gson().toJson(collectMoments));
 
+                    context.startActivity(intent);
+                } else if (ft.getType() == 3) {
+                    Intent intent = new Intent(context, MomentDetailActivity.class);
+                    Log.d("weng123",""+ppFromString(ft.getBody(),"detail.id").getAsString());
+                    intent.putExtra("momentId", ppFromString(ft.getBody(),"detail.id").getAsString());
                     context.startActivity(intent);
                 }
             }
@@ -245,34 +242,40 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.contentTv.setText(ft.getContent());
             binding.placeTv.setText(ft.getPlace());
 
-            //设置图片
-            RealmList<Pic> pics = ft.getPics();
+//            //设置图片
+            String pics = ft.getPics().get(0).getKey().toString();
 
-            int picNum = pics.size();
-            int width = 0;
-            if (picNum == 0) {
-                //do nothing
-            } else if (picNum == 1) {
-                binding.mainGv.setNumColumns(1);
-                width = PPHelper.MomentGridViewWidth;
-            } else if (picNum == 2) {
-                binding.mainGv.setNumColumns(2);
-                width = PPHelper.MomentGridViewWidth / 2;
-            } else if (picNum == 3) {
-                binding.mainGv.setNumColumns(2);
-                width = PPHelper.MomentGridViewWidth / 2;
-            } else if (picNum == 4) {
-                binding.mainGv.setNumColumns(2);
-                width = PPHelper.MomentGridViewWidth / 2;
-            } else {
-                binding.mainGv.setNumColumns(3);
-                width = PPHelper.MomentGridViewWidth / 3;
-            }
-
-            final float scale = context.getResources().getDisplayMetrics().density;
-            int pixels = (int) (width * scale + 0.5f);
-            MomentImageAdapter momentImageAdapter = new MomentImageAdapter(context, pics, pixels);
-            binding.mainGv.setAdapter(momentImageAdapter);
+            Log.d("weng233", "" + pics);
+            Picasso.with(PPApplication.getContext())
+                    .load(PPHelper.getSlimImageUrl(pics))
+                    .transform(new RoundedTransformation(30, 0))
+                    .placeholder(R.drawable.pictures_no).into(binding.contentSiv);
+//
+//            int picNum = pics.size();
+//            int width = 0;
+//            if (picNum == 0) {
+//                //do nothing
+//            } else if (picNum == 1) {
+//                binding.mainGv.setNumColumns(1);
+//                width = PPHelper.MomentGridViewWidth;
+//            } else if (picNum == 2) {
+//                binding.mainGv.setNumColumns(2);
+//                width = PPHelper.MomentGridViewWidth / 2;
+//            } else if (picNum == 3) {
+//                binding.mainGv.setNumColumns(2);
+//                width = PPHelper.MomentGridViewWidth / 2;
+//            } else if (picNum == 4) {
+//                binding.mainGv.setNumColumns(2);
+//                width = PPHelper.MomentGridViewWidth / 2;
+//            } else {
+//                binding.mainGv.setNumColumns(3);
+//                width = PPHelper.MomentGridViewWidth / 3;
+//            }
+//
+//            final float scale = context.getResources().getDisplayMetrics().density;
+//            int pixels = (int) (width * scale + 0.5f);
+//            MomentImageAdapter momentImageAdapter = new MomentImageAdapter(context, pics, pixels);
+//            binding.mainGv.setAdapter(momentImageAdapter);
         }
     }
 

@@ -1,6 +1,5 @@
 package com.penn.jba.model.realm;
 
-import io.realm.PicRealmProxy;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -247,8 +246,8 @@ public class CurrentUser extends RealmObject {
         this.momentBeLiked = momentBeLiked;
     }
 
-    public String getUnreadMessage(){
-        String message="你有"+unreadMessageMoment+"条未读消息";
+    public String getUnreadMessage() {
+        String message = "你有" + unreadMessageMoment + "条未读消息";
         return message;
     }
 
@@ -260,7 +259,7 @@ public class CurrentUser extends RealmObject {
         this.age = age;
     }
 
-    public String getMyAge(){
-        return "("+age+")岁";
+    public String getMyAge() {
+        return "(" + age + ")岁";
     }
 }

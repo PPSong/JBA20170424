@@ -34,7 +34,7 @@ public class Footprint extends RealmObject {
     private String status;
     private int type;
     private String body;
-
+    
     private String footprintBelong;
 
     private RealmList<Pic> pics;
@@ -125,16 +125,16 @@ public class Footprint extends RealmObject {
     }
 
     public String getDate() {
-        Long timestamp=getCreateTime();
-        SimpleDateFormat format =  new SimpleDateFormat("MM/dd");
-        String date=format.format(timestamp);
+        Long timestamp = getCreateTime();
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd");
+        String date = format.format(timestamp);
         return date;
     }
 
     public String getTime() {
-        Long timestamp=getCreateTime();
-        SimpleDateFormat format =  new SimpleDateFormat("HH:mm");
-        String time=format.format(timestamp);
+        Long timestamp = getCreateTime();
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+        String time = format.format(timestamp);
         return time;
     }
 
@@ -203,7 +203,7 @@ public class Footprint extends RealmObject {
             if (idA.equals(PPHelper.currentUserId)) {
                 String i_collect_ta_moment = PPApplication.getContext().getString(R.string.i_collect_ta_moment);
 
-                return i_collect_ta_moment ;
+                return i_collect_ta_moment;
             } else {
                 String ta_collect_my_moment = PPApplication.getContext().getString(R.string.ta_collect_my_moment);
 
@@ -219,7 +219,7 @@ public class Footprint extends RealmObject {
             String idA = ppFromString(body, "detail.createdBy").getAsString();
             String idB = ppFromString(body, "detail.receivedBy").getAsString();
 
-            if (idA.equals(PPHelper.currentUserId) ) {
+            if (idA.equals(PPHelper.currentUserId)) {
                 return ppFromString(body, "relatedUsers.1.head").getAsString();
             } else {
                 return ppFromString(body, "relatedUsers.0.head").getAsString();
@@ -228,7 +228,7 @@ public class Footprint extends RealmObject {
             String idA = ppFromString(body, "detail.createdBy").getAsString();
             String idB = ppFromString(body, "detail.receivedBy").getAsString();
 
-            if (idA.equals(PPHelper.currentUserId) ){
+            if (idA.equals(PPHelper.currentUserId)) {
                 return ppFromString(body, "relatedUsers.1.head").getAsString();
             } else {
                 return ppFromString(body, "relatedUsers.0.head").getAsString();

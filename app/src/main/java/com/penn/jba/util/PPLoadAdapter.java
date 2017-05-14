@@ -44,7 +44,7 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
     public PPLoadAdapter(Context context, List<T> data, FootprintBelong footprintBelong) {
         this.data = data;
         this.footprintBelong = footprintBelong;
-        this.activityContext =context;
+        this.activityContext = context;
     }
 
     //HeaderView和FooterView的get和set函数
@@ -169,23 +169,30 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
         public void bind(CurrentUser cu) {
             binding.setPresenter(cu);
             binding.executePendingBindings();
-            Picasso.with(PPApplication.getContext())
-                    .load(PPHelper.get80ImageUrl(cu.getHead()))
-                    .placeholder(R.drawable.pictures_no).into(binding.headerCiv);
 
-            Picasso.with(PPApplication.getContext())
-                    .load(PPHelper.getSlimImageUrl(cu.getBanner()))
-                    .placeholder(R.drawable.pictures_no).into(binding.mybannerIv);
+            if (cu.getHead() != null)
+                Picasso.with(PPApplication.getContext())
+                        .load(PPHelper.get80ImageUrl(cu.getHead()))
+                        .placeholder(R.drawable.pictures_no).into(binding.headerCiv);
 
-            binding.unreadMessageTv.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
+            if (cu.getBanner() != null)
+                Picasso.with(PPApplication.getContext())
+                        .load(PPHelper.getSlimImageUrl(cu.getBanner()))
+                        .placeholder(R.drawable.pictures_no).into(binding.mybannerIv);
 
-                    Intent intent1 = new Intent(activityContext, MessageActivity.class);
-                    activityContext.startActivity(intent1);
-                    return false;
-                }
-            });
+            if (cu.getUnreadMessageMoment() == 0) {
+                binding.unreadMessageTv.setVisibility(View.INVISIBLE);
+
+            } else {
+                binding.unreadMessageTv.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        Intent intent1 = new Intent(activityContext, MessageActivity.class);
+                        activityContext.startActivity(intent1);
+                        return false;
+                    }
+                });
+            }
         }
     }
 
