@@ -96,5 +96,10 @@
     <string name="friend">伴友</string>
     <string name="system">系统</string>
     <string name="message">消息</string>
+    <string name="moment_detail">片刻详情</string>
+    <string name="more">更多</string>
+    <string name="moment_detail_hint">我也要评论</string>
+    <string name="secret_replay_hint">私密回复:</string>
+    <string name="replay_hint">回复:</string>
 
 </resources>

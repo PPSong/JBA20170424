@@ -112,7 +112,7 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
             binding.line1Tv.setText(startStr + PPHelper.ppFromString(recordStr, "content", STRING).getAsString());
 
             try {
-                DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                DateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm");
                 String tmpStr = sdf.format(PPHelper.ppFromString(recordStr, "createTime").getAsLong());
                 binding.line2Tv.setText(tmpStr);
             } catch (Exception e) {

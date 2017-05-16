@@ -26,6 +26,7 @@ import com.penn.jba.model.realm.CurrentUser;
 import com.penn.jba.model.realm.CurrentUserSetting;
 import com.penn.jba.model.realm.Pic;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 

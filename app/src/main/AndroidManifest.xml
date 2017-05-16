@@ -28,7 +28,7 @@
         android:name=".PPApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -81,7 +81,8 @@
             android:name=".OtherMainPageActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".CollectDetailActivity" />
-        <activity android:name=".MomentDetailActivity"
+        <activity
+            android:name=".MomentDetailActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <activity android:name=".message.MessageActivity"></activity>
