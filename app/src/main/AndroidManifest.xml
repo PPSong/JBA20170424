@@ -76,7 +76,7 @@
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
             android:name=".dailyReport.DailyReportActivity"
-            android:theme="@style/DailyReport" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".OtherMainPageActivity"
             android:theme="@style/AppTheme.NoActionBar" />
