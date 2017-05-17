@@ -43,10 +43,10 @@
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:background="@drawable/textview_style"
+                android:hint="@string/moment_detail_hint"
                 android:imeOptions="actionSend"
                 android:singleLine="true"
                 android:textSize="15dp"
-                android:hint="@string/moment_detail_hint"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -142,10 +142,11 @@
                             app:layout_constraintLeft_toRightOf="@+id/squareIV"
                             app:layout_constraintTop_toTopOf="parent">
 
-                            <LinearLayout
+                            <android.support.constraint.ConstraintLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="5dp"
+                                android:orientation="horizontal"
                                 app:layout_constraintLeft_toLeftOf="parent"
                                 app:layout_constraintTop_toTopOf="parent">
 
@@ -153,9 +154,23 @@
                                     android:id="@+id/line1_tv"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textSize="15dp" />
+                                    android:textSize="15dp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintLeft_toLeftOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent" />
 
-                            </LinearLayout>
+                                <ImageView
+                                    android:id="@+id/gender_iv"
+                                    android:layout_width="14dp"
+                                    android:layout_height="14dp"
+                                    android:layout_gravity="center"
+                                    android:layout_marginLeft="5dp"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintLeft_toRightOf="@+id/line1_tv"
+                                    app:layout_constraintTop_toTopOf="parent" />
+
+                            </android.support.constraint.ConstraintLayout>
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -167,7 +182,7 @@
                                     android:id="@+id/textView"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="距离我"
+                                    android:text="距离"
                                     android:textSize="15dp" />
 
                                 <TextView
@@ -222,7 +237,16 @@
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintRight_toRightOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:srcCompat="@drawable/header" />
+                            app:layout_constraintVertical_bias="0.0" />
+
+                        <ImageView
+                            android:id="@+id/like_iv"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginRight="10dp"
+                            app:layout_constraintBottom_toBottomOf="@+id/moment_siv"
+                            app:layout_constraintRight_toRightOf="parent" />
                     </android.support.constraint.ConstraintLayout>
 
                     <android.support.constraint.ConstraintLayout

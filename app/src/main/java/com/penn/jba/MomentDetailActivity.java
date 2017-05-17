@@ -388,12 +388,39 @@ public class MomentDetailActivity extends AppCompatActivity {
         Picasso.with(activityContext)
                 .load(PPHelper.get80ImageUrl(ppFromString(momentStr, "data._creator.head").getAsString()))
                 .placeholder(R.drawable.pictures_no)
-                .transform(new RoundedTransformation(10, 0))
+                .transform(new RoundedTransformation(8, 0))
                 .into(binding.squareIV);
 
         binding.line1Tv.setText(ppFromString(momentStr, "data._creator.nickname").getAsString());
         //binding.line2Tv.setText(ppFromString(momentStr, "data.location.geo").getAsJsonArray().toString());
         binding.contentTv.setText(ppFromString(momentStr, "data.content").getAsString());
+
+
+        int gender = ppFromString(momentStr, "data.gender").getAsInt();
+        int iflike = ppFromString(momentStr, "data.isLiked").getAsInt();
+        if (gender == 1) {
+            binding.genderIv.setImageResource(R.mipmap.icon_man3x);
+        } else {
+            binding.genderIv.setImageResource(R.mipmap.women3x);
+        }
+        if (iflike == 0) {
+            binding.likeIv.setImageResource(R.mipmap.like_n3x);
+            binding.likeIv.setTag("n");
+        } else {
+            binding.likeIv.setImageResource(R.mipmap.like_h3x);
+            binding.likeIv.setTag("y");
+        }
+        binding.likeIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //todo 确认喜欢成功后修改图标
+                if (binding.likeIv.getTag().equals("n")) {
+                    setlike(true);
+                } else {
+                    setlike(false);
+                }
+            }
+        });
 
         String dateString = new SimpleDateFormat("yyyy年MM月dd日").format(ppFromString(momentStr, "data.createTime").getAsLong());
         binding.createTimeRttv.setText(dateString);
@@ -446,6 +473,53 @@ public class MomentDetailActivity extends AppCompatActivity {
                             }
                         }
                 )
+        );
+    }
+
+    private void setlike(final Boolean key) {
+        //复用 false 为取消like，true是like
+        String api = "moment.like";
+
+        if (key == false) {
+            api = "moment.unLike";
+        }
+
+        PPJSONObject jBody = new PPJSONObject();
+        jBody
+                .put("id", momentId);
+
+        final Observable<String> apiResult = PPRetrofit.getInstance().api(api, jBody.getJSONObject());
+        disposableList.add(
+                apiResult.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doFinally(new Action() {
+                            @Override
+                            public void run() throws Exception {
+                                if (key == false) {
+                                    binding.likeIv.setImageResource(R.mipmap.like_n3x);
+                                    binding.likeIv.setTag("n");
+                                } else {
+                                    binding.likeIv.setImageResource(R.mipmap.like_h3x);
+                                    binding.likeIv.setTag("y");
+                                }
+                            }
+                        })
+                        .subscribe(
+                                new Consumer<String>() {
+                                    @Override
+                                    public void accept(String s) throws Exception {
+                                        PPWarn ppWarn = ppWarning(s);
+                                        if (ppWarn != null) {
+                                            throw new Exception(ppWarn.msg);
+                                        }
+                                    }
+                                },
+                                new Consumer<Throwable>() {
+                                    @Override
+                                    public void accept(Throwable t) throws Exception {
+                                        PPHelper.ppShowError(t.toString());
+                                    }
+                                })
         );
     }
 }

@@ -34,7 +34,7 @@ public class Footprint extends RealmObject {
     private String status;
     private int type;
     private String body;
-    
+
     private String footprintBelong;
 
     private RealmList<Pic> pics;
@@ -185,12 +185,28 @@ public class Footprint extends RealmObject {
 //            }
             return ppFromString(body, "detail.content").getAsString();
         } else if (type == 10) {
-            int fansNum = ppFromString(body, "detail.fansNum").getAsInt();
-            int collectNum = ppFromString(body, "detail.collectNum").getAsInt();
             int beCollectedNum = ppFromString(body, "detail.beCollectedNum").getAsInt();
-            String result = PPApplication.getContext().getString(R.string.daily_report);
+            int collectNum = ppFromString(body, "detail.collectNum").getAsInt();
+            int fansNum = ppFromString(body, "detail.fansNum").getAsInt();
+            String result = "";
 
-            return String.format(result, beCollectedNum, collectNum, fansNum);
+            if (beCollectedNum == 0 && collectNum == 0 && fansNum != 0) {
+                result = "今天我增加了" + fansNum + "个新粉丝";
+            } else if (beCollectedNum == 0 && collectNum != 0 && fansNum == 0) {
+                result = "今天我迹录了" + collectNum + "次他人的片刻";
+            } else if (beCollectedNum == 0 && collectNum != 0 && fansNum != 0) {
+                result = "今天我迹录了" + collectNum + "次他人的片刻, 增加了" + fansNum + "个新粉丝";
+            } else if (beCollectedNum != 0 && collectNum == 0 && fansNum == 0) {
+                result = "今天我被" + beCollectedNum + "人迹录了片刻";
+            } else if (beCollectedNum != 0 && collectNum == 0 && fansNum != 0) {
+                result = "今天我被" + beCollectedNum + "人迹录了片刻, 增加了" + fansNum + "个新粉丝";
+            } else if (beCollectedNum != 0 && collectNum != 0 && fansNum == 0) {
+                result = "今天我被" + beCollectedNum + "人迹录了片刻, 迹录了" + collectNum + "次他人的片刻";
+            } else if (fansNum != 0 && collectNum != 0 && beCollectedNum != 0) {
+                result = "今天我被" + fansNum + "人迹录了片刻, 迹录了" + collectNum + "次他人的片刻, 增加了" + beCollectedNum + "个新粉丝";
+            }
+            return result;
+
         } else if (type == 0) {
             return PPApplication.getContext().getString((R.string.welcome));
         } else if (type == 11) {
