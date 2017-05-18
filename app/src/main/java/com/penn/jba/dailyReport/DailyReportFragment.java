@@ -52,7 +52,6 @@ public class DailyReportFragment extends Fragment {
         args.putString("data", data);
         fragment.setArguments(args);
 
-        Log.d("weng090", type);
         return fragment;
     }
 

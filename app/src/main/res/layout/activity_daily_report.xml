@@ -13,7 +13,8 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#353535">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/tl"
@@ -26,20 +27,9 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"></android.support.v7.widget.Toolbar>
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <RelativeLayout
-            android:id="@+id/footer_rl"
-            android:layout_width="30dp"
-            android:layout_height="20dp"
-            android:layout_marginBottom="10dp"
-            android:background="#000"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"></RelativeLayout>
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/main_vp"
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -47,7 +37,28 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tl"
-            app:layout_constraintVertical_bias="0.0"></android.support.v4.view.ViewPager>
+            app:layout_constraintVertical_bias="0.0">
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/main_vp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="0dp" />
+
+            <LinearLayout
+                android:id="@+id/layout_dot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="5dp"
+                android:layout_gravity="bottom|center"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+            </LinearLayout>
+
+        </FrameLayout>
+
 
         <ProgressBar
             android:id="@+id/loading_pb"
@@ -55,10 +66,10 @@
             android:layout_height="64dp"
             android:indeterminate="true"
             android:visibility="visible"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"/>
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 

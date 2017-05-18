@@ -4,13 +4,16 @@ import android.support.v4.app.FragmentManager;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebViewFragment;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -60,8 +63,13 @@ public class DailyReportActivity extends AppCompatActivity {
     private String fans;
     private String collects;
     private String beCollecteds;
-    private JsonArray beCollectedsJsonArray;
 
+    //导航圆点图片
+    private ImageView mImageView;
+    //导航圆点数组
+    private ImageView[] imageViews;
+
+    private int lastPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,9 +112,10 @@ public class DailyReportActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         initData();
-
     }
 
+
+    //-----helper-----
     private void initData() {
         // 获取dailyReport数据
         PPJSONObject jBodyFans = new PPJSONObject();
@@ -170,7 +179,6 @@ public class DailyReportActivity extends AppCompatActivity {
                                 }));
     }
 
-    //-----helper-----
     private void setupPage() {
         fragments = new ArrayList<DailyReportFragment>();
 
@@ -190,9 +198,11 @@ public class DailyReportActivity extends AppCompatActivity {
 
         MyPagerAdapter myFragmentPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), fragments);
         binding.mainVp.setAdapter(myFragmentPagerAdapter);
+        binding.mainVp.setOnPageChangeListener(new myPageChangeListener());
         binding.mainVp.setOffscreenPageLimit(3);
 
         binding.loadingPb.setVisibility(View.INVISIBLE);
+        initGoodsViewPager();
     }
 
     class MyPagerAdapter extends FragmentPagerAdapter {
@@ -206,11 +216,7 @@ public class DailyReportActivity extends AppCompatActivity {
 
         @Override
         public android.support.v4.app.Fragment getItem(int position) {
-//            switch (position) {
-//                case 0:
-//                    return DailyReportFragment.newInstance("fans", fans);
-//
-//            }
+
             return fragments.get(position);
         }
 
@@ -219,126 +225,60 @@ public class DailyReportActivity extends AppCompatActivity {
             return fragments.size();
         }
     }
-//
-//    //-----helper-----
-//    private void setupPage() {
-//        Log.v("pplog121", "setupPage");
-//        binding.materialViewPager.getViewPager().setAdapter(new FragmentStatePagerAdapter(getSupportFragmentManager()) {
-//
-//            @Override
-//            public Fragment getItem(int position) {
-//                Log.v("pplog121", "getItem");
-//                switch (position) {
-//                    case 0:
-//                        Log.v("pplog121", "pptest1:" + beCollecteds);
-//                        beCollectedsJsonArray = PPHelper.ppFromString(beCollecteds, "").getAsJsonArray();
-//                        return ReportListFragment.newInstance("beCollecteds", beCollecteds);
-//                    case 1:
-//                        Log.v("pplog121", "pptest2:" + collects);
-//                        return ReportListFragment.newInstance("collects", collects);
-//                    case 2:
-//                        Log.v("pplog121", "pptest3:" + fans);
-//                        return ReportListFragment.newInstance("fans", fans);
-//                }
-//
-//                return null;
-//            }
-//
-//            @Override
-//            public int getCount() {
-//                return 3;
-//            }
-//
-//            @Override
-//            public CharSequence getPageTitle(int position) {
-//                switch (position) {
-//                    case 0:
-//                        return "被迹录";
-//                    case 1:
-//                        return "迹录";
-//                    case 2:
-//                        return "新粉丝";
-//                }
-//                return "";
-//            }
-//        });
-//
-//        Log.v("pplog121", "setupPage2");
-//
-//        binding.materialViewPager.setMaterialViewPagerListener(new MaterialViewPager.Listener() {
-//            @Override
-//            public HeaderDesign getHeaderDesign(int page) {
-//                switch (page) {
-//                    case 0:
-//                        return HeaderDesign.fromColorResAndUrl(
-//                                R.color.green,
-//                                PPHelper.get800ImageUrl(profilePics.get(0 % profilePics.size()))
-//                        );
-//                    case 1:
-//                        return HeaderDesign.fromColorResAndUrl(
-//                                R.color.blue,
-//                                PPHelper.get800ImageUrl(profilePics.get(1 % profilePics.size()))
-//                        );
-//                    case 2:
-//                        return HeaderDesign.fromColorResAndUrl(
-//                                R.color.cyan,
-//                                PPHelper.get800ImageUrl(profilePics.get(2 % profilePics.size()))
-//                        );
-//                }
-//
-//                return null;
-//            }
-//        });
-//
-//        Log.v("pplog121", "setupPage7");
-//
-//        binding.materialViewPager.getViewPager().setOffscreenPageLimit(binding.materialViewPager.getViewPager().getAdapter().getCount());
-//        binding.materialViewPager.getPagerTitleStrip().setViewPager(binding.materialViewPager.getViewPager());
-//
-//        Log.v("pplog121", "setupPage8");
-//
-//        binding.materialViewPager.getViewPager().addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//            @Override
-//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//
-//            }
-//
-//            @Override
-//            public void onPageSelected(int position) {
-//                if (position == 0) {
-//                    setSubTitle("今天我被" + beCollectedsJsonArray.size() + "人迹录了片刻");
-//                } else if (position == 1) {
-//                    JsonArray ja = PPHelper.ppFromString(collects, "").getAsJsonArray();
-//                    setSubTitle("今天我迹录了" + ja.size() + "人片刻");
-//                } else if (position == 2) {
-//                    JsonArray ja = PPHelper.ppFromString(fans, "").getAsJsonArray();
-//                    setSubTitle("今天我增加了" + ja.size() + "个新粉丝");
-//                }
-//            }
-//
-//            @Override
-//            public void onPageScrollStateChanged(int state) {
-//
-//            }
-//        });
-//
-//        Log.v("pplog121", "setupPage9");
-//
-//        setSubTitle("今天我被" + beCollectedsJsonArray.size() + "人迹录了片刻");
-//        Log.v("pplog121", "setupPage10");
-//
-//        Toolbar toolbar = binding.materialViewPager.getToolbar();
-//        if (toolbar != null) {
-//            setSupportActionBar(toolbar);
-//
-//            final ActionBar actionBar = getSupportActionBar();
-//            if (actionBar != null) {
-//                actionBar.setDisplayHomeAsUpEnabled(true);
-//            }
-//        }
-//    }
-//
-//    private void setSubTitle(String str) {
-//        ((TextView) binding.materialViewPager.findViewById(R.id.main_tv)).setText(str);
-//    }
+
+    private void initGoodsViewPager() {
+        //Log.d("weng090",""+fragments.size());
+        imageViews = new ImageView[fragments.size()];
+
+        LinearLayout.LayoutParams margin = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        //每个圆点大小
+
+        // 设置每个小圆点距离左边的间距
+        margin.setMargins(5, 0, 0, 0);
+
+        for (int i = 0; i < fragments.size(); i++) {
+
+            ImageView imageView = new ImageView(this);
+
+            // 设置每个小圆点的宽高
+            imageView.setLayoutParams(new LinearLayout.LayoutParams(5, 5));
+            imageViews[i] = imageView;
+
+            if (i == 0) {
+                // 默认选中第一张图片
+                imageViews[i]
+                        .setBackgroundResource(R.drawable.goods_indicator_focused);
+            } else {
+                // 其他图片都设置未选中状态
+                imageViews[i]
+                        .setBackgroundResource(R.drawable.goods_indicator_unfocused);
+            }
+            binding.layoutDot.addView(imageViews[i], margin);
+        }
+    }
+
+    private class myPageChangeListener implements ViewPager.OnPageChangeListener {
+        @Override
+        public void onPageScrollStateChanged(int arg0) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void onPageScrolled(int arg0, float arg1, int arg2) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void onPageSelected(int arg0) {
+            // 遍历数组让当前选中图片下的小圆点设置颜色
+            for (int i = 0; i < imageViews.length; i++) {
+                imageViews[arg0].setBackgroundResource(R.drawable.goods_indicator_focused);
+                if (arg0 != i) {
+                    imageViews[i].setBackgroundResource(R.drawable.goods_indicator_unfocused);
+                }
+            }
+        }
+    }
 }
