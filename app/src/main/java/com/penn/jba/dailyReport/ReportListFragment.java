@@ -15,16 +15,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.penn.jba.R;
 import com.penn.jba.databinding.FragmentReportListBinding;
-import com.penn.jba.footprint.FootprintAdapter;
-import com.penn.jba.model.realm.CurrentUser;
-import com.penn.jba.model.realm.Footprint;
-import com.penn.jba.util.PPHelper;
 
 import java.util.ArrayList;
 
 import io.reactivex.disposables.Disposable;
-import io.realm.Realm;
-import io.realm.RealmResults;
 
 public class ReportListFragment extends Fragment {
     private Context activityContext;

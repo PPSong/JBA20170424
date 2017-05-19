@@ -2,24 +2,26 @@ package com.penn.jba;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.jakewharton.rxbinding2.view.RxView;
-import com.penn.jba.databinding.ActivityLoginBinding;
 import com.penn.jba.databinding.ActivityOtherMainPageBinding;
 import com.penn.jba.footprint.FootprintAdapter;
+import com.penn.jba.model.realm.CurrentUser;
 import com.penn.jba.model.realm.Footprint;
 import com.penn.jba.model.realm.Pic;
+import com.penn.jba.otherMainPage.OtherMainPageAdapter;
 import com.penn.jba.util.FootprintStatus;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPJSONObject;
@@ -30,6 +32,7 @@ import com.penn.jba.util.PPValueType;
 import com.penn.jba.util.PPWarn;
 import com.penn.jba.util.PicStatus;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +41,6 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Function3;
@@ -49,8 +51,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-import static android.R.attr.targetId;
-import static com.penn.jba.R.string.sb_follow_to_me;
+import static com.penn.jba.footprint.FastBlurUtil.doBlur;
 import static com.penn.jba.util.PPHelper.ppWarning;
 
 public class OtherMainPageActivity extends AppCompatActivity {
@@ -67,7 +68,7 @@ public class OtherMainPageActivity extends AppCompatActivity {
 
     private RealmResults<Footprint> footprints;
 
-    private FootprintAdapter footprintAdapter;
+    private OtherMainPageAdapter otherMainPageAdapter;
 
     private InnerPPRefreshLoadController ppRefreshLoadController;
 
@@ -113,13 +114,13 @@ public class OtherMainPageActivity extends AppCompatActivity {
     }
 
     private void setup() {
-        setSupportActionBar(binding.tb);
+        setSupportActionBar(binding.tl);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         getUserInfoAndFriendship();
     }
-    //-----help-----
 
+    //-----help-----
     private void getUserInfoAndFriendship() {
         PPJSONObject jBody1 = new PPJSONObject();
         jBody1
@@ -196,23 +197,6 @@ public class OtherMainPageActivity extends AppCompatActivity {
     }
 
     private void loadContent() {
-        //处理userInfo
-        Log.v("pplog131", userInfoStr);
-        String avatar = PPHelper.ppFromString(userInfoStr, "data.profile.head", PPValueType.STRING).getAsString();
-        String nickname = PPHelper.ppFromString(userInfoStr, "data.profile.nickname", PPValueType.STRING).getAsString();
-        int age = PPHelper.ppFromString(userInfoStr, "data.profile.age", PPValueType.INT).getAsInt();
-        int fans = PPHelper.ppFromString(userInfoStr, "data.stats.fans", PPValueType.INT).getAsInt();
-        int momentBeLiked = PPHelper.ppFromString(userInfoStr, "data.stats.momentBeLiked", PPValueType.INT).getAsInt();
-        JsonArray photos = PPHelper.ppFromString(userInfoStr, "data.profile.photos", PPValueType.ARRAY).getAsJsonArray();
-
-        binding.ctbl.setTitle(nickname);
-        Picasso.with(activityContext)
-                .load(PPHelper.get80ImageUrl(avatar))
-                .placeholder(R.drawable.pictures_no)
-                .into(binding.avatarCiv);
-        binding.line1Tv.setText("" + age + activityContext.getResources().getString(R.string.years_old));
-        binding.line2Tv.setText(activityContext.getResources().getString(R.string.follow) + ":" + fans + " " + activityContext.getResources().getString(R.string.like) + ":" + momentBeLiked);
-
         //处理和我的朋友关系
         int isFans = PPHelper.ppFromString(friendshipStr, "data.isFans", PPValueType.INT).getAsInt();
         int isFollowed = PPHelper.ppFromString(friendshipStr, "data.isFollowed", PPValueType.INT).getAsInt();
@@ -228,6 +212,25 @@ public class OtherMainPageActivity extends AppCompatActivity {
     }
 
     private void loadStrangerContent() {
+        binding.unfollowCl.setVisibility(View.VISIBLE);
+        binding.followCl.setVisibility(View.INVISIBLE);
+
+        String nickname = PPHelper.ppFromString(userInfoStr, "data.profile.nickname", PPValueType.STRING).getAsString();
+        int age = PPHelper.ppFromString(userInfoStr, "data.profile.age", PPValueType.INT).getAsInt();
+        int genger = PPHelper.ppFromString(userInfoStr, "data.profile.gender", PPValueType.INT).getAsInt();
+
+        // 处理userInfo
+        String avatar = "";
+        if (PPHelper.ppFromString(userInfoStr, "data.profile.head", PPValueType.STRING).getAsString() != "") {
+            avatar = PPHelper.ppFromString(userInfoStr, "data.profile.head", PPValueType.STRING).getAsString();
+        } else {
+            if (genger == 1) {
+                avatar = "pic_head_man.png";
+            } else {
+                avatar = "pic_head_woman.png";
+            }
+        }
+
         PPJSONObject jBody = new PPJSONObject();
         jBody
                 .put("target", targetId);
@@ -254,18 +257,13 @@ public class OtherMainPageActivity extends AppCompatActivity {
                                            }
                                            //处理userView
                                            int meets = PPHelper.ppFromString(userViewStr, "data.meets", PPValueType.INT).getAsInt();
-                                           String tmpStr1 = String.format(activityContext.getResources().getString(R.string.we_meet_shoulder_n_times), meets);
-                                           binding.strangerLine1Tv.setText(tmpStr1);
+                                           binding.cjTv.setText("" + meets);
 
                                            int beCollecteds = PPHelper.ppFromString(userViewStr, "data.beCollecteds", PPValueType.INT).getAsInt();
-                                           String tmpStr2 = String.format(activityContext.getResources().getString(R.string.ta_meet_your_n_moments), beCollecteds);
-                                           binding.strangerLine2Tv.setText(tmpStr2);
+                                           binding.pkTv.setText("" + beCollecteds);
 
                                            int collects = PPHelper.ppFromString(userViewStr, "data.collects", PPValueType.INT).getAsInt();
-                                           String tmpStr3 = String.format(activityContext.getResources().getString(R.string.i_meet_ta_n_moments), beCollecteds);
-                                           binding.strangerLine3Tv.setText(tmpStr3);
-
-                                           binding.userNsv.setVisibility(View.VISIBLE);
+                                           binding.tpkTv.setText("" + collects);
 
                                            Observable<Object> followButtonObservable = RxView.clicks(binding.followTaBt)
                                                    .debounce(200, TimeUnit.MILLISECONDS);
@@ -281,6 +279,70 @@ public class OtherMainPageActivity extends AppCompatActivity {
                                                            }
                                                    )
                                            );
+                                       }
+                                   },
+                                new Consumer<Throwable>() {
+                                    @Override
+                                    public void accept(Throwable t) throws Exception {
+                                        Log.v("pplog131", t.toString());
+                                        PPHelper.ppShowError(t.toString());
+                                    }
+                                })
+        );
+
+        binding.nameTv.setText(nickname);
+
+        if (genger == 1) {
+            binding.genderIv.setImageResource(R.mipmap.icon_man3x);
+        } else {
+            binding.genderIv.setImageResource(R.mipmap.women3x);
+        }
+
+        Picasso.with(activityContext)
+                .load(PPHelper.getSlimImageUrl(avatar))
+                .placeholder(R.drawable.pictures_no)
+                .into(binding.unfollowSiv);
+        binding.ageTv.setText("" + age + activityContext.getResources().getString(R.string.years_old));
+
+    }
+
+    private void loadTargetContent() {
+        binding.followCl.setVisibility(View.VISIBLE);
+        binding.unfollowCl.setVisibility(View.INVISIBLE);
+        loadTargetContent(0);
+    }
+
+    private void loadTargetContent(long before) {
+        PPJSONObject jBody = new PPJSONObject();
+        jBody
+                .put("target", targetId);
+
+        if (before != 0) {
+            jBody.put("before", before);
+        }
+
+        final Observable<String> apiResult = PPRetrofit.getInstance()
+                .api("footprint.withSomeone", jBody.getJSONObject());
+
+        disposableList.add(
+                apiResult
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doFinally(new Action() {
+                            @Override
+                            public void run() throws Exception {
+                                binding.pb.setVisibility(View.INVISIBLE);
+                            }
+                        })
+                        .subscribe(new Consumer<String>() {
+                                       @Override
+                                       public void accept(String s) throws Exception {
+                                           PPWarn ppWarn = ppWarning(s);
+                                           if (ppWarn != null) {
+                                               throw new Exception(ppWarn.msg);
+                                           }
+                                           setupUserRv();
+                                           binding.mainSwipeRefreshLayout.setVisibility(View.VISIBLE);
                                        }
                                    },
                                 new Consumer<Throwable>() {
@@ -320,9 +382,6 @@ public class OtherMainPageActivity extends AppCompatActivity {
                                         if (ppWarn != null) {
                                             throw new Exception(ppWarn.msg);
                                         }
-
-                                        binding.userNsv.setVisibility(View.INVISIBLE);
-                                        //wengtodo refresh page
                                         loadTargetContent();
                                     }
                                 },
@@ -335,78 +394,33 @@ public class OtherMainPageActivity extends AppCompatActivity {
         );
     }
 
-    private void loadTargetContent() {
-        loadTargetContent(0);
-    }
-
-    private void loadTargetContent(long before) {
-        PPJSONObject jBody = new PPJSONObject();
-        jBody
-                .put("target", targetId);
-        if (before != 0) {
-            jBody.put("before", before);
-        }
-
-        final Observable<String> apiResult = PPRetrofit.getInstance()
-                .api("footprint.withSomeone", jBody.getJSONObject());
-
-        disposableList.add(
-                apiResult
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doFinally(new Action() {
-                            @Override
-                            public void run() throws Exception {
-                                binding.pb.setVisibility(View.INVISIBLE);
-                            }
-                        })
-                        .subscribe(new Consumer<String>() {
-                                       @Override
-                                       public void accept(String s) throws Exception {
-                                           PPWarn ppWarn = ppWarning(s);
-                                           if (ppWarn != null) {
-                                               throw new Exception(ppWarn.msg);
-                                           }
-                                           setupUserRv();
-                                           binding.mainSwipeRefreshLayout.setVisibility(View.VISIBLE);
-                                       }
-                                   },
-                                new Consumer<Throwable>() {
-                                    @Override
-                                    public void accept(Throwable t) throws Exception {
-                                        Log.v("pplog131", t.toString());
-                                        PPHelper.ppShowError(t.toString());
-                                    }
-                                })
-        );
-    }
-
     private final OrderedRealmCollectionChangeListener<RealmResults<Footprint>> changeListener = new OrderedRealmCollectionChangeListener<RealmResults<Footprint>>() {
         @Override
         public void onChange(RealmResults<Footprint> collection, OrderedCollectionChangeSet changeSet) {
             // `null`  means the async query returns the first time.
             if (changeSet == null) {
-                footprintAdapter.notifyDataSetChanged();
+                otherMainPageAdapter.notifyDataSetChanged();
                 return;
             }
             // For deletions, the adapter has to be notified in reverse order.
             OrderedCollectionChangeSet.Range[] deletions = changeSet.getDeletionRanges();
             for (int i = deletions.length - 1; i >= 0; i--) {
                 OrderedCollectionChangeSet.Range range = deletions[i];
-                footprintAdapter.notifyItemRangeRemoved(range.startIndex, range.length);
+                otherMainPageAdapter.notifyItemRangeRemoved(range.startIndex + 1, range.length);
             }
 
             OrderedCollectionChangeSet.Range[] insertions = changeSet.getInsertionRanges();
             for (OrderedCollectionChangeSet.Range range : insertions) {
-                footprintAdapter.notifyItemRangeInserted(range.startIndex, range.length);
+                otherMainPageAdapter.notifyItemRangeInserted(range.startIndex + 1, range.length);
             }
 
             OrderedCollectionChangeSet.Range[] modifications = changeSet.getChangeRanges();
             for (OrderedCollectionChangeSet.Range range : modifications) {
-                footprintAdapter.notifyItemRangeChanged(range.startIndex, range.length);
+                otherMainPageAdapter.notifyItemRangeChanged(range.startIndex + 1, range.length);
             }
         }
     };
+
 
     private void clearOldDate() {
         try (Realm realm = Realm.getDefaultInstance()) {
@@ -484,21 +498,52 @@ public class OtherMainPageActivity extends AppCompatActivity {
         }
     }
 
+    //
     private void setupUserRv() {
         realm = Realm.getDefaultInstance();
 
         clearOldDate();
 
+        String tmpBanner = PPHelper.ppFromString(userInfoStr, "data.profile.banner", PPValueType.STRING).getAsString();
+
+        Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                Log.d("weng", "onBitmapLoaded");
+                Bitmap image2 = doBlur(bitmap, 60, false);
+                Drawable background = new BitmapDrawable(getResources(), image2);
+                binding.mainRv.setBackgroundDrawable(background);
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                Log.d("weng", "onBitmapFailed");
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+                Log.d("weng", "onPrepareLoad");
+            }
+        };
+        if (tmpBanner != null)
+            Picasso.with(activityContext)
+                    .load(PPHelper.get80ImageUrl(tmpBanner))
+                    .into(target);
+
+        binding.mainRv.setTag(target);
+
         footprints = realm.where(Footprint.class).equalTo("footprintBelong", FootprintBelong.OTHER.toString()).findAllSorted("createTime", Sort.DESCENDING);
         footprints.addChangeListener(changeListener);
 
-        binding.userRv.setLayoutManager(new LinearLayoutManager(activityContext));
-        footprintAdapter = new FootprintAdapter(activityContext, footprints, FootprintBelong.OTHER);
-        binding.userRv.setAdapter(footprintAdapter);
+        binding.mainRv.setLayoutManager(new LinearLayoutManager(activityContext));
+        otherMainPageAdapter = new OtherMainPageAdapter(activityContext, footprints, FootprintBelong.OTHER);
 
-        binding.userRv.setHasFixedSize(true);
+        otherMainPageAdapter.setHeaderView(binding.mainRv, userInfoStr);
+        binding.mainRv.setAdapter(otherMainPageAdapter);
 
-        ppRefreshLoadController = new InnerPPRefreshLoadController(binding.mainSwipeRefreshLayout, binding.userRv);
+        binding.mainRv.setHasFixedSize(true);
+
+        ppRefreshLoadController = new InnerPPRefreshLoadController(binding.mainSwipeRefreshLayout, binding.mainRv);
         ppRefreshLoadController.onRefresh();
     }
 
@@ -562,6 +607,14 @@ public class OtherMainPageActivity extends AppCompatActivity {
         @Override
         public void doLoadMore() {
             PPJSONObject jBody = new PPJSONObject();
+
+            if (footprints.size() == 1) {
+                final OtherMainPageAdapter tmp = ((OtherMainPageAdapter) (recyclerView.getAdapter()));
+                tmp.cancelLoadMoreCell();
+                end();
+                return;
+            }
+
             jBody
                     //因为最后一条记录为"loadmore"的fake记录
                     .put("target", targetId)
@@ -600,7 +653,7 @@ public class OtherMainPageActivity extends AppCompatActivity {
                                                 return;
                                             }
 
-                                            final PPLoadAdapter tmp = ((PPLoadAdapter) (recyclerView.getAdapter()));
+                                            final OtherMainPageAdapter tmp = ((OtherMainPageAdapter) (recyclerView.getAdapter()));
                                             tmp.cancelLoadMoreCell();
                                             end();
                                         }
@@ -610,7 +663,7 @@ public class OtherMainPageActivity extends AppCompatActivity {
                                             PPHelper.ppShowError(t1.getMessage());
                                             t1.printStackTrace();
 
-                                            PPLoadAdapter tmp = ((PPLoadAdapter) (recyclerView.getAdapter()));
+                                            OtherMainPageAdapter tmp = ((OtherMainPageAdapter) (recyclerView.getAdapter()));
                                             tmp.cancelLoadMoreCell();
                                             end();
                                         }

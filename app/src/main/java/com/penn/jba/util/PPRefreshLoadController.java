@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.penn.jba.message.MessageAdapter;
+import com.penn.jba.otherMainPage.OtherMainPageAdapter;
 
 /**
  * Created by penn on 14/04/2017.
@@ -92,6 +93,8 @@ public abstract class PPRefreshLoadController implements SwipeRefreshLayout.OnRe
                 ((PPLoadAdapter) recyclerView.getAdapter()).needLoadMoreCell();
             } else if (recyclerView.getAdapter() instanceof MessageAdapter) {
                 ((MessageAdapter) recyclerView.getAdapter()).needLoadMoreCell();
+            }else if (recyclerView.getAdapter() instanceof OtherMainPageAdapter) {
+                ((OtherMainPageAdapter) recyclerView.getAdapter()).needLoadMoreCell();
             }
 
             doLoadMore();

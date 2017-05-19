@@ -13,6 +13,7 @@ import com.google.gson.JsonArray;
 import com.penn.jba.CollectDetailActivity;
 import com.penn.jba.FootprintBelong;
 import com.penn.jba.MomentDetailActivity;
+import com.penn.jba.OtherMainPageActivity;
 import com.penn.jba.PPApplication;
 import com.penn.jba.R;
 
@@ -146,6 +147,19 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
                     Log.d("weng123",""+ppFromString(ft.getBody(),"detail.id").getAsString());
                     intent.putExtra("momentId", ppFromString(ft.getBody(),"detail.id").getAsString());
                     context.startActivity(intent);
+                }else if (ft.getType() == 1) {
+                    String idA = ppFromString(ft.getBody(), "relatedUsers.0.id").getAsString();
+                    String idB = ppFromString(ft.getBody(), "relatedUsers.1.id").getAsString();
+
+                    if (idA.equals(PPHelper.currentUserId)) {
+                        Intent intent = new Intent(context, OtherMainPageActivity.class);
+                        intent.putExtra("targetId", idB);
+                        context.startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(context, OtherMainPageActivity.class);
+                        intent.putExtra("targetId", idA);
+                        context.startActivity(intent);
+                    }
                 }
             }
         });
@@ -394,7 +408,7 @@ public class FootprintAdapter extends PPLoadAdapter<Footprint> {
             binding.timeLineInclude.timedetailTv.setText(ft.getTime());
             Picasso.with(PPApplication.getContext())
                     .load(PPHelper.get80ImageUrl(ft.getAvatarNetFileName()))
-                    .placeholder(R.drawable.pictures_no).into(binding.avatarIv);
+                    .placeholder(R.drawable.pictures_no).into(binding.avatarCiv);
         }
     }
 }

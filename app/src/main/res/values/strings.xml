@@ -102,5 +102,7 @@
     <string name="secret_replay_hint">私密回复:</string>
     <string name="replay_hint">回复:</string>
     <string name="daily_report_title">每日报告</string>
+    <string name="chat">聊天</string>
+    <string name="msg">寄信</string>
 
 </resources>
