@@ -3,6 +3,8 @@ package com.penn.jba;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -11,21 +13,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.google.gson.JsonArray;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.penn.jba.databinding.ActivityOtherMainPageBinding;
-import com.penn.jba.footprint.FootprintAdapter;
-import com.penn.jba.model.realm.CurrentUser;
 import com.penn.jba.model.realm.Footprint;
 import com.penn.jba.model.realm.Pic;
 import com.penn.jba.otherMainPage.OtherMainPageAdapter;
 import com.penn.jba.util.FootprintStatus;
 import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPJSONObject;
-import com.penn.jba.util.PPLoadAdapter;
 import com.penn.jba.util.PPRefreshLoadController;
 import com.penn.jba.util.PPRetrofit;
 import com.penn.jba.util.PPValueType;
@@ -80,6 +80,8 @@ public class OtherMainPageActivity extends AppCompatActivity {
 
     private String userViewStr;
 
+    private Boolean isFriend;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,13 +94,24 @@ public class OtherMainPageActivity extends AppCompatActivity {
 
         targetId = getIntent().getStringExtra("targetId");
 
+        isFriend = false;
         setup();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.other_mainpage_option, menu);
+        menu.findItem(R.id.like_each).setIcon(resizeImage(R.mipmap.timeline_likeeach3x, 168, 168));
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
+        } else if (item.getItemId() == R.id.like_each) {
+            beFriends();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -121,6 +134,16 @@ public class OtherMainPageActivity extends AppCompatActivity {
     }
 
     //-----help-----
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem like_bt = menu.findItem(R.id.like_each);
+        if (isFriend) {
+            like_bt.setVisible(true);
+        } else {
+            like_bt.setVisible(false);
+        }
+        return true;
+    }
+
     private void getUserInfoAndFriendship() {
         PPJSONObject jBody1 = new PPJSONObject();
         jBody1
@@ -310,6 +333,16 @@ public class OtherMainPageActivity extends AppCompatActivity {
         binding.followCl.setVisibility(View.VISIBLE);
         binding.unfollowCl.setVisibility(View.INVISIBLE);
         loadTargetContent(0);
+
+        int isFollowed = PPHelper.ppFromString(friendshipStr, "data.isFollowed", PPValueType.INT).getAsInt();
+
+        if (isFollowed == 1) {
+            isFriend = false;
+        } else {
+            Log.d("weng090", "" + isFollowed);
+            isFriend = true;
+        }
+        this.invalidateOptionsMenu();
     }
 
     private void loadTargetContent(long before) {
@@ -357,6 +390,7 @@ public class OtherMainPageActivity extends AppCompatActivity {
 
     private void follow() {
         binding.followTaBt.setEnabled(false);
+
         PPJSONObject jBody = new PPJSONObject();
         jBody
                 .put("target", targetId)
@@ -383,6 +417,44 @@ public class OtherMainPageActivity extends AppCompatActivity {
                                             throw new Exception(ppWarn.msg);
                                         }
                                         loadTargetContent();
+                                    }
+                                },
+                                new Consumer<Throwable>() {
+                                    @Override
+                                    public void accept(Throwable t) throws Exception {
+                                        PPHelper.ppShowError(t.toString());
+                                    }
+                                })
+        );
+    }
+
+    private void beFriends() {
+        PPJSONObject jBody = new PPJSONObject();
+        jBody
+                .put("target", targetId)
+                .put("isFree", "true");
+
+        final Observable<String> apiResult = PPRetrofit.getInstance().api("friend.follow", jBody.getJSONObject());
+
+        disposableList.add(
+                apiResult
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doFinally(new Action() {
+                            @Override
+                            public void run() throws Exception {
+                                isFriend = false;
+                                invalidateOptionsMenu();
+                            }
+                        })
+                        .subscribe(
+                                new Consumer<String>() {
+                                    @Override
+                                    public void accept(String s) throws Exception {
+                                        PPWarn ppWarn = ppWarning(s);
+                                        if (ppWarn != null) {
+                                            throw new Exception(ppWarn.msg);
+                                        }
                                     }
                                 },
                                 new Consumer<Throwable>() {
@@ -498,7 +570,6 @@ public class OtherMainPageActivity extends AppCompatActivity {
         }
     }
 
-    //
     private void setupUserRv() {
         realm = Realm.getDefaultInstance();
 
@@ -509,7 +580,6 @@ public class OtherMainPageActivity extends AppCompatActivity {
         Target target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Log.d("weng", "onBitmapLoaded");
                 Bitmap image2 = doBlur(bitmap, 60, false);
                 Drawable background = new BitmapDrawable(getResources(), image2);
                 binding.mainRv.setBackgroundDrawable(background);
@@ -671,5 +741,22 @@ public class OtherMainPageActivity extends AppCompatActivity {
                             )
             );
         }
+    }
+
+    private Drawable resizeImage(int resId, int w, int h) {
+        // load the origial Bitmap
+        Bitmap BitmapOrg = BitmapFactory.decodeResource(getResources(), resId);
+        int width = BitmapOrg.getWidth();
+        int height = BitmapOrg.getHeight();
+        int newWidth = w;
+        int newHeight = h;
+        // calculate the scale
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // create a matrix for the manipulation
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+        Bitmap resizedBitmap = Bitmap.createBitmap(BitmapOrg, 0, 0, width, height, matrix, true);
+        return new BitmapDrawable(resizedBitmap);
     }
 }
