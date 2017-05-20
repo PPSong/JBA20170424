@@ -28,6 +28,7 @@ import com.penn.jba.util.PPHelper;
 import com.penn.jba.util.PPJSONObject;
 import com.penn.jba.util.PPRetrofit;
 import com.penn.jba.util.PPWarn;
+import com.penn.jba.view.RoundedTransformation;
 import com.squareup.picasso.Picasso;
 import com.synnapps.carouselview.ImageClickListener;
 import com.synnapps.carouselview.ImageListener;
@@ -125,6 +126,7 @@ public class NearbyListMomentGroupItemFragment extends Fragment {
 
         Picasso.with(activityContext)
                 .load(PPHelper.get80ImageUrl(PPHelper.ppFromString(momentGroupStr, "head").getAsString()))
+                .transform(new RoundedTransformation(10, 0))
                 .placeholder(R.drawable.pictures_no)
                 .into(binding.avatarCiv);
 
@@ -198,7 +200,7 @@ public class NearbyListMomentGroupItemFragment extends Fragment {
                 .put("target", PPHelper.ppFromString(momentGroupStr, "id").getAsString())
                 .put("isFree", "true");
 
-        Log.d("weng121",momentGroupStr);
+        Log.d("weng121", momentGroupStr);
         final Observable<String> apiResult = PPRetrofit.getInstance().api("friend.follow", jBody.getJSONObject());
 
         disposableList.add(

@@ -42,7 +42,7 @@ public abstract class OtherPageLoadAdapter<T> extends RecyclerView.Adapter {
     private View mHeaderView;
     private String userInfoStr;
 
-    private static Context activityContext;
+    private Context activityContext;
 
     public OtherPageLoadAdapter(Context context, List<T> data, FootprintBelong footprintBelong) {
         this.data = data;

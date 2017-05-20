@@ -101,7 +101,7 @@ public class OtherMainPageActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.other_mainpage_option, menu);
-        menu.findItem(R.id.like_each).setIcon(resizeImage(R.mipmap.timeline_likeeach3x, 168, 168));
+        menu.findItem(R.id.like_each).setIcon(PPHelper.resizeImage(R.mipmap.timeline_likeeach3x, 168, 168));
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -741,22 +741,5 @@ public class OtherMainPageActivity extends AppCompatActivity {
                             )
             );
         }
-    }
-
-    private Drawable resizeImage(int resId, int w, int h) {
-        // load the origial Bitmap
-        Bitmap BitmapOrg = BitmapFactory.decodeResource(getResources(), resId);
-        int width = BitmapOrg.getWidth();
-        int height = BitmapOrg.getHeight();
-        int newWidth = w;
-        int newHeight = h;
-        // calculate the scale
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        // create a matrix for the manipulation
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        Bitmap resizedBitmap = Bitmap.createBitmap(BitmapOrg, 0, 0, width, height, matrix, true);
-        return new BitmapDrawable(resizedBitmap);
     }
 }

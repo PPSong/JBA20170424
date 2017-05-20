@@ -14,26 +14,27 @@
     <android.support.constraint.ConstraintLayout
         android:id="@+id/main_cl"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/black">
 
         <me.crosswall.lib.coverflow.core.PagerContainer
             android:id="@+id/main_pc"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginRight="8dp"
-            coverflow:layout_constraintRight_toRightOf="parent"
-            android:layout_marginLeft="8dp"
-            coverflow:layout_constraintLeft_toLeftOf="parent"
-            coverflow:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="8dp"
-            coverflow:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="8dp">
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            coverflow:layout_constraintBottom_toBottomOf="parent"
+            coverflow:layout_constraintLeft_toLeftOf="parent"
+            coverflow:layout_constraintRight_toRightOf="parent"
+            coverflow:layout_constraintTop_toTopOf="parent">
 
             <android.support.v4.view.ViewPager
-                android:layout_gravity="center"
                 android:id="@+id/main_vp"
                 android:layout_width="300dp"
-                android:layout_height="400dp" />
+                android:layout_height="450dp"
+                android:layout_gravity="center" />
 
         </me.crosswall.lib.coverflow.core.PagerContainer>
 
@@ -42,14 +43,14 @@
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:layout_gravity="center"
-            android:layout_marginRight="8dp"
-            coverflow:layout_constraintRight_toRightOf="parent"
-            android:layout_marginLeft="8dp"
-            coverflow:layout_constraintLeft_toLeftOf="parent"
-            coverflow:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="8dp"
-            coverflow:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="8dp" />
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            coverflow:layout_constraintBottom_toBottomOf="parent"
+            coverflow:layout_constraintLeft_toLeftOf="parent"
+            coverflow:layout_constraintRight_toRightOf="parent"
+            coverflow:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 

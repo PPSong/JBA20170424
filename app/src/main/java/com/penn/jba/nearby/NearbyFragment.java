@@ -2,7 +2,6 @@ package com.penn.jba.nearby;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,10 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.penn.jba.R;
-import com.penn.jba.databinding.FragmentFootprintBinding;
 import com.penn.jba.databinding.FragmentNearbyBinding;
-import com.penn.jba.footprint.FootprintAllFragment;
-import com.penn.jba.footprint.FootprintMineFragment;
+import com.penn.jba.util.PPHelper;
 
 public class NearbyFragment extends Fragment {
     private Context activityContext;
@@ -67,6 +64,7 @@ public class NearbyFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.nearby_option, menu);
+        menu.findItem(R.id.AR_Mode).setIcon(PPHelper.resizeImage(R.mipmap.vrmode, 218, 218));
         this.menu = menu;
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -74,9 +72,8 @@ public class NearbyFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
-            case R.id.refresh:
-                nearbyListModeFragment.loadContent();
+            case R.id.AR_Mode:
+                //
 
                 return true;
             default:

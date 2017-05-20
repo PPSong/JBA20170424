@@ -39,7 +39,7 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
 
     private CurrentUser currentUser;
 
-    private static Context activityContext;
+    private Context activityContext;
 
     public PPLoadAdapter(Context context, List<T> data, FootprintBelong footprintBelong) {
         this.data = data;
@@ -187,8 +187,8 @@ public abstract class PPLoadAdapter<T> extends RecyclerView.Adapter {
                 binding.unreadMessageTv.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        Intent intent1 = new Intent(activityContext, MessageActivity.class);
-                        activityContext.startActivity(intent1);
+                        Intent intent1 = new Intent(PPApplication.getContext(), MessageActivity.class);
+                        PPApplication.getContext().startActivity(intent1);
                         return false;
                     }
                 });

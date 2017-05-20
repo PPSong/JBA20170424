@@ -1,18 +1,18 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
-tools:context="com.penn.jba.nearby.NearbyFragment">
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.penn.jba.nearby.NearbyFragment">
 
-<data>
+    <data>
 
-    <variable
-        name="presenter"
-        type="com.penn.jba.nearby.NearbyFragment" />
+        <variable
+            name="presenter"
+            type="com.penn.jba.nearby.NearbyFragment" />
 
-</data>
+    </data>
 
-<com.penn.jba.util.LockableViewPager
-    android:id="@+id/main_view_pager"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    <com.penn.jba.util.LockableViewPager
+        android:id="@+id/main_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </layout>
